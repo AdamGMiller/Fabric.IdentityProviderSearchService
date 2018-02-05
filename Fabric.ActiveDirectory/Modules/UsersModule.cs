@@ -15,14 +15,15 @@ namespace Fabric.ActiveDirectory.Modules
     {
         public UsersModule() : base("/users")
         {
-            Get("/search", 
-                async _ => await Search(), 
-                null, 
+            Get("/search",
+                _ => Search(),
+                null,
                 "Search");
         }
 
         private dynamic Search()
         {
+            //TODO: make async
             var searchRequest = this.Bind<SearchRequest>();
 
             try
