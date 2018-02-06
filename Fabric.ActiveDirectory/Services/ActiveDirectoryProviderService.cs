@@ -1,26 +1,54 @@
 ﻿using System.Collections.Generic;
+using System.DirectoryServices.AccountManagement;
 using Fabric.ActiveDirectory.Models;
 
 namespace Fabric.ActiveDirectory.Services
 {
     public class ActiveDirectoryProviderService : IExternalIdentityProviderService
     {
+        private readonly string _domain;
 
-        public ICollection<ExternalUser> SearchUsers(string searchText)
+        public ActiveDirectoryProviderService(string domain)
         {
-            var ldapQuery = $"(&(objectClass=user)(objectCategory=person)(|(sAMAccountName={searchText}*)(givenName={searchText}*)(sn={searchText}*)))";
+            _domain = domain;
+        }
 
-            var users = new List<ExternalUser>();
-            var user = new ExternalUser
+        public ICollection<AdPrincipal> SearchUsers(string searchText)
+        {
+            var principals = new List<AdPrincipal>();
+
+            var ctx = new PrincipalContext(ContextType.Domain, _domain);
+
+            var userPrincipal = new UserPrincipal(ctx);
+
+            var queryFilter = (Principal) userPrincipal;
+            queryFilter.Name = $"{searchText}*";
+
+            var searcher = new PrincipalSearcher(queryFilter);
+            var principalresult =  searcher.FindAll();           
+
+            foreach (var principal in principalresult)
             {
-                FirstName = "sey",
-                LastName = "butts",
-                MiddleName = "mour",
-                SubjectId = "testresult"
-            };
+                var adPrincipal = new AdPrincipal {Name = principal.Name};
 
-            users.Add(user);
-            return users;
+                if (principal is UserPrincipal)
+                {
+                    var userPrincipalResult = principal as UserPrincipal;
+                    
+                    adPrincipal.FirstName = userPrincipalResult.GivenName;
+                    adPrincipal.MiddleName = userPrincipalResult.MiddleName;
+                    adPrincipal.LastName = userPrincipalResult.Surname;
+                    adPrincipal.PrincipalType = PrincipalType.User;
+                }
+                else if (principal is GroupPrincipal)
+                {
+                    adPrincipal.PrincipalType = PrincipalType.Group;
+                }
+
+                principals.Add(adPrincipal);
+            }
+
+            return principals;
         }
     }
 }

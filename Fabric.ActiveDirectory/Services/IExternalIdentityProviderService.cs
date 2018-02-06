@@ -6,6 +6,6 @@ namespace Fabric.ActiveDirectory.Services
     public interface IExternalIdentityProviderService
     {
         //TODO: make async
-        ICollection<ExternalUser> SearchUsers(string searchText);
+        ICollection<AdPrincipal> SearchUsers(string searchText);
     }
 }

@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Fabric.ActiveDirectory.ApiModels;
 using Fabric.ActiveDirectory.Exceptions;
 using Fabric.ActiveDirectory.Models;
@@ -11,9 +10,9 @@ using Nancy.Responses.Negotiation;
 
 namespace Fabric.ActiveDirectory.Modules
 {
-    public class UsersModule : NancyModule
+    public class PrincipalsModule : NancyModule
     {
-        public UsersModule() : base("/users")
+        public PrincipalsModule() : base("/principals")
         {
             Get("/search",
                 _ => Search(),
@@ -28,20 +27,28 @@ namespace Fabric.ActiveDirectory.Modules
 
             try
             {
+                var principals = new List<AdPrincipalApiModel>();
                 //TODO: DI!!
-                var idpResolver = new ExternalIdentityProviderServiceResolver();
+                var idpResolver = new ExternalIdentityProviderServiceResolver("hqcatalyst");
 
-                idpResolver.GetExternalIdentityProviderService(searchRequest.IdentityProvider);
+                var service = idpResolver.GetExternalIdentityProviderService(searchRequest.IdentityProvider);
 
-                var users = new ActiveDirectoryProviderService().SearchUsers(searchRequest.SearchText);
+                var users = service.SearchUsers(searchRequest.SearchText);
 
-                return users.Select(u => new UserApiModel
+                principals.AddRange(users.Select(u => new AdPrincipalApiModel
                 {
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     MiddleName = u.MiddleName,
-                    SubjectId = u.SubjectId
-                });
+                    SubjectId = u.SubjectId,
+                    PrincipalType = u.PrincipalType.ToString()
+                }));
+
+                return new AdSearchResultApiModel
+                {
+                    Principals = principals,
+                    ResultCount = principals.Count
+                };
             }
             catch (InvalidExternalIdentityProviderException e)
             {
