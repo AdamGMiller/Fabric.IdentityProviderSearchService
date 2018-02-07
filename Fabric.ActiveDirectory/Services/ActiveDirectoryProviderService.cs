@@ -34,9 +34,10 @@ namespace Fabric.ActiveDirectory.Services
             }
             
             var subjectIdParts = subjectId.Split('\\');
+            var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            var ctx = new PrincipalContext(ContextType.Domain, _domain);
+            var ctx = new PrincipalContext(ContextType.Domain, domain);
             var userPrincipalResult = UserPrincipal.FindByIdentity(ctx, IdentityType.SamAccountName, accountName);
 
             if (userPrincipalResult == null)
