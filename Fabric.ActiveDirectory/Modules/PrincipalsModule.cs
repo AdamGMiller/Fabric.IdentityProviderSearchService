@@ -30,11 +30,11 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
             try
             {
-                var principals = new List<AdPrincipalApiModel>();
+                var principals = new List<FabricPrincipalApiModel>();
 
                 var users = _seachService.SearchPrincipals(searchRequest.SearchText, searchRequest.Type);
 
-                principals.AddRange(users.Select(u => new AdPrincipalApiModel
+                principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {                    
                     FirstName = u.FirstName,
                     LastName = u.LastName,
@@ -43,7 +43,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     PrincipalType = u.PrincipalType.ToString()
                 }));
 
-                return new AdSearchResultApiModel
+                return new IdpSearchResultApiModel
                 {
                     Principals = principals,
                     ResultCount = principals.Count
@@ -51,7 +51,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
             catch (InvalidExternalIdentityProviderException e)
             {
-                return CreateFailureResponse<AdPrincipal>(e.Message, HttpStatusCode.BadRequest);
+                return CreateFailureResponse<FabricPrincipal>(e.Message, HttpStatusCode.BadRequest);
             }
         }
 

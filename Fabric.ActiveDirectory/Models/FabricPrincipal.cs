@@ -1,6 +1,6 @@
 ﻿namespace Fabric.IdentityProviderSearchService.Models
 {
-    public class AdPrincipal
+    public class FabricPrincipal
     {       
         public string FirstName { get; set; }
         public string LastName { get; set; }

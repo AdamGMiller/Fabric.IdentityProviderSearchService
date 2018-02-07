@@ -13,7 +13,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _externalIdentityProviderService = externalIdentityProviderService;
         }
 
-        public IEnumerable<AdPrincipal> SearchPrincipals(string searchText, string principalTypeString)
+        public IEnumerable<FabricPrincipal> SearchPrincipals(string searchText, string principalTypeString)
         {
             //set principal type based on string 
             PrincipalType principalType;

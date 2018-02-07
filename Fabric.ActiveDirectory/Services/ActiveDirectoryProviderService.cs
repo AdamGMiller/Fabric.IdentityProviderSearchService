@@ -15,7 +15,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _domain = "hqcatalyst";
         }
 
-        public IEnumerable<AdPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
+        public IEnumerable<FabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
         {
             var ldapQuery = BuildLdapQuery(searchText, principalType);
 
@@ -24,11 +24,11 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
-        public AdPrincipal FindUserBySubjectId(string subjectId)
+        public FabricPrincipal FindUserBySubjectId(string subjectId)
         {
             if (!subjectId.Contains(@"\"))
             {            
-                return new AdPrincipal();
+                return new FabricPrincipal();
             }
             
             var subjectIdParts = subjectId.Split('\\');
@@ -40,10 +40,10 @@ namespace Fabric.IdentityProviderSearchService.Services
 
             if (userPrincipalResult == null)
             {
-                return new AdPrincipal();
+                return new FabricPrincipal();
             }
 
-            return new AdPrincipal
+            return new FabricPrincipal
             {                
                 FirstName = userPrincipalResult.GivenName,
                 MiddleName = userPrincipalResult.MiddleName,
@@ -53,9 +53,9 @@ namespace Fabric.IdentityProviderSearchService.Services
             };
         }
 
-        private IEnumerable<AdPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
+        private IEnumerable<FabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
         {
-            var principals = new List<AdPrincipal>();
+            var principals = new List<FabricPrincipal>();
           
             var directorySearcher = new DirectorySearcher(null, ldapQuery);
 
@@ -78,9 +78,9 @@ namespace Fabric.IdentityProviderSearchService.Services
             return entryResult.SchemaClassName.Equals("user");
         }
 
-        private AdPrincipal CreateUserPrincipal(DirectoryEntry userEntry)
+        private FabricPrincipal CreateUserPrincipal(DirectoryEntry userEntry)
         {
-            return new AdPrincipal
+            return new FabricPrincipal
             {              
                 FirstName = ReadUserEntryProperty(userEntry.Properties["givenname"]),
                 LastName = ReadUserEntryProperty(userEntry.Properties["sn"]),
@@ -90,9 +90,9 @@ namespace Fabric.IdentityProviderSearchService.Services
             };
         }
 
-        private AdPrincipal CreateGroupPrincipal(DirectoryEntry groupEntry)
+        private FabricPrincipal CreateGroupPrincipal(DirectoryEntry groupEntry)
         {
-            return new AdPrincipal
+            return new FabricPrincipal
             {
                 SubjectId = GetSubjectId(ReadUserEntryProperty(groupEntry.Properties["name"])),
                 PrincipalType = PrincipalType.Group

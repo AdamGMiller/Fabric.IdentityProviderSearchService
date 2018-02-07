@@ -1,6 +1,6 @@
 ﻿namespace Fabric.IdentityProviderSearchService.ApiModels
 {
-    public class AdPrincipalApiModel
+    public class FabricPrincipalApiModel
     {
         public string SubjectId { get; set; }        
         public string FirstName { get; set; }
