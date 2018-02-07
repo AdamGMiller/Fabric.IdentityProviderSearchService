@@ -26,58 +26,32 @@ namespace Fabric.ActiveDirectory.Services
             return principals;
         }
 
-        private IEnumerable<AdPrincipal> Search(string searchText, PrincipalType principalType, List<AdPrincipal> principals)
+        public AdPrincipal FindUserBySubjectId(string subjectId)
         {
+            if (!subjectId.Contains(@"\"))
+            {            
+                return new AdPrincipal();
+            }
+            
+            var subjectIdParts = subjectId.Split('\\');
+            var accountName = subjectIdParts[subjectIdParts.Length - 1];
+
             var ctx = new PrincipalContext(ContextType.Domain, _domain);
+            var userPrincipalResult = UserPrincipal.FindByIdentity(ctx, IdentityType.SamAccountName, accountName);
 
-            var queryFilter = GetQueryFilter(principalType, ctx);
-            queryFilter.SamAccountName = $"{searchText}*";
-
-            var searcher = new PrincipalSearcher(queryFilter);
-            var principalResult = searcher.FindAll();
-
-            foreach (var principal in principalResult)
+            if (userPrincipalResult == null)
             {
-                var adPrincipal = new AdPrincipal {Name = principal.Name};
-
-                if (principal is UserPrincipal)
-                {
-                    var userPrincipalResult = principal as UserPrincipal;
-
-                    adPrincipal.FirstName = userPrincipalResult.GivenName;
-                    adPrincipal.MiddleName = userPrincipalResult.MiddleName;
-                    adPrincipal.LastName = userPrincipalResult.Surname;
-                    adPrincipal.PrincipalType = PrincipalType.User;
-                }
-                else if (principal is GroupPrincipal)
-                {
-                    adPrincipal.PrincipalType = PrincipalType.Group;
-                }
-
-                principals.Add(adPrincipal);
+                return new AdPrincipal();
             }
 
-            return principals;
-        }
-
-        private Principal GetQueryFilter(PrincipalType principalType, PrincipalContext principalContext)
-        {
-            Principal principal;
-
-            switch (principalType)
-            {
-                case PrincipalType.Group:
-                    principal = new GroupPrincipal(principalContext);
-                    break;
-                case PrincipalType.User:
-                    principal = new UserPrincipal(principalContext);
-                    break;
-                default:
-                    principal = new ComputerPrincipal(principalContext);
-                    break;
-            }
-
-            return principal;
+            return new AdPrincipal
+            {                
+                FirstName = userPrincipalResult.GivenName,
+                MiddleName = userPrincipalResult.MiddleName,
+                LastName = userPrincipalResult.Surname,
+                SubjectId = GetSubjectId(userPrincipalResult.SamAccountName),
+                PrincipalType = PrincipalType.User
+            };
         }
 
         private IEnumerable<AdPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
@@ -108,13 +82,12 @@ namespace Fabric.ActiveDirectory.Services
         private AdPrincipal CreateUserPrincipal(DirectoryEntry userEntry)
         {
             return new AdPrincipal
-            {
-                Name = ReadUserEntryProperty(userEntry.Properties["name"]),
+            {              
                 FirstName = ReadUserEntryProperty(userEntry.Properties["givenname"]),
                 LastName = ReadUserEntryProperty(userEntry.Properties["sn"]),
                 MiddleName = ReadUserEntryProperty(userEntry.Properties["middlename"]),
                 PrincipalType = PrincipalType.User,                
-                SubjectId = $"{_domain}\\{ReadUserEntryProperty(userEntry.Properties["samaccountname"])}"
+                SubjectId = GetSubjectId(ReadUserEntryProperty(userEntry.Properties["samaccountname"]))
             };
         }
 
@@ -122,7 +95,7 @@ namespace Fabric.ActiveDirectory.Services
         {
             return new AdPrincipal
             {
-                Name = ReadUserEntryProperty(groupEntry.Properties["name"]),
+                SubjectId = GetSubjectId(ReadUserEntryProperty(groupEntry.Properties["name"])),
                 PrincipalType = PrincipalType.Group
             };
         }
@@ -145,6 +118,11 @@ namespace Fabric.ActiveDirectory.Services
                 default:
                     return $"(&(|(&(objectClass=user)(objectCategory=person))(objectCategory=group)){nameFilter})";
             }
+        }
+
+        private string GetSubjectId(string sAmAccountName)
+        {
+            return $"{_domain}\\{sAmAccountName}";
         }
     }
 }

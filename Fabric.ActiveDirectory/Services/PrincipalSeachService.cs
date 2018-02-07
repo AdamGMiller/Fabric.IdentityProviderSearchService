@@ -34,7 +34,7 @@ namespace Fabric.ActiveDirectory.Services
                 //TODO: replace with custom exception
                 throw new Exception("invalid principal type provided");
             }
-
+            
             return _externalIdentityProviderService.SearchPrincipals(searchText, principalType);
         }
     }

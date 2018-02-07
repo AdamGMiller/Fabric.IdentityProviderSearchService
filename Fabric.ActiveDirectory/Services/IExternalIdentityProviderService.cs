@@ -6,5 +6,6 @@ namespace Fabric.ActiveDirectory.Services
     public interface IExternalIdentityProviderService
     {
         IEnumerable<AdPrincipal> SearchPrincipals(string searchText, PrincipalType principalType);
+        AdPrincipal FindUserBySubjectId(string subjectId);
     }
 }

@@ -1,8 +1,7 @@
 ﻿namespace Fabric.ActiveDirectory.Models
 {
     public class AdPrincipal
-    {
-        public string Name { get; set; }
+    {       
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MiddleName { get; set; }
