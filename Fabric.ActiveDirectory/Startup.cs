@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Microsoft.Owin.Extensions;
+﻿using Microsoft.Owin.Extensions;
 using Owin;
 
 namespace Fabric.ActiveDirectory
@@ -11,7 +7,7 @@ namespace Fabric.ActiveDirectory
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseNancy();
+            app.UseNancy(opt => opt.Bootstrapper = new Bootstrapper());
             app.UseStageMarker(PipelineStage.MapHandler);
         }
     }

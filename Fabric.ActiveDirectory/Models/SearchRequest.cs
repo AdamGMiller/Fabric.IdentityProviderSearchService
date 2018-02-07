@@ -2,8 +2,7 @@
 {
     public class SearchRequest
     {
-        public string SearchText { get; set; }
-        public string IdentityProvider { get; set; }
+        public string SearchText { get; set; }        
         public string PrincipalType { get; set; }
     }
 }

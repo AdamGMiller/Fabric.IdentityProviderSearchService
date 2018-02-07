@@ -8,12 +8,13 @@ namespace Fabric.ActiveDirectory.Services
     {
         private readonly string _domain;
 
-        public ActiveDirectoryProviderService(string domain)
+        public ActiveDirectoryProviderService()
         {
-            _domain = domain;
+            //TODO: dont hardcode this pass in the configuration in the constructor
+            _domain = "hqcatalyst";
         }
 
-        public ICollection<AdPrincipal> SearchUsers(string searchText)
+        public ICollection<AdPrincipal> SearchPrincipals(string searchText)
         {
             var principals = new List<AdPrincipal>();
 
@@ -23,11 +24,12 @@ namespace Fabric.ActiveDirectory.Services
 
             var queryFilter = (Principal) userPrincipal;
             queryFilter.Name = $"{searchText}*";
+            
 
-            var searcher = new PrincipalSearcher(queryFilter);
-            var principalresult =  searcher.FindAll();           
+            var searcher = new PrincipalSearcher(queryFilter);            
+            var principalResult =  searcher.FindAll();           
 
-            foreach (var principal in principalresult)
+            foreach (var principal in principalResult)
             {
                 var adPrincipal = new AdPrincipal {Name = principal.Name};
 
@@ -41,7 +43,7 @@ namespace Fabric.ActiveDirectory.Services
                     adPrincipal.PrincipalType = PrincipalType.User;
                 }
                 else if (principal is GroupPrincipal)
-                {
+                {                    
                     adPrincipal.PrincipalType = PrincipalType.Group;
                 }
 

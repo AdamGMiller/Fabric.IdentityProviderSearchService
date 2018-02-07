@@ -111,24 +111,25 @@
   <ItemGroup>
     <Compile Include="ApiModels\AdPrincipalApiModel.cs" />
     <Compile Include="ApiModels\AdSearchResultApiModel.cs" />
-    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="ApiModels\ErrorFactory.cs" />
+    <Compile Include="Bootstrapper.cs" />
     <Compile Include="Exceptions\InvalidExternalIdentityProviderException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AdPrincipal.cs" />
+    <Compile Include="ApiModels\Error.cs" />
     <Compile Include="Models\SearchRequest.cs" />
     <Compile Include="Modules\PrincipalsModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActiveDirectoryProviderService.cs" />
-    <Compile Include="Services\ExternalIdentityProviderServiceResolver.cs" />
     <Compile Include="Services\IExternalIdentityProviderService.cs" />
-    <Compile Include="Services\IExternalIdentityProviderServiceResolver.cs" />
+    <Compile Include="Services\PrincipalSeachService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\" />
+    <Folder Include="App_Start\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

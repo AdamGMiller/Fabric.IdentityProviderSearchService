@@ -10,10 +10,14 @@ using Nancy.Responses.Negotiation;
 
 namespace Fabric.ActiveDirectory.Modules
 {
-    public class PrincipalsModule : NancyModule
+    public sealed class PrincipalsModule : NancyModule
     {
-        public PrincipalsModule() : base("/principals")
+        private readonly PrincipalSeachService _seachService;
+
+        public PrincipalsModule(PrincipalSeachService seachService) : base("/principals")
         {
+            _seachService = seachService;
+
             Get("/search",
                 _ => Search(),
                 null,
@@ -28,12 +32,8 @@ namespace Fabric.ActiveDirectory.Modules
             try
             {
                 var principals = new List<AdPrincipalApiModel>();
-                //TODO: DI!!
-                var idpResolver = new ExternalIdentityProviderServiceResolver("hqcatalyst");
 
-                var service = idpResolver.GetExternalIdentityProviderService(searchRequest.IdentityProvider);
-
-                var users = service.SearchUsers(searchRequest.SearchText);
+                var users = _seachService.SearchPrincipals(searchRequest.SearchText);
 
                 principals.AddRange(users.Select(u => new AdPrincipalApiModel
                 {
@@ -52,15 +52,14 @@ namespace Fabric.ActiveDirectory.Modules
             }
             catch (InvalidExternalIdentityProviderException e)
             {
-                return CreateFailureResponse(e.Message, HttpStatusCode.BadRequest);
+                return CreateFailureResponse<AdPrincipal>(e.Message, HttpStatusCode.BadRequest);
             }
-            
         }
 
-        private Negotiator CreateFailureResponse(string message, HttpStatusCode statusCode)
+        private Negotiator CreateFailureResponse<T>(string message, HttpStatusCode statusCode)
         {
-            //TODO: create a better Error object to pass to WithModel()
-            return Negotiate.WithModel(new {Message = message}).WithStatusCode(statusCode);
+            var error = ErrorFactory.CreateError<T>(message, statusCode);
+            return Negotiate.WithModel(error).WithStatusCode(statusCode);
         }
     }
 }
