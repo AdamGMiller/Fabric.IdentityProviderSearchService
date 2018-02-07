@@ -32,10 +32,11 @@ namespace Fabric.ActiveDirectory.Modules
             {
                 var principals = new List<AdPrincipalApiModel>();
 
-                var users = _seachService.SearchPrincipals(searchRequest.SearchText);
+                var users = _seachService.SearchPrincipals(searchRequest.SearchText, searchRequest.Type);
 
                 principals.AddRange(users.Select(u => new AdPrincipalApiModel
                 {
+                    Name = u.Name,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     MiddleName = u.MiddleName,
