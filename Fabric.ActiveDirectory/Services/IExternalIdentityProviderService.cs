@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Fabric.ActiveDirectory.Models;
 
 namespace Fabric.ActiveDirectory.Services
 {
     public interface IExternalIdentityProviderService
     {
-        //TODO: make async
-        ICollection<AdPrincipal> SearchPrincipals(string searchText);
+        IEnumerable<AdPrincipal> SearchPrincipals(string searchText);
     }
 }

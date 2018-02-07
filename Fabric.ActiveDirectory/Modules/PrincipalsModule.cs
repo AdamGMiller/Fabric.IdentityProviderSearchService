@@ -25,8 +25,7 @@ namespace Fabric.ActiveDirectory.Modules
         }
 
         private dynamic Search()
-        {
-            //TODO: make async
+        {            
             var searchRequest = this.Bind<SearchRequest>();
 
             try

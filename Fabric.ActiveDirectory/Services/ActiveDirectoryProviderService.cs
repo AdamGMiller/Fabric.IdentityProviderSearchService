@@ -14,7 +14,7 @@ namespace Fabric.ActiveDirectory.Services
             _domain = "hqcatalyst";
         }
 
-        public ICollection<AdPrincipal> SearchPrincipals(string searchText)
+        public IEnumerable<AdPrincipal> SearchPrincipals(string searchText)
         {
             var principals = new List<AdPrincipal>();
 
