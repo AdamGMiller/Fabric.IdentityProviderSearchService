@@ -1,7 +1,7 @@
 ﻿using System;
 using Nancy;
 
-namespace Fabric.ActiveDirectory.ApiModels
+namespace Fabric.IdentityProviderSearchService.ApiModels
 {
     public class ErrorFactory
     {

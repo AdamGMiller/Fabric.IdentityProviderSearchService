@@ -1,7 +1,7 @@
 ﻿using Microsoft.Owin.Extensions;
 using Owin;
 
-namespace Fabric.ActiveDirectory
+namespace Fabric.IdentityProviderSearchService
 {
     public class Startup
     {

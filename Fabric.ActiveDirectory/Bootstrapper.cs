@@ -1,8 +1,8 @@
-﻿using Fabric.ActiveDirectory.Services;
+﻿using Fabric.IdentityProviderSearchService.Services;
 using Nancy;
 using Nancy.TinyIoc;
 
-namespace Fabric.ActiveDirectory
+namespace Fabric.IdentityProviderSearchService
 {
     public class Bootstrapper : DefaultNancyBootstrapper
     {

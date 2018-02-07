@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Fabric.ActiveDirectory.Exceptions
+namespace Fabric.IdentityProviderSearchService.Exceptions
 {
     public class InvalidExternalIdentityProviderException : Exception
     {

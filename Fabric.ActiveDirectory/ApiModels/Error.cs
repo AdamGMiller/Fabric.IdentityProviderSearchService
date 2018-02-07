@@ -1,4 +1,4 @@
-﻿namespace Fabric.ActiveDirectory.ApiModels
+﻿namespace Fabric.IdentityProviderSearchService.ApiModels
 {
     public class Error
     {

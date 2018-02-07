@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Fabric.ActiveDirectory.ApiModels;
-using Fabric.ActiveDirectory.Exceptions;
-using Fabric.ActiveDirectory.Models;
-using Fabric.ActiveDirectory.Services;
+using Fabric.IdentityProviderSearchService.ApiModels;
+using Fabric.IdentityProviderSearchService.Exceptions;
+using Fabric.IdentityProviderSearchService.Models;
+using Fabric.IdentityProviderSearchService.Services;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
 
-namespace Fabric.ActiveDirectory.Modules
+namespace Fabric.IdentityProviderSearchService.Modules
 {
     public sealed class PrincipalsModule : NancyModule
     {

@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
-using System.Linq;
-using System.Web.UI;
-using Fabric.ActiveDirectory.Models;
+using Fabric.IdentityProviderSearchService.Models;
 
-namespace Fabric.ActiveDirectory.Services
+namespace Fabric.IdentityProviderSearchService.Services
 {
     public class ActiveDirectoryProviderService : IExternalIdentityProviderService
     {

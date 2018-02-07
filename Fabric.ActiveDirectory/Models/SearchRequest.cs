@@ -1,4 +1,4 @@
-﻿namespace Fabric.ActiveDirectory.Models
+﻿namespace Fabric.IdentityProviderSearchService.Models
 {
     public class SearchRequest
     {

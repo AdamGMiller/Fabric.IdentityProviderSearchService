@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Fabric.ActiveDirectory.Models;
+using Fabric.IdentityProviderSearchService.Models;
 
-namespace Fabric.ActiveDirectory.Services
+namespace Fabric.IdentityProviderSearchService.Services
 {
     public class PrincipalSeachService
     {
