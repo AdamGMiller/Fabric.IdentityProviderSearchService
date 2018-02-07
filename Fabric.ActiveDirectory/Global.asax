@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Fabric.ActiveDirectory.WebApiApplication" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Fabric.IdentityProviderSearchService.WebApiApplication" Language="C#" %>
