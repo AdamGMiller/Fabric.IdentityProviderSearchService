@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
+using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
     public class ActiveDirectoryProviderService : IExternalIdentityProviderService
-    {
+    {        
         private readonly string _domain;
 
-        public ActiveDirectoryProviderService()
-        {
-            //TODO: dont hardcode this pass in the configuration in the constructor
-            _domain = "hqcatalyst";
+        public ActiveDirectoryProviderService(IAppConfiguration appConfig)
+        {           
+            _domain = appConfig.DomainName;
         }
 
         public IEnumerable<FabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
