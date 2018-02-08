@@ -1,5 +1,6 @@
 ﻿using System;
 using Fabric.IdentityProviderSearchService.Configuration;
+using Fabric.IdentityProviderSearchService.Infrastructure.PipelineHooks;
 using Fabric.IdentityProviderSearchService.Services;
 using Nancy;
 using Nancy.Bootstrapper;
@@ -19,6 +20,9 @@ namespace Fabric.IdentityProviderSearchService
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
             base.ApplicationStartup(container, pipelines);
+
+            pipelines.BeforeRequest += ctx => RequestHooks.RemoveContentTypeHeaderForGet(ctx);
+            pipelines.BeforeRequest += ctx => RequestHooks.SetDefaultVersionInUrl(ctx);
 
             container.Register(_appConfig);
         }

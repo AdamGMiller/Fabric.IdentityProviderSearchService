@@ -14,7 +14,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
     {
         private readonly PrincipalSeachService _seachService;
 
-        public PrincipalsModule(PrincipalSeachService seachService) : base("/principals")
+        public PrincipalsModule(PrincipalSeachService seachService) : base("/v1/principals")
         {
             _seachService = seachService;
 
