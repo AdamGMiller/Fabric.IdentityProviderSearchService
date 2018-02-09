@@ -14,16 +14,16 @@ apply plugin: 'io.github.swagger2markup'
 
 convertSwagger2markup {
 
-	def url = "${System.env.FABRICAUTHORIZATIONBASEURL}"
+	def url = "${System.env.FABRICIDENTITYPROVIDERSEARCHSERVICEBASEURL}"
     if (url?.trim()) {
         logger.info("----------HOST NAME = ${url}----------")
         swaggerInput "${url}/docs/swagger.json"
     }
     else {
-        throw new GradleException("FABRICAUTHORIZATIONBASEURL environment variable is required.")
+        throw new GradleException("FABRICIDENTITYPROVIDERSEARCHSERVICEBASEURL environment variable is required.")
     }
     
-	def dir = "${System.env.AUTHORIZATIONMARKDOWNDIRECTORY}"
+	def dir = "${System.env.IDENTITYPROVIDERSEARCHSERVICEMARKDOWNDIRECTORY}"
 	if (!dir?.trim()) {
 	    dir = "${buildDir}/markdown"
 	}

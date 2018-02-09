@@ -6,6 +6,7 @@ using Fabric.IdentityProviderSearchService.Services;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
+using Nancy.Responses.Negotiation;
 using Nancy.Swagger.Services;
 using Nancy.TinyIoc;
 using Serilog;
@@ -31,6 +32,14 @@ namespace Fabric.IdentityProviderSearchService
 
             InitializeSwaggerMetadata();
 
+            pipelines.OnError.AddItemToEndOfPipeline(
+                (ctx, ex) => new OnErrorHooks(_logger)
+                    .HandleInternalServerError(
+                        ctx,
+                        ex,
+                        container.Resolve<IResponseNegotiator>(),
+                        false)); //TODO: find out how to determine if IsDevelopment is true
+
             pipelines.BeforeRequest += ctx => RequestHooks.RemoveContentTypeHeaderForGet(ctx);
             pipelines.BeforeRequest += ctx => RequestHooks.SetDefaultVersionInUrl(ctx);
 
@@ -50,7 +59,7 @@ namespace Fabric.IdentityProviderSearchService
             securitySchemeBuilder.Scope(Scopes.SearchPrincipalsScope, "Grants access to search api");
             try
             {
-                SwaggerMetadataProvider.SetSecuritySchemeBuilder(securitySchemeBuilder, "fabric.identity");
+                SwaggerMetadataProvider.SetSecuritySchemeBuilder(securitySchemeBuilder, "fabric.identityprovidersearchservice");
             }
             catch (ArgumentException ex)
             {
