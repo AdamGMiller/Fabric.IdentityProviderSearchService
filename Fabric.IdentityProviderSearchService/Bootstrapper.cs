@@ -47,6 +47,22 @@ namespace Fabric.IdentityProviderSearchService
             container.Register(_logger);
         }
 
+        protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
+        {
+            base.ConfigureRequestContainer(container, context);
+            container.Register<IActiveDirectoryServiceProxy, ActiveDirectoryServiceProxy>();
+            container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
+            container.Register<PrincipalSeachService, PrincipalSeachService>();
+        }
+
+        protected override void ConfigureConventions(NancyConventions nancyConventions)
+        {
+            base.ConfigureConventions(nancyConventions);
+
+            nancyConventions.StaticContentsConventions.Add(
+                StaticContentConventionBuilder.AddDirectory("/swagger"));
+        }
+
         private void InitializeSwaggerMetadata()
         {
             SwaggerMetadataProvider.SetInfo("Fabric Identity Provider Search Service", "v1",
@@ -69,21 +85,6 @@ namespace Fabric.IdentityProviderSearchService
             {
                 _logger.Warning("Error configuring Swagger Security Scheme: {exceptionMessage", ex.Message);
             }
-        }
-
-        protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
-        {
-            base.ConfigureRequestContainer(container, context);
-            container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
-            container.Register<PrincipalSeachService, PrincipalSeachService>();
-        }
-
-        protected override void ConfigureConventions(NancyConventions nancyConventions)
-        {
-            base.ConfigureConventions(nancyConventions);
-
-            nancyConventions.StaticContentsConventions.Add(
-                StaticContentConventionBuilder.AddDirectory("/swagger"));
         }
     }
 }

@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.DirectoryServices;
-using System.DirectoryServices.AccountManagement;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
     public class ActiveDirectoryProviderService : IExternalIdentityProviderService
-    {        
+    {
+        private readonly IActiveDirectoryServiceProxy _activeDirectoryServiceProxy;
         private readonly string _domain;
 
-        public ActiveDirectoryProviderService(IAppConfiguration appConfig)
-        {           
+        public ActiveDirectoryProviderService(IActiveDirectoryServiceProxy activeDirectoryServiceProxy, IAppConfiguration appConfig)
+        {
+            _activeDirectoryServiceProxy = activeDirectoryServiceProxy;
             _domain = appConfig.DomainName;
         }
 
@@ -35,8 +36,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            var ctx = new PrincipalContext(ContextType.Domain, domain);
-            var userPrincipalResult = UserPrincipal.FindByIdentity(ctx, IdentityType.SamAccountName, accountName);
+            var userPrincipalResult = _activeDirectoryServiceProxy.SearchForUser(domain, accountName);
 
             if (userPrincipalResult == null)
             {
@@ -56,10 +56,8 @@ namespace Fabric.IdentityProviderSearchService.Services
         private IEnumerable<FabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
         {
             var principals = new List<FabricPrincipal>();
-          
-            var directorySearcher = new DirectorySearcher(null, ldapQuery);
 
-            var searchResults = directorySearcher.FindAll();
+            var searchResults = _activeDirectoryServiceProxy.SearchDirectory(ldapQuery);
 
             foreach (SearchResult searchResult in searchResults)
             {
