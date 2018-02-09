@@ -24,7 +24,7 @@ namespace Fabric.IdentityProviderSearchService.Logging
             return new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
                 .Enrich.FromLogContext();
-            //.WriteTo.
+
         }
     }
 }

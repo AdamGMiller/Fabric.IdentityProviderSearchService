@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Fabric.IdentityProviderSearchService.ApiModels;
+using Fabric.IdentityProviderSearchService.Constants;
 using Nancy;
 using Nancy.Swagger;
 using Nancy.Swagger.Modules;
@@ -27,8 +28,8 @@ namespace Fabric.IdentityProviderSearchService.Modules
         private readonly Parameter _typeParameter = new Parameter
         {
             Name = "type",
-            Description = "Filters the search to either users or groups",
-            Required = true,
+            Description = "Filters the search to either users or groups. Valid values are 'user' and 'group'. If not specified then both users and groups are returned",
+            Required = false,
             Type = "string",
             In = ParameterIn.Query
         };
@@ -38,11 +39,14 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
         private readonly SecurityRequirementBuilder _oAuth2SearchScopeBuilder = new SecurityRequirementBuilder()
             .SecurityScheme(SecuritySchemes.Oauth2)
-            .SecurityScheme(new List<string> { "fabric/idpsearchservice.searchusers" });
+            .SecurityScheme(new List<string> { Scopes.SearchPrincipalsScope });
 
         public PrincipalsMetadataModule(ISwaggerModelCatalog modelCatalog, ISwaggerTagCatalog tagCatalog)
             : base(modelCatalog, tagCatalog)
         {
+
+            modelCatalog.AddModel<FabricPrincipalApiModel>();
+
             RouteDescriber.DescribeRouteWithParams(
                 "Search",
                 "",
@@ -54,6 +58,11 @@ namespace Fabric.IdentityProviderSearchService.Modules
                         Code = (int) HttpStatusCode.OK,
                         Message = "Search was successful"
                     },
+                    new HttpResponseMetadata
+                    {
+                        Code = (int) HttpStatusCode.BadRequest,
+                        Message = "Invalid type parameter provided"
+                    }
                 },
                 new[]
                 {

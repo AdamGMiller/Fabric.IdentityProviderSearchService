@@ -1,5 +1,6 @@
 ﻿using System;
 using Fabric.IdentityProviderSearchService.Configuration;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Infrastructure.PipelineHooks;
 using Fabric.IdentityProviderSearchService.Services;
 using Nancy;
@@ -46,7 +47,7 @@ namespace Fabric.IdentityProviderSearchService
             securitySchemeBuilder.Flow(Oauth2Flows.Implicit);
             securitySchemeBuilder.Description("Authentication with Fabric.Identity");
             securitySchemeBuilder.AuthorizationUrl(@"http://localhost:5001");
-            //TODO: add scopes
+            securitySchemeBuilder.Scope(Scopes.SearchPrincipalsScope, "Grants access to search api");
             try
             {
                 SwaggerMetadataProvider.SetSecuritySchemeBuilder(securitySchemeBuilder, "fabric.identity");

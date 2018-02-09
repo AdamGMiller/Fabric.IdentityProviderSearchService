@@ -287,6 +287,8 @@
     <Compile Include="Configuration\ApplicationInsights.cs" />
     <Compile Include="Configuration\IAppConfiguration.cs" />
     <Compile Include="Constants\HttpResponseHeaders.cs" />
+    <Compile Include="Constants\Scopes.cs" />
+    <Compile Include="Exceptions\BadRequestException.cs" />
     <Compile Include="Exceptions\InvalidExternalIdentityProviderException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

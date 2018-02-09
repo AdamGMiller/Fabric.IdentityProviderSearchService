@@ -35,7 +35,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 var users = _seachService.SearchPrincipals(searchRequest.SearchText, searchRequest.Type);
 
                 principals.AddRange(users.Select(u => new FabricPrincipalApiModel
-                {                    
+                {
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     MiddleName = u.MiddleName,
@@ -50,6 +50,10 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 };
             }
             catch (InvalidExternalIdentityProviderException e)
+            {
+                return CreateFailureResponse<FabricPrincipal>(e.Message, HttpStatusCode.BadRequest);
+            }
+            catch (BadRequestException e)
             {
                 return CreateFailureResponse<FabricPrincipal>(e.Message, HttpStatusCode.BadRequest);
             }

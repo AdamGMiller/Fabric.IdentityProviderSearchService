@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services
@@ -14,8 +15,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         }
 
         public IEnumerable<FabricPrincipal> SearchPrincipals(string searchText, string principalTypeString)
-        {
-            //set principal type based on string 
+        {           
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
             {
@@ -31,8 +31,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             }
             else
             {
-                //TODO: replace with custom exception
-                throw new Exception("invalid principal type provided");
+                throw new BadRequestException("invalid principal type provided. valid values are 'user' and 'group'");
             }
             
             return _externalIdentityProviderService.SearchPrincipals(searchText, principalType);
