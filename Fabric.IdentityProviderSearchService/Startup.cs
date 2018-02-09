@@ -1,7 +1,9 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
+using Fabric.IdentityProviderSearchService.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Owin.Extensions;
 using Owin;
+using Serilog.Core;
 
 namespace Fabric.IdentityProviderSearchService
 {
@@ -16,7 +18,9 @@ namespace Fabric.IdentityProviderSearchService
             var appConfig = new AppConfiguration();
             ConfigurationBinder.Bind(configuration, appConfig);
 
-            app.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(appConfig));
+            var logger = LogFactory.CreateTraceLogger(new LoggingLevelSwitch(), appConfig.ApplicationInsights);
+                        
+            app.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(appConfig, logger));
             app.UseStageMarker(PipelineStage.MapHandler);
         }
     }
