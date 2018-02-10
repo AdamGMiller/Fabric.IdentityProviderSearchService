@@ -7,16 +7,16 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public class ActiveDirectoryProviderService : IExternalIdentityProviderService
     {
-        private readonly IActiveDirectoryServiceProxy _activeDirectoryServiceProxy;
+        private readonly IActiveDirectoryProxy _activeDirectoryProxy;
         private readonly string _domain;
 
-        public ActiveDirectoryProviderService(IActiveDirectoryServiceProxy activeDirectoryServiceProxy, IAppConfiguration appConfig)
+        public ActiveDirectoryProviderService(IActiveDirectoryProxy activeDirectoryProxy, IAppConfiguration appConfig)
         {
-            _activeDirectoryServiceProxy = activeDirectoryServiceProxy;
+            _activeDirectoryProxy = activeDirectoryProxy;
             _domain = appConfig.DomainName;
         }
 
-        public IEnumerable<FabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
+        public IEnumerable<IFabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
         {
             var ldapQuery = BuildLdapQuery(searchText, principalType);
 
@@ -25,7 +25,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
-        public FabricPrincipal FindUserBySubjectId(string subjectId)
+        public IFabricPrincipal FindUserBySubjectId(string subjectId)
         {
             if (!subjectId.Contains(@"\"))
             {            
@@ -36,7 +36,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            var userPrincipalResult = _activeDirectoryServiceProxy.SearchForUser(domain, accountName);
+            var userPrincipalResult = _activeDirectoryProxy.SearchForUser(domain, accountName);
 
             if (userPrincipalResult == null)
             {
@@ -53,53 +53,45 @@ namespace Fabric.IdentityProviderSearchService.Services
             };
         }
 
-        private IEnumerable<FabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
+        private IEnumerable<IFabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
         {
-            var principals = new List<FabricPrincipal>();
+            var principals = new List<IFabricPrincipal>();
 
-            var searchResults = _activeDirectoryServiceProxy.SearchDirectory(ldapQuery);
+            var searchResults = _activeDirectoryProxy.SearchDirectory(ldapQuery);
 
-            foreach (SearchResult searchResult in searchResults)
+            foreach (var searchResult in searchResults)
             {
-                var entryResult = searchResult.GetDirectoryEntry();
-
-                principals.Add(IsDirectoryEntryAUser(entryResult)
-                    ? CreateUserPrincipal(entryResult)
-                    : CreateGroupPrincipal(entryResult));
+                principals.Add(IsDirectoryEntryAUser(searchResult)
+                    ? CreateUserPrincipal(searchResult)
+                    : CreateGroupPrincipal(searchResult));
             }
-
             return principals;
         }
 
-        private bool IsDirectoryEntryAUser(DirectoryEntry entryResult)
+        private bool IsDirectoryEntryAUser(IDirectoryEntry entryResult)
         {            
             return entryResult.SchemaClassName.Equals("user");
         }
 
-        private FabricPrincipal CreateUserPrincipal(DirectoryEntry userEntry)
+        private IFabricPrincipal CreateUserPrincipal(IDirectoryEntry userEntry)
         {
             return new FabricPrincipal
             {              
-                FirstName = ReadUserEntryProperty(userEntry.Properties["givenname"]),
-                LastName = ReadUserEntryProperty(userEntry.Properties["sn"]),
-                MiddleName = ReadUserEntryProperty(userEntry.Properties["middlename"]),
+                FirstName = userEntry.Properties["givenname"].ToString(),
+                LastName = userEntry.Properties["sn"].ToString(),
+                MiddleName = userEntry.Properties["middlename"].ToString(),
                 PrincipalType = PrincipalType.User,                
-                SubjectId = GetSubjectId(ReadUserEntryProperty(userEntry.Properties["samaccountname"]))
+                SubjectId = GetSubjectId(userEntry.Properties["samaccountname"].ToString())
             };
         }
 
-        private FabricPrincipal CreateGroupPrincipal(DirectoryEntry groupEntry)
+        private IFabricPrincipal CreateGroupPrincipal(IDirectoryEntry groupEntry)
         {
             return new FabricPrincipal
             {
-                SubjectId = GetSubjectId(ReadUserEntryProperty(groupEntry.Properties["name"])),
+                SubjectId = GetSubjectId(groupEntry.Properties["name"].ToString()),
                 PrincipalType = PrincipalType.Group
             };
-        }
-
-        private string ReadUserEntryProperty(PropertyValueCollection propertyValueCollection)
-        {
-            return propertyValueCollection.Value?.ToString() ?? string.Empty;
         }
 
         private string BuildLdapQuery(string searchText, PrincipalType principalType)

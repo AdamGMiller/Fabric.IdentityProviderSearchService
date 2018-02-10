@@ -5,7 +5,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public interface IExternalIdentityProviderService
     {
-        IEnumerable<FabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType);
-        FabricPrincipal FindUserBySubjectId(string subjectId);
+        IEnumerable<IFabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType);
+        IFabricPrincipal FindUserBySubjectId(string subjectId);
     }
 }

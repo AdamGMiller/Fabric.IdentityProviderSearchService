@@ -50,7 +50,7 @@ namespace Fabric.IdentityProviderSearchService
         protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
         {
             base.ConfigureRequestContainer(container, context);
-            container.Register<IActiveDirectoryServiceProxy, ActiveDirectoryServiceProxy>();
+            container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
             container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
             container.Register<PrincipalSeachService, PrincipalSeachService>();
         }
