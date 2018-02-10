@@ -25,7 +25,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public async Task FindUsersAndGroups_Succeeds_Async()
+        public async Task SearchPrincipals_FindUsersAndGroups_Succeeds_Async()
         {
             var searchResult = await _browser.Get("/principals/search", with =>
             {
@@ -42,7 +42,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public async Task FindGroups_Succeeds_Async()
+        public async Task SearchPrincipals_FindGroups_Succeeds_Async()
         {
             var searchResult = await _browser.Get("/principals/search", with =>
             {
@@ -59,7 +59,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public async Task FindUsers_Succeeds_Async()
+        public async Task SearchPrincipals_FindUsers_Succeeds_Async()
         {
             var searchResult = await _browser.Get("/principals/search", with =>
             {
@@ -73,6 +73,44 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
             Assert.Equal(2, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_NoPrincipalsFound_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("searchtext", "fdfd");                
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            Assert.Equal(0, users.ResultCount);            
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_NoSearchText_Fails_Async()
+        {
+            var searchResult = await _browser.Get("/principals/search", with =>
+            {
+                with.HttpRequest();
+            });
+
+            Assert.Equal(HttpStatusCode.BadRequest, searchResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_InvalidType_Fails_Async()
+        {
+            var searchResult = await _browser.Get("/principals/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("type", "foo");
+            });
+
+            Assert.Equal(HttpStatusCode.BadRequest, searchResult.StatusCode);
         }
     }
 }

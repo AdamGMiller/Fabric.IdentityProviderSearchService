@@ -28,6 +28,12 @@ namespace Fabric.IdentityProviderSearchService.Modules
         {            
             var searchRequest = this.Bind<SearchRequest>();
 
+            if (string.IsNullOrEmpty(searchRequest.SearchText))
+            {
+                return CreateFailureResponse<FabricPrincipalApiModel>("Search text was not provided and is required",
+                    HttpStatusCode.BadRequest);
+            }
+
             try
             {
                 var principals = new List<FabricPrincipalApiModel>();
@@ -51,11 +57,11 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
             catch (InvalidExternalIdentityProviderException e)
             {
-                return CreateFailureResponse<FabricPrincipal>(e.Message, HttpStatusCode.BadRequest);
+                return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
             catch (BadRequestException e)
             {
-                return CreateFailureResponse<FabricPrincipal>(e.Message, HttpStatusCode.BadRequest);
+                return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
         }
 
