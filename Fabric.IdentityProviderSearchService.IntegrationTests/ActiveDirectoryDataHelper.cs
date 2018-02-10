@@ -10,18 +10,18 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var principals = new List<IDirectoryEntry>
             {
-                CreateMockDirectoryEntry("user1", PrincipalType.User),
-                CreateMockDirectoryEntry("user2", PrincipalType.User),
-                CreateMockDirectoryEntry("user3", PrincipalType.User),
-                CreateMockDirectoryEntry("group1", PrincipalType.Group, "group one"),
-                CreateMockDirectoryEntry("group2", PrincipalType.Group, "group two"),
-                CreateMockDirectoryEntry("group3", PrincipalType.Group, "group three")
+                CreateMockDirectoryEntry("patrick", "jones", PrincipalType.User),
+                CreateMockDirectoryEntry("patricia", "smith", PrincipalType.User),
+                CreateMockDirectoryEntry("janet", "apple", PrincipalType.User),
+                CreateMockDirectoryEntry("", "", PrincipalType.Group, "patient group"),
+                CreateMockDirectoryEntry("", "", PrincipalType.Group, "janitorial group"),
+                CreateMockDirectoryEntry("", "", PrincipalType.Group, "developer group")
             };
 
             return principals;
         }
 
-        private IDirectoryEntry CreateMockDirectoryEntry(string id, PrincipalType type, string name = "")
+        private IDirectoryEntry CreateMockDirectoryEntry(string firstName, string lastName, PrincipalType type, string name = "")
         {
             var principal1 = new Mock<IDirectoryEntry>();
             principal1.SetupGet(p => p.SchemaClassName).Returns(type.ToString().ToLower());
@@ -29,10 +29,10 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             {
                 var props = new Dictionary<string, string>
                 {
-                    {"givenname", id},
-                    {"sn", $"{id}sn"},
-                    {"middlename", $"{id}middlename"},
-                    {"samaccountname", $"{id}.{id}sn"},
+                    {"givenname", firstName},
+                    {"sn", lastName},
+                    {"middlename", "middlename"},
+                    {"samaccountname", type == PrincipalType.User ? $"{firstName}.{lastName}" : name},
                     {"name", name }
                 };
 

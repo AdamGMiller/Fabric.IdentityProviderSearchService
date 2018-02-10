@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.DirectoryServices;
 
 namespace Fabric.IdentityProviderSearchService.Models
@@ -9,12 +10,12 @@ namespace Fabric.IdentityProviderSearchService.Models
 
         public DirectoryEntryWrapper(DirectoryEntry directoryEntry)
         {
-            _directoryEntry = directoryEntry;
-            Properties = _directoryEntry.Properties;
+            Properties = new Dictionary<string, object>();
+            _directoryEntry = directoryEntry;            
 
             foreach (PropertyValueCollection directoryEntryProperty in directoryEntry.Properties)
             {
-                Properties.Add(directoryEntryProperty.PropertyName, ReadUserEntryProperty(directoryEntryProperty));
+                Properties.Add(directoryEntryProperty.PropertyName.ToLower(), ReadUserEntryProperty(directoryEntryProperty));
             }
             SchemaClassName = _directoryEntry.SchemaClassName;
         }

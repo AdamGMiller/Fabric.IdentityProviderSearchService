@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.DirectoryServices;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
 
@@ -77,11 +76,11 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             return new FabricPrincipal
             {              
-                FirstName = userEntry.Properties["givenname"].ToString(),
-                LastName = userEntry.Properties["sn"].ToString(),
-                MiddleName = userEntry.Properties["middlename"].ToString(),
+                FirstName = userEntry.Properties["givenname"]?.ToString(),
+                LastName = userEntry.Properties["sn"]?.ToString(),
+                MiddleName = userEntry.Properties["middlename"]?.ToString(),
                 PrincipalType = PrincipalType.User,                
-                SubjectId = GetSubjectId(userEntry.Properties["samaccountname"].ToString())
+                SubjectId = GetSubjectId(userEntry.Properties["samaccountname"]?.ToString())
             };
         }
 
@@ -89,7 +88,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             return new FabricPrincipal
             {
-                SubjectId = GetSubjectId(groupEntry.Properties["name"].ToString()),
+                SubjectId = GetSubjectId(groupEntry.Properties["name"]?.ToString()),
                 PrincipalType = PrincipalType.Group
             };
         }

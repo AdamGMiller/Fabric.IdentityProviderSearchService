@@ -40,7 +40,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     LastName = u.LastName,
                     MiddleName = u.MiddleName,
                     SubjectId = u.SubjectId,
-                    PrincipalType = u.PrincipalType.ToString()
+                    PrincipalType = u.PrincipalType.ToString().ToLower()
                 }));
 
                 return new IdpSearchResultApiModel
