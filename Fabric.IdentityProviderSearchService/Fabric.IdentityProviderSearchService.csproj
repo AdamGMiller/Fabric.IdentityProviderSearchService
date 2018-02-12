@@ -248,7 +248,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json" />
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Documentation\build.gradle" />
     <Content Include="Documentation\gradlew" />
     <Content Include="Documentation\gradlew.bat" />
