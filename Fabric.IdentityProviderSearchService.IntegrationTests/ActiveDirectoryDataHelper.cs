@@ -40,6 +40,6 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             });
 
             return principal1.Object;
-        }
+        }        
     }
 }

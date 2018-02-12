@@ -31,7 +31,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             var mockProxy = new Mock<IActiveDirectoryProxy>()
                 .SetupActiveDirectoryProxy(new ActiveDirectoryDataHelper().GetPrincipals());
-            container.Register<IActiveDirectoryProxy>(mockProxy.Object);
+            container.Register(mockProxy.Object);
         }
     }
 }

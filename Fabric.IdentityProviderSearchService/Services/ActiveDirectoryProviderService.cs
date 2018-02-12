@@ -35,21 +35,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            var userPrincipalResult = _activeDirectoryProxy.SearchForUser(domain, accountName);
-
-            if (userPrincipalResult == null)
-            {
-                return new FabricPrincipal();
-            }
-
-            return new FabricPrincipal
-            {                
-                FirstName = userPrincipalResult.GivenName,
-                MiddleName = userPrincipalResult.MiddleName,
-                LastName = userPrincipalResult.Surname,
-                SubjectId = GetSubjectId(userPrincipalResult.SamAccountName),
-                PrincipalType = PrincipalType.User
-            };
+            return _activeDirectoryProxy.SearchForUser(domain, accountName);
         }
 
         private IEnumerable<IFabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)

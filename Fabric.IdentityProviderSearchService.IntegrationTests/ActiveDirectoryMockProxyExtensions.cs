@@ -18,6 +18,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private static string _userSearchForPat =
             "(&(objectClass=user)(objectCategory=person)(|(sAMAccountName=pat*)(givenName=pat*)(sn=pat*)))";
 
+        private static string _identitySearchForPatrickJones = "patrick.jones";
+        private static string _identitySearchForPatrickJon = "patrick.jon";
+
         public static Mock<IActiveDirectoryProxy> SetupActiveDirectoryProxy(this Mock<IActiveDirectoryProxy> mockAdProxy, IEnumerable<IDirectoryEntry> principals)
         {
             mockAdProxy.Setup(proxy => proxy.SearchDirectory(It.Is<string>(s => s == _userAndGroupSearchForPat)))
@@ -39,6 +42,50 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
                 {
                     return principals.Where(p => p.SchemaClassName.Equals("user") &&
                                                  ((Dictionary<string, string>)p.Properties).Any(pv => pv.Value.ToString().StartsWith("pat")));
+                });
+
+            mockAdProxy.Setup(proxy =>
+                    proxy.SearchForUser(It.IsAny<string>(), It.Is<string>(s => s == _identitySearchForPatrickJones)))
+                .Returns(() =>
+                {
+                    var userEntry = principals.FirstOrDefault(p =>
+                        ((Dictionary<string, string>) p.Properties).Any(pv => pv.Value.Equals(_identitySearchForPatrickJones)));
+
+                    if (userEntry == null)
+                    {
+                        return new FabricPrincipal();
+                    }
+
+                    return new FabricPrincipal
+                    {
+                        FirstName = userEntry.Properties["givenname"]?.ToString(),
+                        LastName = userEntry.Properties["sn"]?.ToString(),
+                        MiddleName = userEntry.Properties["middlename"]?.ToString(),
+                        PrincipalType = PrincipalType.User,
+                        SubjectId =$"testing\\{userEntry.Properties["samaccountname"]?.ToString()}"
+                    };
+                });
+
+            mockAdProxy.Setup(proxy =>
+                    proxy.SearchForUser(It.IsAny<string>(), It.Is<string>(s => s == _identitySearchForPatrickJon)))
+                .Returns(() =>
+                {
+                    var userEntry = principals.FirstOrDefault(p =>
+                        ((Dictionary<string, string>)p.Properties).Any(pv => pv.Value.Equals(_identitySearchForPatrickJon)));
+
+                    if (userEntry == null)
+                    {
+                        return new FabricPrincipal();
+                    }
+
+                    return new FabricPrincipal
+                    {
+                        FirstName = userEntry.Properties["givenname"]?.ToString(),
+                        LastName = userEntry.Properties["sn"]?.ToString(),
+                        MiddleName = userEntry.Properties["middlename"]?.ToString(),
+                        PrincipalType = PrincipalType.User,
+                        SubjectId = $"testing\\{userEntry.Properties["samaccountname"]?.ToString()}"
+                    };
                 });
 
             return mockAdProxy;

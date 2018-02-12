@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="ActiveDirectoryDataHelper.cs" />
     <Compile Include="ActiveDirectoryMockProxyExtensions.cs" />
+    <Compile Include="ActiveDirectoryProviderServiceTests.cs" />
     <Compile Include="ActiveDirectorySearchTests.cs" />
     <Compile Include="IntegrationTestsFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

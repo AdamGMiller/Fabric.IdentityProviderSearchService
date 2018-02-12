@@ -22,10 +22,29 @@ namespace Fabric.IdentityProviderSearchService.Services
             return searchResults;
         }
 
-        public UserPrincipal SearchForUser(string domain, string accountName)
+        public IFabricPrincipal SearchForUser(string domain, string accountName)
         {
             var ctx = new PrincipalContext(ContextType.Domain, domain);
-            return UserPrincipal.FindByIdentity(ctx, IdentityType.SamAccountName, accountName);
+            var userPrincipalResult = UserPrincipal.FindByIdentity(ctx, IdentityType.SamAccountName, accountName);
+
+            if (userPrincipalResult == null)
+            {
+                return new FabricPrincipal();
+            }
+
+            return new FabricPrincipal
+            {
+                FirstName = userPrincipalResult.GivenName,
+                MiddleName = userPrincipalResult.MiddleName,
+                LastName = userPrincipalResult.Surname,
+                SubjectId = GetSubjectId(domain, userPrincipalResult.SamAccountName),
+                PrincipalType = PrincipalType.User
+            };
+        }
+
+        private string GetSubjectId(string domain, string sAmAccountName)
+        {
+            return $"{domain}\\{sAmAccountName}";
         }
     }
 }
