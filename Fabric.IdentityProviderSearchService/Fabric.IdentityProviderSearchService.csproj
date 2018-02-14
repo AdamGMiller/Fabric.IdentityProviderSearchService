@@ -103,9 +103,6 @@
     <Reference Include="Nancy, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nancy.2.0.0-clinteastwood\lib\net452\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Hosting.Aspnet, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nancy.Hosting.Aspnet.2.0.0-clinteastwood\lib\net452\Nancy.Hosting.Aspnet.dll</HintPath>
-    </Reference>
     <Reference Include="Nancy.Metadata.Modules, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nancy.Metadata.Modules.2.0.0-barneyrubble\lib\net452\Nancy.Metadata.Modules.dll</HintPath>
     </Reference>
@@ -264,6 +261,7 @@
     <Content Include="swagger\swagger-ui-standalone-preset.js.map" />
     <Content Include="swagger\swagger-ui.css.map" />
     <Content Include="swagger\swagger-ui.js.map" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

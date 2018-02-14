@@ -23,7 +23,8 @@ namespace Fabric.IdentityProviderSearchService.Logging
         {
             return new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
-                .Enrich.FromLogContext();
+                .Enrich.FromLogContext()
+                .WriteTo.RollingFile("logs\\idpsearchservice-{Date}.log");
 
         }
     }
