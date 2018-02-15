@@ -8,6 +8,9 @@ function ReplaceStrings ($stringToFind, $stringToReplace) {
     }
 }
 
+Write-Host "changing to markdown directory"
+Set-Location $2
+
 Write-Host "Cloning Git Wiki repo..."
 $REPO="https://$1@github.com/HealthCatalyst/Fabric.IdentityProviderSearchService.wiki.git"
 git clone $REPO
