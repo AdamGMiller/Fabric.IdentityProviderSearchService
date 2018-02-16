@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
+using Microsoft.Security.Application;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
@@ -35,7 +36,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            return _activeDirectoryProxy.SearchForUser(domain, accountName);
+            return _activeDirectoryProxy.SearchForUser(Encoder.LdapFilterEncode(domain), Encoder.LdapFilterEncode(accountName));
         }
 
         private IEnumerable<IFabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
@@ -81,7 +82,8 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         private string BuildLdapQuery(string searchText, PrincipalType principalType)
         {
-            var nameFilter = $"(|(sAMAccountName={searchText}*)(givenName={searchText}*)(sn={searchText}*))";
+            var encodedSearchText = Encoder.LdapFilterEncode(searchText);
+            var nameFilter = $"(|(sAMAccountName={encodedSearchText}*)(givenName={encodedSearchText}*)(sn={encodedSearchText}*))";
 
             switch (principalType)
             {

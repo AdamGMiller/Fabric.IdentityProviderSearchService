@@ -28,7 +28,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
         private readonly Parameter _typeParameter = new Parameter
         {
             Name = "type",
-            Description = "Filters the search to either users or groups. Valid values are 'user' and 'group'. If not specified then both users and groups are returned",
+            Description = "Filters the search to either users or groups. Valid values are 'user' and 'group'. If not specified then both users and groups are searched",
             Required = false,
             Type = "string",
             In = ParameterIn.Query
