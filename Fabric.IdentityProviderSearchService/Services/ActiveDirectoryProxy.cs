@@ -8,17 +8,17 @@ namespace Fabric.IdentityProviderSearchService.Services
     public class ActiveDirectoryProxy : IActiveDirectoryProxy
     {
         public IEnumerable<IDirectoryEntry> SearchDirectory(string ldapQuery)
-        {
+        {           
             var directorySearcher = new DirectorySearcher(null, ldapQuery);
-            var results = directorySearcher.FindAll();
+            var results = directorySearcher.FindAll();         
 
             var searchResults = new List<IDirectoryEntry>();
-
+            
             foreach (SearchResult searchResult in results)
             {
                 searchResults.Add(new DirectoryEntryWrapper(searchResult.GetDirectoryEntry()));
             }
-
+            
             return searchResults;
         }
 
