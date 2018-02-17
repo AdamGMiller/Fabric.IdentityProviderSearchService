@@ -24,20 +24,13 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private IDirectoryEntry CreateMockDirectoryEntry(string firstName, string lastName, PrincipalType type, string name = "")
         {
             var principal1 = new Mock<IDirectoryEntry>();
-            principal1.SetupGet(p => p.SchemaClassName).Returns(type.ToString().ToLower());
-            principal1.SetupGet(p => p.Properties).Returns(() =>
-            {
-                var props = new Dictionary<string, string>
-                {
-                    {"givenname", firstName},
-                    {"sn", lastName},
-                    {"middlename", "middlename"},
-                    {"samaccountname", type == PrincipalType.User ? $"{firstName}.{lastName}" : name},
-                    {"name", name }
-                };
-
-                return props;
-            });
+            principal1.SetupGet(p => p.SchemaClassName).Returns(type.ToString().ToLower());        
+            principal1.SetupGet(p => p.FirstName).Returns(firstName);
+            principal1.SetupGet(p => p.LastName).Returns(lastName);
+            principal1.SetupGet(p => p.MiddleName).Returns("middlename");
+            principal1.SetupGet(p => p.Name).Returns(name);
+            principal1.SetupGet(p => p.SamAccountName)
+                .Returns(type == PrincipalType.User ? $"{firstName}.{lastName}" : name);
 
             return principal1.Object;
         }        

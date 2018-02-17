@@ -63,11 +63,11 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             return new FabricPrincipal
             {              
-                FirstName = userEntry.Properties["givenname"],
-                LastName = userEntry.Properties["sn"],
-                MiddleName = userEntry.Properties["middlename"],
+                FirstName = userEntry.FirstName,
+                LastName = userEntry.LastName,
+                MiddleName = userEntry.MiddleName,
                 PrincipalType = PrincipalType.User,                
-                SubjectId = GetSubjectId(userEntry.Properties["samaccountname"])
+                SubjectId = GetSubjectId(userEntry.SamAccountName)
             };
         }
 
@@ -75,7 +75,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             return new FabricPrincipal
             {
-                SubjectId = GetSubjectId(groupEntry.Properties["name"]),
+                SubjectId = GetSubjectId(groupEntry.Name),
                 PrincipalType = PrincipalType.Group
             };
         }
