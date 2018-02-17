@@ -26,6 +26,46 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 _ => Search(),
                 null,
                 "Search");
+
+            Get("/user",
+                _ => SearchForUser(),
+                null, 
+                "SearchForUser");
+        }
+
+        private dynamic SearchForUser()
+        {
+            var searchRequest = this.Bind<SearchRequest>();
+
+            if (string.IsNullOrEmpty(searchRequest.SearchText))
+            {
+                return CreateFailureResponse<FabricPrincipalApiModel>("Search text was not provided and is required",
+                    HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                var u = _seachService.FindUserBySubjectId(searchRequest.SearchText);
+
+                return u == null
+                    ? new FabricPrincipalApiModel()
+                    : new FabricPrincipalApiModel
+                    {
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        MiddleName = u.MiddleName,
+                        SubjectId = u.SubjectId,
+                        PrincipalType = u.PrincipalType.ToString().ToLower()
+                    };
+            }
+            catch (InvalidExternalIdentityProviderException e)
+            {
+                return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
+            }
+            catch (BadRequestException e)
+            {
+                return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
+            }
         }
 
         private dynamic Search()

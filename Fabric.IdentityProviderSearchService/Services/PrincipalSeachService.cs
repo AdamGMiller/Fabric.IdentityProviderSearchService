@@ -36,5 +36,10 @@ namespace Fabric.IdentityProviderSearchService.Services
             
             return _externalIdentityProviderService.SearchPrincipals(searchText, principalType);
         }
+
+        public IFabricPrincipal FindUserBySubjectId(string subjectId)
+        {
+            return _externalIdentityProviderService.FindUserBySubjectId(subjectId);
+        }
     }
 }

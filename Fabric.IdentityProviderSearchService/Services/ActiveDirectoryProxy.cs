@@ -32,7 +32,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 
                 if (userPrincipalResult == null)
                 {
-                    return new FabricPrincipal();
+                    return null;
                 }
 
                 return new FabricPrincipal

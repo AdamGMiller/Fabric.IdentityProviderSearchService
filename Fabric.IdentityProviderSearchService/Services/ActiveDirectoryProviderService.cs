@@ -29,7 +29,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             if (!subjectId.Contains(@"\"))
             {            
-                return new FabricPrincipal();
+                return null;
             }
             
             var subjectIdParts = subjectId.Split('\\');
