@@ -35,6 +35,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
         private dynamic SearchForUser()
         {
+            this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchRequest>();
 
             if (string.IsNullOrEmpty(searchRequest.SearchText))
@@ -45,18 +46,16 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
             try
             {
-                var u = _seachService.FindUserBySubjectId(searchRequest.SearchText);
+                var user = _seachService.FindUserBySubjectId(searchRequest.SearchText);
 
-                return u == null
-                    ? new FabricPrincipalApiModel()
-                    : new FabricPrincipalApiModel
-                    {
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
-                        MiddleName = u.MiddleName,
-                        SubjectId = u.SubjectId,
-                        PrincipalType = u.PrincipalType.ToString().ToLower()
-                    };
+                return new FabricPrincipalApiModel
+                {
+                    FirstName = user?.FirstName,
+                    LastName = user?.LastName,
+                    MiddleName = user?.MiddleName,
+                    SubjectId = user?.SubjectId,
+                    PrincipalType = user?.PrincipalType.ToString().ToLower()
+                };
             }
             catch (InvalidExternalIdentityProviderException e)
             {
