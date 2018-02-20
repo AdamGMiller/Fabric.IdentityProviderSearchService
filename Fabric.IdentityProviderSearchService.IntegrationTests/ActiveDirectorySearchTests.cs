@@ -12,16 +12,36 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 {
     public class ActiveDirectorySearchTests : IClassFixture<IntegrationTestsFixture>
     {
+        private readonly IntegrationTestsFixture _integrationTestsFixture;
         private readonly Browser _browser;
 
         public ActiveDirectorySearchTests(IntegrationTestsFixture integrationTestsFixture)
         {
+            _integrationTestsFixture = integrationTestsFixture;
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
             {
                 new Claim("scope", Scopes.SearchPrincipalsScope)
             }, "testprincipal"));
 
             _browser = integrationTestsFixture.GetBrowser(claimsPrincipal);
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_InvalidScope_Fails_Async()
+        {
+            var invalidScopePrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+            {
+                new Claim("scope", "foo")
+            }, "testprincipal"));
+            var browser = _integrationTestsFixture.GetBrowser(invalidScopePrincipal);
+
+            var searchResult = await browser.Get("/principals/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("searchtext", "pat");
+            });
+
+            Assert.Equal(HttpStatusCode.Forbidden, searchResult.StatusCode);
         }
 
         [Fact]
