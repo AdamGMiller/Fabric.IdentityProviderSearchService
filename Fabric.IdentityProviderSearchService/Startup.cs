@@ -1,5 +1,6 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Logging;
+using IdentityServer3.AccessTokenValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Owin.Extensions;
 using Owin;
@@ -19,7 +20,14 @@ namespace Fabric.IdentityProviderSearchService
             ConfigurationBinder.Bind(configuration, appConfig);
 
             var logger = LogFactory.CreateTraceLogger(new LoggingLevelSwitch(), appConfig.ApplicationInsights);
-                        
+
+
+            app.UseIdentityServerBearerTokenAuthentication(new IdentityServerBearerTokenAuthenticationOptions
+            {
+                Authority = appConfig.IdentityServerConfidentialClientSettings.Authority,
+                RequiredScopes = appConfig.IdentityServerConfidentialClientSettings.Scopes
+            });
+
             app.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(appConfig, logger));
             app.UseStageMarker(PipelineStage.MapHandler);
         }

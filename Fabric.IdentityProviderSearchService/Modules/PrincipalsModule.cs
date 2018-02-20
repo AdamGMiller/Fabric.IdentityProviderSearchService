@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Fabric.IdentityProviderSearchService.ApiModels;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
+using Nancy.Security;
 
 namespace Fabric.IdentityProviderSearchService.Modules
 {
@@ -26,6 +30,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
         private dynamic Search()
         {            
+            this.RequiresClaims(AuthorizationReadClaim);
             var searchRequest = this.Bind<SearchRequest>();
 
             if (string.IsNullOrEmpty(searchRequest.SearchText))
@@ -69,6 +74,11 @@ namespace Fabric.IdentityProviderSearchService.Modules
         {
             var error = ErrorFactory.CreateError<T>(message, statusCode);
             return Negotiate.WithModel(error).WithStatusCode(statusCode);
+        }
+
+        private Predicate<Claim> AuthorizationReadClaim
+        {
+            get { return claim => claim.Type == "scope" && claim.Value == Scopes.SearchPrincipalsScope; }
         }
     }
 }
