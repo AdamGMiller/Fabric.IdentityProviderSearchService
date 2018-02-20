@@ -61,7 +61,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
                     if (userEntry == null)
                     {
-                        return new FabricPrincipal();
+                        return null;
                     }
 
                     return new FabricPrincipal
@@ -83,7 +83,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
                     if (userEntry == null)
                     {
-                        return new FabricPrincipal();
+                        return null;
                     }
 
                     return new FabricPrincipal

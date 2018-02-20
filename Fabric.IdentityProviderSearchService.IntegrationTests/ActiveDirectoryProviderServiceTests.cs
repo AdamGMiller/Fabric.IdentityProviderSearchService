@@ -36,22 +36,19 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_InvalidSubjectIdFormat_NotNullResult()
+        public void FindUserBySubjectId_InvalidSubjectIdFormat_NullResult()
         {
             var user = _providerService.FindUserBySubjectId($"{_appConfig.DomainName}.patrick.jones");
 
-            Assert.NotNull(user); 
-            Assert.Null(user.FirstName);
-
+            Assert.Null(user); 
         }
 
         [Fact]
-        public void FindUserBySubjectId_UserNotFound_NotNullResult()
+        public void FindUserBySubjectId_UserNotFound_NullResult()
         {
             var user = _providerService.FindUserBySubjectId($"{_appConfig.DomainName}\\patrick.jon");
 
-            Assert.NotNull(user);
-            Assert.Null(user.FirstName);
+            Assert.Null(user);
         }
     }
 }
