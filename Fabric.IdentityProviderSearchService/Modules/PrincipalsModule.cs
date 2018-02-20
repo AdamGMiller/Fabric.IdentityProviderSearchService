@@ -36,17 +36,17 @@ namespace Fabric.IdentityProviderSearchService.Modules
         private dynamic SearchForUser()
         {
             this.RequiresClaims(SearchPrincipalClaim);
-            var searchRequest = this.Bind<SearchRequest>();
+            var searchRequest = this.Bind<SubjectIdRequest>();
 
-            if (string.IsNullOrEmpty(searchRequest.SearchText))
+            if (string.IsNullOrEmpty(searchRequest.SubjectId))
             {
-                return CreateFailureResponse<FabricPrincipalApiModel>("Search text was not provided and is required",
+                return CreateFailureResponse<FabricPrincipalApiModel>("Subject Id was not provided and is required",
                     HttpStatusCode.BadRequest);
             }
 
             try
             {
-                var user = _seachService.FindUserBySubjectId(searchRequest.SearchText);
+                var user = _seachService.FindUserBySubjectId(searchRequest.SubjectId);
 
                 return new FabricPrincipalApiModel
                 {
