@@ -36,7 +36,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_InvalidSubjectIdFormat_NullResult()
+        public void FindUserBySubjectId_InvalidSubjectIdFormat_NotNullResult()
         {
             var user = _providerService.FindUserBySubjectId($"{_appConfig.DomainName}.patrick.jones");
 
@@ -46,7 +46,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_UserNotFound_NullResult()
+        public void FindUserBySubjectId_UserNotFound_NotNullResult()
         {
             var user = _providerService.FindUserBySubjectId($"{_appConfig.DomainName}\\patrick.jon");
 
