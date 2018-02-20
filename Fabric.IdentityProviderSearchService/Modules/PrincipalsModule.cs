@@ -30,7 +30,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
         private dynamic Search()
         {            
-            this.RequiresClaims(AuthorizationReadClaim);
+            this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchRequest>();
 
             if (string.IsNullOrEmpty(searchRequest.SearchText))
@@ -76,7 +76,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             return Negotiate.WithModel(error).WithStatusCode(statusCode);
         }
 
-        private Predicate<Claim> AuthorizationReadClaim
+        private Predicate<Claim> SearchPrincipalClaim
         {
             get { return claim => claim.Type == "scope" && claim.Value == Scopes.SearchPrincipalsScope; }
         }
