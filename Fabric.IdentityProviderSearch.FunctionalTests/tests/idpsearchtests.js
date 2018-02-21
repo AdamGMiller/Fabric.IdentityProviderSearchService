@@ -1,18 +1,10 @@
-//get fabric installer secret from environment variable  (build pipeline will create an identity container same as it does in auth release pipeline )
-
-//register the idp search api with identity
-
-//create a client that has the fabric\identity.search scope 
-
-//create tests for finding users, groups, and both 
-
 var chakram = require("chakram");
 var expect = require("chakram").expect;
 
 describe("identity provider search tests", function(){    
     var fabricInstallerSecret = process.env.FABRIC_INSTALLER_SECRET;    
     var baseIdPSearchUrl = process.env.BASE_IDP_SEARCH_URL;
-    var baseIdentityUrl = process.env.BASE_IDENTITY_URL;        
+    var baseIdentityUrl = process.env.BASE_IDENTITY_URL;      
 
     if(!baseIdPSearchUrl) {
         baseIdPSearchUrl = "http://localhost:5009";
@@ -48,7 +40,7 @@ describe("identity provider search tests", function(){
             });
     }
 
-    function getAccessTokenForInstaller(installerClientSecret) {
+    function getAccessTokenForInstaller(installerClientSecret) {        
         var postData = {
             form: {
                 "client_id": "fabric-installer",
@@ -120,10 +112,14 @@ describe("identity provider search tests", function(){
 
     describe("search for users and groups", function(){
         it("should find both users and groups", function(){
-            chakram.get(baseIdPSearchUrl + "/principals/search?searchtext=ky", authRequestOptions)
+            this.timeout(15000);
+            return chakram.get(baseIdPSearchUrl + "/principals/search?searchtext=kyle", authRequestOptions)
                 .then(function(searchResponse){
-                    expect(clientResponse).to.have.status(200);
-                    expect(clientResponse).to.comprise.of.json({ clientId: "func-test" });                    
+                    console.log(JSON.stringify(searchResponse));
+                    expect(searchResponse).to.have.status(200);
+                    expect(searchResponse).to.have.json("resultCount", function(resultCount){
+                        expect(resultCount).to.be.above(0);
+                    });                    
                 });
         })
     });
