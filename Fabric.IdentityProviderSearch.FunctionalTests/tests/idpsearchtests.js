@@ -110,17 +110,29 @@ describe("identity provider search tests", function(){
         return bootstrapIdentityServer();
     });
 
-    describe("search for users and groups", function(){
-        it("should find both users and groups", function(){
-            this.timeout(15000);
+    describe("search for principals", function(){
+        it("should return at least one result for known existing principal", function(){
+            this.timeout(15000);            
             return chakram.get(baseIdPSearchUrl + "/principals/search?searchtext=kyle", authRequestOptions)
-                .then(function(searchResponse){
-                    console.log(JSON.stringify(searchResponse));
+                .then(function(searchResponse){                    
                     expect(searchResponse).to.have.status(200);
                     expect(searchResponse).to.have.json("resultCount", function(resultCount){
                         expect(resultCount).to.be.above(0);
                     });                    
                 });
-        })
+        });
+
+        it("should return a 401 if no authorization header present", function(){
+            this.timeout(15000);
+            var requestOptions = {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+            return chakram.get(baseIdPSearchUrl + "/principals/search?searchtext=kyle", requestOptions)
+                .then(function(searchResponse){                    
+                    expect(searchResponse).to.have.status(401);                    
+                });
+        });
     });
 });
