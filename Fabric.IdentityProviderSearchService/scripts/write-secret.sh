@@ -1,7 +1,7 @@
 #!/bin/bash
 
 installerSecretString=$1
-destinationFile=$3
+destinationFile=$2
 
 json="{\"installerSecret\":\""$installerSecretString"\"}"  
 
