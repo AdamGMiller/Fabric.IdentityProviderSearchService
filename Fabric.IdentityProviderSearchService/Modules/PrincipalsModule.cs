@@ -11,16 +11,19 @@ using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
 using Nancy.Security;
+using Serilog;
 
 namespace Fabric.IdentityProviderSearchService.Modules
 {
     public sealed class PrincipalsModule : NancyModule
     {
         private readonly PrincipalSeachService _seachService;
+        private readonly ILogger _logger;
 
-        public PrincipalsModule(PrincipalSeachService seachService) : base("/v1/principals")
+        public PrincipalsModule(PrincipalSeachService seachService, ILogger logger) : base("/v1/principals")
         {
             _seachService = seachService;
+            _logger = logger;
 
             Get("/search",
                 _ => Search(),
@@ -46,6 +49,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
             try
             {
+                _logger.Information($"searching for user with subject id: {searchRequest.SubjectId}");
                 var user = _seachService.FindUserBySubjectId(searchRequest.SubjectId);
 
                 return new FabricPrincipalApiModel
@@ -64,6 +68,10 @@ namespace Fabric.IdentityProviderSearchService.Modules
             catch (BadRequestException e)
             {
                 return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
+            }
+            catch (Exception e)
+            {
+                return CreateFailureResponse<object>(e.Message, HttpStatusCode.BadRequest);
             }
         }
 

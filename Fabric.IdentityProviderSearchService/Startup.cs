@@ -21,13 +21,13 @@ namespace Fabric.IdentityProviderSearchService
 
             var logger = LogFactory.CreateTraceLogger(new LoggingLevelSwitch(), appConfig.ApplicationInsights);
 
-
+            
             app.UseIdentityServerBearerTokenAuthentication(new IdentityServerBearerTokenAuthenticationOptions
             {
                 Authority = appConfig.IdentityServerConfidentialClientSettings.Authority,
                 RequiredScopes = appConfig.IdentityServerConfidentialClientSettings.Scopes
             });
-
+            
             app.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(appConfig, logger));
             app.UseStageMarker(PipelineStage.MapHandler);
         }

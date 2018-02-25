@@ -5,6 +5,7 @@ using Fabric.IdentityProviderSearchService.Infrastructure.PipelineHooks;
 using Fabric.IdentityProviderSearchService.Services;
 using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.Configuration;
 using Nancy.Conventions;
 using Nancy.Responses.Negotiation;
 using Nancy.Swagger.Services;
@@ -38,7 +39,7 @@ namespace Fabric.IdentityProviderSearchService
                         ctx,
                         ex,
                         container.Resolve<IResponseNegotiator>(),
-                        false)); //TODO: find out how to determine if IsDevelopment is true
+                        true)); //TODO: find out how to determine if IsDevelopment is true
 
             pipelines.BeforeRequest += ctx => RequestHooks.RemoveContentTypeHeaderForGet(ctx);
             pipelines.BeforeRequest += ctx => RequestHooks.SetDefaultVersionInUrl(ctx);
@@ -61,6 +62,12 @@ namespace Fabric.IdentityProviderSearchService
 
             nancyConventions.StaticContentsConventions.Add(
                 StaticContentConventionBuilder.AddDirectory("/swagger"));
+        }
+
+        public override void Configure(INancyEnvironment environment)
+        {
+            base.Configure(environment);
+            environment.Tracing(true, true);
         }
 
         private void InitializeSwaggerMetadata()
