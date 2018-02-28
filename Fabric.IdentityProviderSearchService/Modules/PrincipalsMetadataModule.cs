@@ -34,6 +34,15 @@ namespace Fabric.IdentityProviderSearchService.Modules
             In = ParameterIn.Query
         };
 
+        private readonly Parameter _subjectIdParameter = new Parameter
+        {
+            Name = "subjectid",
+            Description = "The subject id of the user being searched",
+            Required = true,
+            Type = "string",
+            In = ParameterIn.Query
+        };
+
         private readonly Tag _searchTag =
             new Tag { Name = "Search", Description = "Finding users and groups from an identity provider" };
 
@@ -74,7 +83,31 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     _searchTag
                 }).SecurityRequirement(_oAuth2SearchScopeBuilder);
 
-
+            RouteDescriber.DescribeRouteWithParams(
+                "SearchForUser",
+                "",
+                "Searches for users by subject id in an identity provider",
+                new[]
+                {
+                    new HttpResponseMetadata<FabricPrincipalApiModel>
+                    {
+                        Code = (int) HttpStatusCode.OK,
+                        Message = "Search was successful"
+                    },
+                    new HttpResponseMetadata
+                    {
+                        Code = (int) HttpStatusCode.BadRequest,
+                        Message = "Subject id not provided"
+                    }
+                },
+                new[]
+                {
+                    _subjectIdParameter
+                },
+                new[]
+                {
+                    _searchTag
+                }).SecurityRequirement(_oAuth2SearchScopeBuilder);
         }
     }
 }
