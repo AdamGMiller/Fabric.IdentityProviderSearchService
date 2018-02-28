@@ -28,7 +28,7 @@ describe("identity provider search tests", function(){
         "requireConsent": "false",
         "allowedGrantTypes": ["client_credentials", "password"],
         "allowedScopes": [
-            "fabric/identity.searchusers",
+            "fabric/idprovider.searchusers",
         ]
     }
 
@@ -59,7 +59,7 @@ describe("identity provider search tests", function(){
                 "client_id": "search-func-test",
                 "client_secret": secret,
                 "grant_type": "client_credentials",
-                "scope": "fabric/identity.searchusers"
+                "scope": "fabric/idprovider.searchusers"
             }
         }
 
