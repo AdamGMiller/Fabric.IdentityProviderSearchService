@@ -44,6 +44,14 @@ namespace Fabric.IdentityProviderSearchService
             pipelines.BeforeRequest += ctx => RequestHooks.RemoveContentTypeHeaderForGet(ctx);
             pipelines.BeforeRequest += ctx => RequestHooks.SetDefaultVersionInUrl(ctx);
 
+            pipelines.AfterRequest += ctx =>
+            {
+                foreach (var corsHeader in HttpResponseHeaders.CorsHeaders)
+                {
+                    ctx.Response.Headers.Add(corsHeader.Item1, corsHeader.Item2);
+                }
+            };
+
             container.Register(_appConfig);
             container.Register(_logger);
         }
