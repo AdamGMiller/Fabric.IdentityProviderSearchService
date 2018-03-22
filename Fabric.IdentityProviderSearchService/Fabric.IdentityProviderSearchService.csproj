@@ -287,8 +287,11 @@
     <Content Include="Documentation\gradlew" />
     <Content Include="Documentation\gradlew.bat" />
     <Content Include="Documentation\gradle\wrapper\gradle-wrapper.properties" />
+    <Content Include="Fabric.IdentityProviderSearchService.WebDeployPackage.nuspec" />
+    <Content Include="Fabric.IdentityProviderSearchService.WebDeployPackage.targets" />
     <None Include="packages.config" />
     <Content Include="Documentation\gradle\wrapper\gradle-wrapper.jar" />
+    <Content Include="Parameters.xml" />
     <Content Include="swagger\swagger-ui-bundle.js.map" />
     <Content Include="swagger\swagger-ui-standalone-preset.js.map" />
     <Content Include="swagger\swagger-ui.css.map" />
@@ -315,6 +318,7 @@
     <Content Include="swagger\swagger-ui.js" />
     <Content Include="Web.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>

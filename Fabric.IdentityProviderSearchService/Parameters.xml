@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<parameters>
+  <parameter
+    name="Discovery Service Endpoint"
+    description="The base url for the Discovery Service. Discovery Service is used to register this service for other services to find as well as an endpoint to find needed services."
+    defaultValue="http://localhost/DiscoveryService/v1/"
+    tags="uri">
+    <parameterEntry kind="XmlFile" scope="Web.config" match="/configuration/appSettings/add[@key='DiscoveryServiceEndPoint']/@value" />
+  </parameter>
+  <parameter
+    name="Application Endpoint Address"
+    description="The web address where Identity Provider Search Service will be accessed"
+    defaultValue="http://localhost/IdentityProviderSearchService"
+    tags="uri">
+    <parameterEntry kind="XmlFile" scope="Web.config" match="/configuration/appSettings/add[@key='ApplicationEndPoint']/@value" />
+  </parameter>
+</parameters>

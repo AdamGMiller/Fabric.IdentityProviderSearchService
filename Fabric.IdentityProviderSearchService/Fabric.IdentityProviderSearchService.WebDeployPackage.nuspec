@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Fabric.IdentityProviderSearchService.WebDeployPackage</id>
+    <version>1.0.2018032101</version>
+    <description>Web Deploy package for the IdentityProviderSearch Service</description>
+    <authors>Health Catalyst</authors>
+    <owners>Health Catalyst</owners>
+  </metadata>
+  <files>
+    <file src="Packages\Fabric.IdentityProviderSearchService.zip" target="build" />
+    <file src="Fabric.IdentityProviderSearchService.WebDeployPackage.targets" target="build" />
+  </files>
+</package>
