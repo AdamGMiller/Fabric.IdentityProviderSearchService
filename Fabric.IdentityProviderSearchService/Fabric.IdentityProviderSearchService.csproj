@@ -146,7 +146,7 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.2.5.0\lib\net46\Serilog.dll</HintPath>
+      <HintPath>..\packages\Serilog.2.6.0\lib\net46\Serilog.dll</HintPath>
     </Reference>
     <Reference Include="Serilog.Extensions.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Extensions.Logging.2.0.2\lib\net461\Serilog.Extensions.Logging.dll</HintPath>
@@ -329,6 +329,7 @@
     <Compile Include="Configuration\AppConfiguration.cs" />
     <Compile Include="Configuration\ApplicationInsights.cs" />
     <Compile Include="Configuration\IAppConfiguration.cs" />
+    <Compile Include="Configuration\WebConfigProvider.cs" />
     <Compile Include="Constants\HttpResponseHeaders.cs" />
     <Compile Include="Constants\Scopes.cs" />
     <Compile Include="Exceptions\BadRequestException.cs" />

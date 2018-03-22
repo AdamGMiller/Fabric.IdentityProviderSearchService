@@ -14,6 +14,7 @@ namespace Fabric.IdentityProviderSearchService
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
+                .Add(new WebConfigProvider())
                 .Build();
 
             var appConfig = new AppConfiguration();
