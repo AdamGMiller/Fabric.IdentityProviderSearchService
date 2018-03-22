@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Fabric.IdentityProviderSearchService.WebDeployPackage</id>
-    <version>1.0.2018032101</version>
+    <version>$version$</version>
     <description>Web Deploy package for the IdentityProviderSearch Service</description>
     <authors>Health Catalyst</authors>
     <owners>Health Catalyst</owners>
