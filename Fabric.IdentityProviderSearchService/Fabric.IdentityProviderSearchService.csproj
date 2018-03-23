@@ -283,6 +283,7 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Deployment\RegisterWithDiscoveryService.sql" />
     <Content Include="Documentation\build.gradle" />
     <Content Include="Documentation\gradlew" />
     <Content Include="Documentation\gradlew.bat" />
