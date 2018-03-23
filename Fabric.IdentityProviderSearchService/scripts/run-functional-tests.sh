@@ -20,7 +20,6 @@ echo "started identity"
 sleep 3
 
 output=$(curl -sSL https://raw.githubusercontent.com/HealthCatalyst/Fabric.Identity/master/Fabric.Identity.API/scripts/setup-samples.sh | sh /dev/stdin http://localhost:5001)
-echo $output
 installerSecret=$(echo $output | grep -oP '(?<="installerSecret":")[^"]*')
 export FABRIC_INSTALLER_SECRET=$installerSecret
 echo $installerSecret

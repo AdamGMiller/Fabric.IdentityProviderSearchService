@@ -13,5 +13,6 @@
     defaultValue="http://localhost/IdentityProviderSearchService"
     tags="uri">
     <parameterEntry kind="XmlFile" scope="Web.config" match="/configuration/appSettings/add[@key='ApplicationEndPoint']/@value" />
+    <parameterEntry kind="TextFile" scope="\\Deployment\\RegisterWithDiscoveryService.sql" match="ServiceUrlPlaceHolder" />
   </parameter>
 </parameters>

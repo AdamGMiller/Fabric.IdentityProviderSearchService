@@ -6,7 +6,7 @@
 
 DECLARE @ServiceNM varchar(255) = 'IdentityProviderSearchService'
 DECLARE @ServiceVersion int = 1
-DECLARE @ServiceUrl varchar(500) = 'ServiceUrlPlaceHolder'
+DECLARE @ServiceUrl varchar(500) = 'ServiceUrlPlaceHolder' + '/v1'
 DECLARE @DiscoveryTypeCD varchar(60) = 'Service'
 DECLARE @HiddenFLG bit = 1
 DECLARE @FriendlyNM varchar(255) = 'IdentityProviderSearchService'

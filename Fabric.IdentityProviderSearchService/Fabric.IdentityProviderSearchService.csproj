@@ -42,6 +42,16 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PublishDatabaseSettings>
+      <Objects>
+        <ObjectGroup Name="MetadataContext-Deployment" Order="1">
+          <Destination Path="" />
+          <Object Type="DbFullSql">
+            <Source Path="Deployment\RegisterWithDiscoveryService.sql" Transacted="False" />
+          </Object>
+        </ObjectGroup>
+      </Objects>
+    </PublishDatabaseSettings>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AntiXssLibrary, Version=4.3.0.0, Culture=neutral, PublicKeyToken=d127efab8a9c114f, processorArchitecture=MSIL">
@@ -290,7 +300,9 @@
     <Content Include="Documentation\gradle\wrapper\gradle-wrapper.properties" />
     <Content Include="Fabric.IdentityProviderSearchService.WebDeployPackage.nuspec" />
     <Content Include="Fabric.IdentityProviderSearchService.WebDeployPackage.targets" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="Documentation\gradle\wrapper\gradle-wrapper.jar" />
     <Content Include="Parameters.xml" />
     <Content Include="swagger\swagger-ui-bundle.js.map" />
