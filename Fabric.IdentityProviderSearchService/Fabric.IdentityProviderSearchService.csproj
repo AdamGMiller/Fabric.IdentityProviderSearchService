@@ -45,7 +45,7 @@
     <PublishDatabaseSettings>
       <Objects>
         <ObjectGroup Name="MetadataContext-Deployment" Order="1">
-          <Destination Path="" />
+          <Destination Path="Data Source=localhost;Initial Catalog=EDWAdmin;Integrated Security=True" />
           <Object Type="DbFullSql">
             <Source Path="Deployment\RegisterWithDiscoveryService.sql" Transacted="False" />
           </Object>
