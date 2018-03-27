@@ -23,14 +23,17 @@ namespace Fabric.IdentityProviderSearchService.Services
         /// Initializes a new instance of the <see cref="DiscoveryServiceClient"/> class.
         /// </summary>
         /// <param name="discoveryServiceUrl">The URL (including version) of the DiscoveryService.</param>
-        /// <param name="handler">The optional message handler for processing requests.</param>
-        public DiscoveryServiceClient(string discoveryServiceUrl, HttpMessageHandler handler = null)
+        public DiscoveryServiceClient(string discoveryServiceUrl) : this(discoveryServiceUrl, new HttpClientHandler { UseDefaultCredentials = true})
         {
-            if (handler == null)
-            {
-                handler = new HttpClientHandler { UseDefaultCredentials = true };
-            }
+        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscoveryServiceClient"/> class.
+        /// </summary>
+        /// <param name="discoveryServiceUrl">The URL (including version) of the DiscoveryService.</param>
+        /// <param name="handler">The optional message handler for processing requests.</param>
+        public DiscoveryServiceClient(string discoveryServiceUrl, HttpMessageHandler handler)
+        {
             this.httpClient = new HttpClient(handler) { BaseAddress = new Uri(discoveryServiceUrl) };
             this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
@@ -53,9 +56,10 @@ namespace Fabric.IdentityProviderSearchService.Services
         /// <returns>A <see cref="DiscoveryServiceApiModel"/></returns>
         public async Task<DiscoveryServiceApiModel> GetServiceAsync(string serviceName, int serviceVersion)
         {
-            var url = $"Services(ServiceName='{serviceName}', Version={serviceVersion}";
+            var url = $"Services(ServiceName='{serviceName}', Version={serviceVersion})";
             var response = await this.httpClient.GetAsync(url).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var apiModel = JsonConvert.DeserializeObject<DiscoveryServiceApiModel>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
             return apiModel;
         }

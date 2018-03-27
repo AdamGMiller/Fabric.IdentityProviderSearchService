@@ -43,7 +43,7 @@ namespace Fabric.IdentityProviderSearchService.UnitTests
                                 new StringContent(JsonConvert.SerializeObject(expectedIdentityServiceModel))
                         });
 
-            var discoveryServiceClient = new DiscoveryServiceClient("http://localhost/DiscoveryService/v1", mockHttpHandler.Object);
+            var discoveryServiceClient = new DiscoveryServiceClient("http://localhost/DiscoveryService/v1/", mockHttpHandler.Object);
             var identityServiceModel = await discoveryServiceClient.GetServiceAsync(
                                            expectedIdentityServiceModel.ServiceName,
                                            expectedIdentityServiceModel.Version);
