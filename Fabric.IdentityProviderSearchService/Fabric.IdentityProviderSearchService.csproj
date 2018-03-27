@@ -340,6 +340,7 @@
     <Compile Include="ApiModels\ErrorFactory.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Configuration\AppConfiguration.cs" />
+    <Compile Include="Configuration\AppConfigurationExtensions.cs" />
     <Compile Include="Configuration\ApplicationInsights.cs" />
     <Compile Include="Configuration\IAppConfiguration.cs" />
     <Compile Include="Configuration\WebConfigProvider.cs" />
@@ -354,6 +355,7 @@
     <Compile Include="Infrastructure\PipelineHooks\RequestHooks.cs" />
     <Compile Include="Logging\LogFactory.cs" />
     <Compile Include="Models\DirectoryEntryWrapper.cs" />
+    <Compile Include="Models\DiscoveryServiceApiModel.cs" />
     <Compile Include="Models\FabricPrincipal.cs" />
     <Compile Include="ApiModels\Error.cs" />
     <Compile Include="Models\IFabricPrincipal.cs" />
@@ -365,6 +367,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActiveDirectoryProviderService.cs" />
     <Compile Include="Services\ActiveDirectoryProxy.cs" />
+    <Compile Include="Services\DiscoveryServiceClient.cs" />
     <Compile Include="Services\IActiveDirectoryProxy.cs" />
     <Compile Include="Services\IExternalIdentityProviderService.cs" />
     <Compile Include="Services\PrincipalSearchService.cs" />

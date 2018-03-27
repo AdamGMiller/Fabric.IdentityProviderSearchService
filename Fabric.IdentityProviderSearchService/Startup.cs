@@ -22,7 +22,8 @@ namespace Fabric.IdentityProviderSearchService
 
             var logger = LogFactory.CreateTraceLogger(new LoggingLevelSwitch(), appConfig.ApplicationInsights);
 
-            
+            appConfig.ConfigureIdentityServiceUrl();
+
             app.UseIdentityServerBearerTokenAuthentication(new IdentityServerBearerTokenAuthenticationOptions
             {
                 Authority = appConfig.IdentityServerConfidentialClientSettings.Authority,
