@@ -10,9 +10,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var principals = new List<IDirectoryEntry>
             {
-                CreateMockDirectoryEntry("patrick", "jones", PrincipalType.User),
-                CreateMockDirectoryEntry("patricia", "smith", PrincipalType.User),
-                CreateMockDirectoryEntry("janet", "apple", PrincipalType.User),
+                CreateMockDirectoryEntry("patrick", "jones", PrincipalType.User, "Patrick Jones"),
+                CreateMockDirectoryEntry("patricia", "smith", PrincipalType.User, "Patricia Smith"),
+                CreateMockDirectoryEntry("janet", "apple", PrincipalType.User, "Janet Apple"),
                 CreateMockDirectoryEntry("", "", PrincipalType.Group, "patient group"),
                 CreateMockDirectoryEntry("", "", PrincipalType.Group, "janitorial group"),
                 CreateMockDirectoryEntry("", "", PrincipalType.Group, "developer group")
@@ -21,7 +21,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             return principals;
         }
 
-        private IDirectoryEntry CreateMockDirectoryEntry(string firstName, string lastName, PrincipalType type, string name = "")
+        private static IDirectoryEntry CreateMockDirectoryEntry(string firstName, string lastName, PrincipalType type, string name = "")
         {
             var principal1 = new Mock<IDirectoryEntry>();
             principal1.SetupGet(p => p.SchemaClassName).Returns(type.ToString().ToLower());        

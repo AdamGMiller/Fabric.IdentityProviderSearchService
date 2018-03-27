@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
-    public class PrincipalSeachService
+    public class PrincipalSearchService
     {
         private readonly IExternalIdentityProviderService _externalIdentityProviderService;
 
-        public PrincipalSeachService(IExternalIdentityProviderService externalIdentityProviderService)
+        public PrincipalSearchService(IExternalIdentityProviderService externalIdentityProviderService)
         {
             _externalIdentityProviderService = externalIdentityProviderService;
         }

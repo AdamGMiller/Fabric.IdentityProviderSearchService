@@ -367,7 +367,7 @@
     <Compile Include="Services\ActiveDirectoryProxy.cs" />
     <Compile Include="Services\IActiveDirectoryProxy.cs" />
     <Compile Include="Services\IExternalIdentityProviderService.cs" />
-    <Compile Include="Services\PrincipalSeachService.cs" />
+    <Compile Include="Services\PrincipalSearchService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -388,7 +388,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>55655</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

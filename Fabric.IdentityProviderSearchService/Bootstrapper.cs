@@ -61,7 +61,7 @@ namespace Fabric.IdentityProviderSearchService
             base.ConfigureRequestContainer(container, context);
             container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
             container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
-            container.Register<PrincipalSeachService, PrincipalSeachService>();
+            container.Register<PrincipalSearchService, PrincipalSearchService>();
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)

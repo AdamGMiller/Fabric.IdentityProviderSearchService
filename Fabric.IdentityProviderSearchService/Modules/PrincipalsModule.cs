@@ -17,12 +17,12 @@ namespace Fabric.IdentityProviderSearchService.Modules
 {
     public sealed class PrincipalsModule : NancyModule
     {
-        private readonly PrincipalSeachService _seachService;
+        private readonly PrincipalSearchService _searchService;
         private readonly ILogger _logger;
 
-        public PrincipalsModule(PrincipalSeachService seachService, ILogger logger) : base("/v1/principals")
+        public PrincipalsModule(PrincipalSearchService searchService, ILogger logger) : base("/v1/principals")
         {
-            _seachService = seachService;
+            _searchService = searchService;
             _logger = logger;
 
             Get("/search",
@@ -50,7 +50,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             try
             {
                 _logger.Information($"searching for user with subject id: {searchRequest.SubjectId}");
-                var user = _seachService.FindUserBySubjectId(searchRequest.SubjectId);
+                var user = _searchService.FindUserBySubjectId(searchRequest.SubjectId);
 
                 return new FabricPrincipalApiModel
                 {
@@ -90,7 +90,9 @@ namespace Fabric.IdentityProviderSearchService.Modules
             {
                 var principals = new List<FabricPrincipalApiModel>();
 
-                var users = _seachService.SearchPrincipals(searchRequest.SearchText, searchRequest.Type);
+                _logger.Information($"searching for users with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
+
+                var users = _searchService.SearchPrincipals(searchRequest.SearchText, searchRequest.Type);
 
                 principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {

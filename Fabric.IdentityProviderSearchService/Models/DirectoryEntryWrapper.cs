@@ -14,7 +14,7 @@ namespace Fabric.IdentityProviderSearchService.Models
             
             SchemaClassName = directoryEntry.SchemaClassName;
 
-            foreach (var property in _propertiesToSet)
+            foreach (var property in PropertiesToSet)
             {
                 var directoryEntryProperty = directoryEntry.Properties[property];
                 Properties.Add(directoryEntryProperty.PropertyName.ToLower(), ReadUserEntryProperty(directoryEntryProperty));
@@ -33,7 +33,7 @@ namespace Fabric.IdentityProviderSearchService.Models
             return propertyValueCollection.Value?.ToString() ?? string.Empty;
         }
 
-        private readonly IEnumerable<string> _propertiesToSet = new List<string>
+        private static readonly IEnumerable<string> PropertiesToSet = new List<string>
         {
             GivenNameString,
             SnString,

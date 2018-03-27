@@ -132,5 +132,22 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.BadRequest, searchResult.StatusCode);
         }
+
+        [Fact]
+        public async Task SearchPrincipals_FindUsersByFullName_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("searchtext", "patrick jones");
+                with.Query("type", "user");
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            Assert.Equal(1, users.ResultCount);
+            Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("user")));
+        }
     }
 }

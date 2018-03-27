@@ -19,9 +19,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         public IEnumerable<IFabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
         {
             var ldapQuery = BuildLdapQuery(searchText, principalType);
-
             var principals = FindPrincipalsWithDirectorySearcher(ldapQuery);
-
             return principals;
         }
 
@@ -80,10 +78,10 @@ namespace Fabric.IdentityProviderSearchService.Services
             };
         }
 
-        private string BuildLdapQuery(string searchText, PrincipalType principalType)
+        private static string BuildLdapQuery(string searchText, PrincipalType principalType)
         {
             var encodedSearchText = Encoder.LdapFilterEncode(searchText);
-            var nameFilter = $"(|(sAMAccountName={encodedSearchText}*)(givenName={encodedSearchText}*)(sn={encodedSearchText}*))";
+            var nameFilter = $"(|(sAMAccountName={encodedSearchText}*)(givenName={encodedSearchText}*)(sn={encodedSearchText}*)(cn={encodedSearchText}*))";
 
             switch (principalType)
             {
