@@ -31,8 +31,7 @@ namespace Fabric.IdentityProviderSearchService.Services
                 handler = new HttpClientHandler { UseDefaultCredentials = true };
             }
 
-            this.httpClient = new HttpClient(handler);
-            this.httpClient.BaseAddress = new Uri(discoveryServiceUrl);
+            this.httpClient = new HttpClient(handler) { BaseAddress = new Uri(discoveryServiceUrl) };
             this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
