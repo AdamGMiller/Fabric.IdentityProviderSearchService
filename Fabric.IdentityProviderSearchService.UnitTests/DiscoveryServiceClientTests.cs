@@ -21,6 +21,11 @@ namespace Fabric.IdentityProviderSearchService.UnitTests
 
     public class DiscoveryServiceClientTests
     {
+        private Mock<MockHttpHandler> _mockHttpHandler;
+        public DiscoveryServiceClientTests()
+        {
+            _mockHttpHandler = new Mock<MockHttpHandler>{CallBase = true};
+        }
         [Fact]
         public async Task GetService_ShouldReturn_ValidServiceAsync()
         {
@@ -33,22 +38,50 @@ namespace Fabric.IdentityProviderSearchService.UnitTests
                         DiscoveryType = "Service"
                     };
 
-            var mockHttpHandler = new Mock<MockHttpHandler>();
-            mockHttpHandler.Setup(httpHandler => httpHandler.Send(It.IsAny<HttpRequestMessage>()))
-                .Returns(
-                    new HttpResponseMessage
-                        {
-                            StatusCode = HttpStatusCode.OK,
-                            Content =
-                                new StringContent(JsonConvert.SerializeObject(expectedIdentityServiceModel))
-                        });
+            var discoveryBaseUrl = "http://localhost/DiscoveryService/v1/";
+            var discoverySearchUrl =
+                $"{discoveryBaseUrl}Services(ServiceName='{expectedIdentityServiceModel.ServiceName}', Version={expectedIdentityServiceModel.Version})";
 
-            var discoveryServiceClient = new DiscoveryServiceClient("http://localhost/DiscoveryService/v1/", mockHttpHandler.Object);
+
+            _mockHttpHandler.Setup(httpHandler => httpHandler.Send(It.IsAny<HttpRequestMessage>()))
+                .Returns((HttpRequestMessage requestMessage) =>
+                    {
+                        if (requestMessage.RequestUri.ToString()
+                            .Equals(discoverySearchUrl, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return new HttpResponseMessage
+                                       {
+                                           StatusCode = HttpStatusCode.OK,
+                                           Content = new StringContent(
+                                               JsonConvert.SerializeObject(
+                                                   expectedIdentityServiceModel))
+                                       };
+                        }
+                        return new HttpResponseMessage
+                            {
+                                StatusCode = HttpStatusCode.BadRequest
+                            };
+                    });
+            
+            var discoveryServiceClient = new DiscoveryServiceClient("http://localhost/DiscoveryService/v1/", _mockHttpHandler.Object);
             var identityServiceModel = await discoveryServiceClient.GetServiceAsync(
                                            expectedIdentityServiceModel.ServiceName,
                                            expectedIdentityServiceModel.Version);
 
             Assert.Equal(expectedIdentityServiceModel.ServiceUrl, identityServiceModel.ServiceUrl);
+        }
+
+        [Fact]
+        public async Task GetService_ShouldThrow_ForNonSuccessCode()
+        {
+            _mockHttpHandler.Setup(httpHandler => httpHandler.Send(It.IsAny<HttpRequestMessage>()))
+                .Returns((HttpRequestMessage requestMessage) =>
+                    new HttpResponseMessage
+                        {
+                            StatusCode = HttpStatusCode.BadRequest
+                        });
+            var discoveryServiceClient = new DiscoveryServiceClient("http://localhost/DiscoveryService/v1/", _mockHttpHandler.Object);
+            await Assert.ThrowsAsync<HttpRequestException>(() => discoveryServiceClient.GetServiceAsync("Identity", 1));
         }
     }
 }
