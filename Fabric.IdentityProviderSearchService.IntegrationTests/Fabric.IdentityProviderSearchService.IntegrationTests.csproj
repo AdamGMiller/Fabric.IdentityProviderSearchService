@@ -147,10 +147,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\AsyncUsageAnalyzers.1.0.0-alpha003\analyzers\dotnet\AsyncUsageAnalyzers.dll" />
-    <Analyzer Include="..\packages\xunit.analyzers.0.7.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Fabric.IdentityProviderSearchService\Fabric.IdentityProviderSearchService.csproj">
       <Project>{7349fe29-f7a0-4195-9705-3f7c1e9090d4}</Project>
       <Name>Fabric.IdentityProviderSearchService</Name>
