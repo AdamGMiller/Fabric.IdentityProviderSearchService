@@ -34,7 +34,7 @@
         /// <param name="handler">The optional message handler for processing requests.</param>
         public DiscoveryServiceClient(string discoveryServiceUrl, HttpMessageHandler handler)
         {
-            this.httpClient = new HttpClient(handler) { BaseAddress = new Uri(discoveryServiceUrl) };
+            this.httpClient = new HttpClient(handler) { BaseAddress = new Uri(this.FormatUrl(discoveryServiceUrl)) };
             this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -59,11 +59,10 @@
             var url = $"Services(ServiceName='{serviceName}', Version={serviceVersion})";
             var response = await this.httpClient.GetAsync(url).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var apiModel = JsonConvert.DeserializeObject<DiscoveryServiceApiModel>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
             return apiModel;
         }
-
+        
         /// <summary>
         /// Cleans up resources.
         /// </summary>
@@ -83,6 +82,16 @@
             {
                 this.httpClient?.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Adds a trailing slash to the url if it is not present.
+        /// </summary>
+        /// <param name="url">The url to format.</param>
+        /// <returns>The formatted url.</returns>
+        private string FormatUrl(string url)
+        {
+            return !url.EndsWith("/") ? $"{url}/" : url;
         }
     }
 }

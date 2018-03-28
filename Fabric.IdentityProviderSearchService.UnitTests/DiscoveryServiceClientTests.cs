@@ -60,7 +60,7 @@ namespace Fabric.IdentityProviderSearchService.UnitTests
                             };
                     });
             
-            var discoveryServiceClient = new DiscoveryServiceClient("http://localhost/DiscoveryService/v1/", _mockHttpHandler.Object);
+            var discoveryServiceClient = new DiscoveryServiceClient("http://localhost/DiscoveryService/v1", _mockHttpHandler.Object);
             var identityServiceModel = await discoveryServiceClient.GetServiceAsync(
                                            expectedIdentityServiceModel.ServiceName,
                                            expectedIdentityServiceModel.Version);
