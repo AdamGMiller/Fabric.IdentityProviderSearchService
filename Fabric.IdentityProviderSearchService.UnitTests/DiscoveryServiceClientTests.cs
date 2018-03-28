@@ -69,7 +69,7 @@ namespace Fabric.IdentityProviderSearchService.UnitTests
         }
 
         [Fact]
-        public async Task GetService_ShouldThrow_ForNonSuccessCode()
+        public async Task GetService_ShouldThrow_ForNonSuccessCodeAsync()
         {
             _mockHttpHandler.Setup(httpHandler => httpHandler.Send(It.IsAny<HttpRequestMessage>()))
                 .Returns((HttpRequestMessage requestMessage) =>
