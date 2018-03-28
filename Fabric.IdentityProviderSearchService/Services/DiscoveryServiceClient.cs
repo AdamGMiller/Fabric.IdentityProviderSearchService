@@ -1,12 +1,12 @@
-﻿using System;
-
-namespace Fabric.IdentityProviderSearchService.Services
+﻿namespace Fabric.IdentityProviderSearchService.Services
 {
+    using System;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
 
     using Fabric.IdentityProviderSearchService.Models;
+
     using Newtonsoft.Json;
 
     /// <summary>
