@@ -67,13 +67,13 @@
 
                 if (apiModel.Value.Count > 1)
                 {
-                    throw new InvalidOperationException($"Retrieved multiple {serviceName} version {serviceVersion} from DiscoveryService at {response.RequestMessage.RequestUri}");
+                    throw new InvalidOperationException($"Retrieved multiple {serviceName} version {serviceVersion} from DiscoveryService at {response.RequestMessage?.RequestUri}");
                 }
 
                 var serviceRegistration = apiModel.Value.SingleOrDefault();
                 if (serviceRegistration == null)
                 {
-                    throw new InvalidOperationException($"Could not get {serviceName} version {serviceVersion} from DiscoveryService at {response.RequestMessage.RequestUri}");
+                    throw new InvalidOperationException($"Could not get {serviceName} version {serviceVersion} from DiscoveryService at {response.RequestMessage?.RequestUri}");
                 }
 
                 return serviceRegistration;
@@ -81,7 +81,7 @@
             catch (JsonException e)
             {
                 throw new InvalidOperationException(
-                    $"Could not get {serviceName} version {serviceVersion} from DiscoveryService at {response.RequestMessage.RequestUri}",
+                    $"Could not get {serviceName} version {serviceVersion} from DiscoveryService at {response.RequestMessage?.RequestUri}",
                     e);
             }
         }
