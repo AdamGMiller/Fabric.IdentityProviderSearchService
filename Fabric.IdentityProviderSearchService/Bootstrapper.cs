@@ -69,7 +69,7 @@ namespace Fabric.IdentityProviderSearchService
             base.ConfigureConventions(nancyConventions);
 
             nancyConventions.StaticContentsConventions.Add(
-                StaticContentConventionBuilder.AddDirectory("/swagger"));
+                StaticContentConventionBuilder.AddDirectory("/swagger/ui"));
         }
 
         public override void Configure(INancyEnvironment environment)

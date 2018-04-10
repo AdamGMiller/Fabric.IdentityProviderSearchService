@@ -191,10 +191,10 @@
     <Content Include="Fabric.IdentityProviderSearchService.WebDeployPackage.targets" />
     <Content Include="Documentation\gradle\wrapper\gradle-wrapper.jar" />
     <Content Include="Parameters.xml" />
-    <Content Include="swagger\swagger-ui-bundle.js.map" />
-    <Content Include="swagger\swagger-ui-standalone-preset.js.map" />
-    <Content Include="swagger\swagger-ui.css.map" />
-    <Content Include="swagger\swagger-ui.js.map" />
+    <Content Include="swagger\ui\swagger-ui-bundle.js.map" />
+    <Content Include="swagger\ui\swagger-ui-standalone-preset.js.map" />
+    <Content Include="swagger\ui\swagger-ui.css.map" />
+    <Content Include="swagger\ui\swagger-ui.js.map" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -207,14 +207,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <Content Include="swagger\favicon-16x16.png" />
-    <Content Include="swagger\favicon-32x32.png" />
-    <Content Include="swagger\index.html" />
-    <Content Include="swagger\oauth2-redirect.html" />
-    <Content Include="swagger\swagger-ui-bundle.js" />
-    <Content Include="swagger\swagger-ui-standalone-preset.js" />
-    <Content Include="swagger\swagger-ui.css" />
-    <Content Include="swagger\swagger-ui.js" />
+    <Content Include="swagger\ui\favicon-16x16.png" />
+    <Content Include="swagger\ui\favicon-32x32.png" />
+    <Content Include="swagger\ui\index.html" />
+    <Content Include="swagger\ui\oauth2-redirect.html" />
+    <Content Include="swagger\ui\swagger-ui-bundle.js" />
+    <Content Include="swagger\ui\swagger-ui-standalone-preset.js" />
+    <Content Include="swagger\ui\swagger-ui.css" />
+    <Content Include="swagger\ui\swagger-ui.js" />
     <Content Include="Web.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
