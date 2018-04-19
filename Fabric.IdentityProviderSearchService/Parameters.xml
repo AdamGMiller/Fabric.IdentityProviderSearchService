@@ -15,4 +15,11 @@
     <parameterEntry kind="XmlFile" scope="Web.config" match="/configuration/appSettings/add[@key='ApplicationEndPoint']/@value" />
     <parameterEntry kind="TextFile" scope="\\Deployment\\RegisterWithDiscoveryService.sql" match="ServiceUrlPlaceHolder" />
   </parameter>
+  <parameter
+    name="Current Domain"
+    description="The current Active Directory domain used to authenticate users. Typically used in the hosted enviroment"
+    defaultValue=""
+    tags="">
+    <parameterEntry kind="XmlFile" scope="Web.config" match="/configuration/appSettings/add[@key='DomainName']/@value" />
+  </parameter>
 </parameters>
