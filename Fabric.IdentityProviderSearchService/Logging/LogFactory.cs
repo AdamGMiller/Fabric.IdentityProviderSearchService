@@ -1,4 +1,6 @@
-﻿using Fabric.IdentityProviderSearchService.Configuration;
+﻿using System;
+using System.IO;
+using Fabric.IdentityProviderSearchService.Configuration;
 using Serilog;
 using Serilog.Core;
 
@@ -21,10 +23,10 @@ namespace Fabric.IdentityProviderSearchService.Logging
 
         private static LoggerConfiguration CreateLoggerConfiguration(LoggingLevelSwitch levelSwitch)
         {
+            var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
             return new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
-              //  .Enrich.FromLogContext()
-                .WriteTo.RollingFile("c:\\inetpub\\wwwroot\\idpsearchservice\\logs\\idpsearchservice-{Date}.log");
+                .WriteTo.RollingFile(Path.Combine(currentDirectory, "logs\\idpsearchservice-{Date}.log"));
 
         }
     }

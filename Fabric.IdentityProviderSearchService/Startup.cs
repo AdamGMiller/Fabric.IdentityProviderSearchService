@@ -21,6 +21,7 @@ namespace Fabric.IdentityProviderSearchService
             ConfigurationBinder.Bind(configuration, appConfig);
 
             var logger = LogFactory.CreateTraceLogger(new LoggingLevelSwitch(), appConfig.ApplicationInsights);
+            logger.Information("IdentityProviderSearchService is starting up...");
 
             appConfig.ConfigureIdentityServiceUrl();
 
