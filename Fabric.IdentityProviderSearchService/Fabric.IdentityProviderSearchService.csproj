@@ -195,6 +195,7 @@
     <Content Include="swagger\ui\swagger-ui-standalone-preset.js.map" />
     <Content Include="swagger\ui\swagger-ui.css.map" />
     <Content Include="swagger\ui\swagger-ui.js.map" />
+    <Content Include="logs\idpsearch.log" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
