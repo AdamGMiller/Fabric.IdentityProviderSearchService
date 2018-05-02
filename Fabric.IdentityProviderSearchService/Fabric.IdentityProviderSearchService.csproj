@@ -258,6 +258,7 @@
     <Compile Include="Services\IActiveDirectoryProxy.cs" />
     <Compile Include="Services\IExternalIdentityProviderService.cs" />
     <Compile Include="Services\PrincipalSearchService.cs" />
+    <Compile Include="SolutionInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
