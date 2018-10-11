@@ -53,7 +53,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         }
 
         private bool IsDirectoryEntryAUser(IDirectoryEntry entryResult)
-        {            
+        {
             return entryResult.SchemaClassName.Equals("user");
         }
 
