@@ -20,7 +20,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         public IFabricPrincipal FindUserBySubjectId(string subjectId)
         {
             var result = GetUserAsync(subjectId).Result;
-            var principal = CreateUserPrincipal(result.First());
+            var principal = CreateUserPrincipal(result);
 
             return principal;
         }
@@ -30,37 +30,34 @@ namespace Fabric.IdentityProviderSearchService.Services
             switch(principalType)
             {
                 case PrincipalType.User:
-                    return GetUserPrincipalsAsync().Result;
+                    return GetUserPrincipalsAsync(searchText).Result;
                 case PrincipalType.Group:
-                    return GetGroupPrincipalsAsync().Result;
+                    return GetGroupPrincipalsAsync(searchText).Result;
                 default:
-                    return GetUsersAndGroups();
+                    return GetUserAndGroupPrincipalsAsync(searchText).Result;
             }
-
-            throw new NotImplementedException();
         }
 
-        private async Task<IGraphServiceUsersCollectionPage> GetUserAsync(string subjectId)
+        private async Task<User> GetUserAsync(string subjectId)
         {
-            // curently gets all users
-            return await _client.Users.Request().GetAsync();
+            return await _client.Users[subjectId].Request().GetAsync();
         }
 
-        private IEnumerable<IFabricPrincipal> GetUsersAndGroups()
+        private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText)
         {
-            var userPrincipals = GetUserPrincipalsAsync();
-            var groupPrincipals = GetGroupPrincipalsAsync();
-
-            var principals = userPrincipals.Result;
-            principals.Concat(groupPrincipals.Result);
-
-            return principals;
+            var results = await Task.WhenAll(
+                Task.Run(() => GetUserPrincipalsAsync(searchText)),
+                Task.Run(() => GetGroupPrincipalsAsync(searchText))
+            );
+            return results.SelectMany(result => result);
         }
 
-        private async Task<IEnumerable<IFabricPrincipal>> GetUserPrincipalsAsync()
+        private async Task<IEnumerable<IFabricPrincipal>> GetUserPrincipalsAsync(string searchText)
         {
+            var filterQuery = 
+                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(PreferredName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
             var principals = new List<IFabricPrincipal>();
-            var users = await _client.Users.Request().GetAsync();
+            var users = await _client.Users.Request().Filter(filterQuery).GetAsync();
             foreach(var result in users)
             {
                 principals.Add(CreateUserPrincipal(result));
@@ -69,11 +66,11 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
-        private async Task<IEnumerable<IFabricPrincipal>> GetGroupPrincipalsAsync()
+        private async Task<IEnumerable<IFabricPrincipal>> GetGroupPrincipalsAsync(string searchText)
         {
-            // can we avoid awaiting here?
+            var filterQuery = $"startswith(DisplayName, '{searchText}')";
             var principals = new List<IFabricPrincipal>();
-            var groups = await _client.Groups.Request().GetAsync();
+            var groups = await _client.Groups.Request().Filter(filterQuery).GetAsync();
 
             foreach(var result in groups)
             {
@@ -87,9 +84,9 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             return new FabricPrincipal
             {
-                FirstName = userEntry.GivenName,    // Given name is first name
-                LastName = userEntry.GivenName, // how to get these values
-                MiddleName = userEntry.GivenName,   // how to get these values
+                FirstName = userEntry.GivenName,
+                LastName = userEntry.Surname,
+                MiddleName = string.Empty,   // don't think this has a value in graph api/azure ad
                 PrincipalType = PrincipalType.User,
                 SubjectId = userEntry.Id
             };
