@@ -245,6 +245,7 @@
     <Compile Include="Infrastructure\PipelineHooks\OnErrorHooks.cs" />
     <Compile Include="Infrastructure\PipelineHooks\RequestHooks.cs" />
     <Compile Include="Logging\LogFactory.cs" />
+    <Compile Include="Models\AzureActiveDirectoryResponses.cs" />
     <Compile Include="Models\DirectoryEntryWrapper.cs" />
     <Compile Include="Models\DiscoveryServiceApiModel.cs" />
     <Compile Include="Models\DiscoveryServiceResponseModel.cs" />

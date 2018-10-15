@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using Fabric.IdentityProviderSearchService.Models;
+using System.Threading.Tasks;
 
 namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
     public interface IAzureActiveDirectoryClientCredentialsService
     {
-        Task<string> GetAzureAccessTokenAsync(string tenantId);
+        Task<AzureActiveDirectoryResponse> GetAzureAccessTokenAsync(string tenantId);
 
         string[] GetTenants();
     }

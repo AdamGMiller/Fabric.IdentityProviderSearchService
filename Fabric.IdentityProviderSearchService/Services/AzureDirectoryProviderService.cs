@@ -12,17 +12,36 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public class AzureDirectoryProviderService : IExternalIdentityProviderService
     {
-        private IGraphServiceClient _client;
         private IAppConfiguration _appConfiguration;
         private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
         private string[] _tenantIds;
+        private ICollection<IGraphServiceClient> _clients;
 
-        public AzureDirectoryProviderService(IGraphServiceClient client, IAppConfiguration appConfiguration, IAzureActiveDirectoryClientCredentialsService azureActiveDirectoryClientCredentialsService)
+        public AzureDirectoryProviderService(IAppConfiguration appConfiguration, IAzureActiveDirectoryClientCredentialsService azureActiveDirectoryClientCredentialsService)
         {
-            _client = client;
             _appConfiguration = appConfiguration;
             _azureActiveDirectoryClientCredentialsService = azureActiveDirectoryClientCredentialsService;
             _tenantIds = _appConfiguration.AzureActiveDirectoryClientSettings.IssuerWhiteList;
+
+            GenerateAccessTokensForTenantsAsync().Wait();
+        }
+
+        private async Task GenerateAccessTokensForTenantsAsync()
+        {
+            _clients = new List<IGraphServiceClient>();
+            foreach(var tenant in _tenantIds)
+            {
+                var response = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenant).ConfigureAwait(false);
+
+                var client = new GraphServiceClient(new DelegateAuthenticationProvider((requestMessage) => {
+                    requestMessage
+                        .Headers
+                        .Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", response.access_token);
+
+                    return Task.FromResult(0);
+                }));
+                _clients.Add(client);
+            }
         }
 
         public IFabricPrincipal FindUserBySubjectId(string subjectId)
@@ -48,13 +67,16 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         private async Task<User> GetUserAsync(string subjectId)
         {
-            var results = Parallel.ForEach(this._tenantIds, async (tenantId) => {
-                var accessToken = _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
-                // _client. TODO: set the access token.
-                await _client.Users[subjectId].Request().GetAsync();
-            });
+            foreach(var client in _clients)
+            {
+                var user = await client.Users[subjectId].Request().GetAsync();
+                if(user != null)
+                {
+                    return user;
+                }
+            }
 
-            // TODO: Parse these for results 
+            // TODO: throw not found?
             return new User(); 
         }
 
@@ -63,16 +85,15 @@ namespace Fabric.IdentityProviderSearchService.Services
             var results = await Task.WhenAll(
                 Task.Run(() => GetUserPrincipalsAsync(searchText)),
                 Task.Run(() => GetGroupPrincipalsAsync(searchText))
-            );
+            ).ConfigureAwait(false);
             return results.SelectMany(result => result);
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserPrincipalsAsync(string searchText)
         {
-            var filterQuery = 
-                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(PreferredName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
             var principals = new List<IFabricPrincipal>();
-            var users = await _client.Users.Request().Filter(filterQuery).GetAsync();
+            var users = await GetAllUsersFromTenantsAsync(searchText);
+
             foreach(var result in users)
             {
                 principals.Add(CreateUserPrincipal(result));
@@ -81,11 +102,26 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
+        private async Task<IEnumerable<User>> GetAllUsersFromTenantsAsync(string searchText)
+        {
+            var filterQuery =
+                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')"; 
+            // or startswith(PreferredName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
+            // TODO: why does preferredname not filter
+
+            var users = new List<User>();
+            foreach (var client in _clients)
+            {
+                 users.AddRange((await client.Users.Request().Filter(filterQuery).GetAsync()));
+            }
+
+            return users;
+        }
+
         private async Task<IEnumerable<IFabricPrincipal>> GetGroupPrincipalsAsync(string searchText)
         {
-            var filterQuery = $"startswith(DisplayName, '{searchText}')";
             var principals = new List<IFabricPrincipal>();
-            var groups = await _client.Groups.Request().Filter(filterQuery).GetAsync();
+            var groups = await GetAllGroupsFromTenantsAsync(searchText).ConfigureAwait(false);
 
             foreach(var result in groups)
             {
@@ -95,11 +131,24 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
+        private async Task<IEnumerable<Group>> GetAllGroupsFromTenantsAsync(string searchText)
+        {
+            var filterQuery = $"startswith(DisplayName, '{searchText}')";
+            var groups = new List<Group>();
+
+            foreach (var client in _clients)
+            {
+                groups.AddRange(await client.Groups.Request().Filter(filterQuery).GetAsync());
+            }
+
+            return groups;
+        }
+
         private IFabricPrincipal CreateUserPrincipal(User userEntry)
         {
             return new FabricPrincipal
             {
-                FirstName = userEntry.GivenName,
+                FirstName = userEntry.GivenName ?? userEntry.DisplayName,
                 LastName = userEntry.Surname,
                 MiddleName = string.Empty,   // don't think this has a value in graph api/azure ad
                 PrincipalType = PrincipalType.User,
@@ -112,6 +161,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             return new FabricPrincipal
             {
                 SubjectId = groupEntry.Id,
+                FirstName = groupEntry.DisplayName,     // TODO: What should go here, the interface doesn't describe a group well
                 PrincipalType = PrincipalType.Group
             };
         }

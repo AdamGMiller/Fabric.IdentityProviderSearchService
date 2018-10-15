@@ -1,5 +1,6 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Exceptions;
+using Fabric.IdentityProviderSearchService.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             this.client = client;
         }
         
-        public async Task<string> GetAzureAccessTokenAsync(string tenantId)
+        public async Task<AzureActiveDirectoryResponse> GetAzureAccessTokenAsync(string tenantId)
         {
             // Could not find an instance where this is multiple.  Leaving code the room for this.
             var scopes = applicationConfiguration.AzureActiveDirectoryClientSettings.Scopes;
@@ -48,7 +49,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             if (response.IsSuccessStatusCode)
             {
                 // TODO: deserialize this to an object and return the access token
-                return JsonConvert.DeserializeObject<string>(responseContent);
+                return JsonConvert.DeserializeObject<AzureActiveDirectoryResponse>(responseContent);
             }
 
             // TODO: add to resource file
