@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services.Azure;
@@ -47,6 +45,11 @@ namespace Fabric.IdentityProviderSearchService.Services
         public IFabricPrincipal FindUserBySubjectId(string subjectId)
         {
             var result = GetUserAsync(subjectId).Result;
+            if(result == null)
+            {
+                return null;
+            }
+
             var principal = CreateUserPrincipal(result);
 
             return principal;
@@ -76,8 +79,7 @@ namespace Fabric.IdentityProviderSearchService.Services
                 }
             }
 
-            // TODO: throw not found?
-            return new User(); 
+            return null; 
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText)
@@ -106,8 +108,6 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             var filterQuery =
                 $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')"; 
-            // or startswith(PreferredName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
-            // TODO: why does preferredname not filter
 
             var users = new List<User>();
             foreach (var client in _clients)
@@ -148,9 +148,9 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             return new FabricPrincipal
             {
-                FirstName = userEntry.GivenName ?? userEntry.DisplayName,
+                FirstName = userEntry.GivenName ?? userEntry.DisplayName,   // TODO: other options include UserPrincipal (e.g. user@adname.com) and PreferredName
                 LastName = userEntry.Surname,
-                MiddleName = string.Empty,   // don't think this has a value in graph api/azure ad
+                MiddleName = string.Empty,   // this value does not exist in the graph api
                 PrincipalType = PrincipalType.User,
                 SubjectId = userEntry.Id
             };
@@ -161,7 +161,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             return new FabricPrincipal
             {
                 SubjectId = groupEntry.Id,
-                FirstName = groupEntry.DisplayName,     // TODO: What should go here, the interface doesn't describe a group well
+                FirstName = groupEntry.DisplayName,     // TODO: What should go here, the principal interface does not describe a graph group well
                 PrincipalType = PrincipalType.Group
             };
         }

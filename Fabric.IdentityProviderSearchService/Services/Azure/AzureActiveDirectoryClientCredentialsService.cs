@@ -1,13 +1,12 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
@@ -31,13 +30,12 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
                 throw new AzureActiveDirectoryException(Resource.NoScopesDefinedForAzureAD);
             }
 
-            // TODO : clean up strings and add to constants file
             var content = new List<KeyValuePair<string, string>>()
             {
-               new KeyValuePair<string, string>( "client_id", applicationConfiguration.AzureActiveDirectoryClientSettings.ClientId ),
-               new KeyValuePair<string, string>( "client_secret", applicationConfiguration.AzureActiveDirectoryClientSettings.ClientSecret ),
-               new KeyValuePair<string, string>( "scope", applicationConfiguration.AzureActiveDirectoryClientSettings.Scopes.First() ),  // not sure how to append multiple.  Only looking for first one for now.
-               new KeyValuePair<string, string>( "grant_type", "client_credentials" )
+               new KeyValuePair<string, string>( AzureRequestHeaders.ClientId, applicationConfiguration.AzureActiveDirectoryClientSettings.ClientId ),
+               new KeyValuePair<string, string>( AzureRequestHeaders.ClientSecret, applicationConfiguration.AzureActiveDirectoryClientSettings.ClientSecret ),
+               new KeyValuePair<string, string>( AzureRequestHeaders.Scope, applicationConfiguration.AzureActiveDirectoryClientSettings.Scopes.First() ),  // not sure how to append multiple.  Only looking for first one for now.
+               new KeyValuePair<string, string>( AzureRequestHeaders.GrantType, "client_credentials" )
             };
 
             string url = $"{applicationConfiguration.AzureActiveDirectoryClientSettings.Authority.TrimEnd('/')}/{tenantId}/oauth2/v2.0/token";
@@ -48,12 +46,10 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
             if (response.IsSuccessStatusCode)
             {
-                // TODO: deserialize this to an object and return the access token
                 return JsonConvert.DeserializeObject<AzureActiveDirectoryResponse>(responseContent);
             }
 
-            // TODO: add to resource file
-            string exceptionMessage = $"Could not retrieve Azure access Token.  Here is the exception: {responseContent}";
+            string exceptionMessage = $"Could not retrieve Azure access Token.  The response was: {responseContent}";
             throw new AzureActiveDirectoryException(exceptionMessage);
         }
 
