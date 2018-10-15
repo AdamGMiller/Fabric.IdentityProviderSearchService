@@ -47,6 +47,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
             if (response.IsSuccessStatusCode)
             {
+                // TODO: deserialize this to an object and return the access token
                 return JsonConvert.DeserializeObject<string>(responseContent);
             }
 

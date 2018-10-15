@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
@@ -12,12 +13,16 @@ namespace Fabric.IdentityProviderSearchService.Services
     public class AzureDirectoryProviderService : IExternalIdentityProviderService
     {
         private IGraphServiceClient _client;
-        private IAzureActiveDirectoryClientCredentialsService _azureService;
+        private IAppConfiguration _appConfiguration;
+        private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
+        private string[] _tenantIds;
 
-        public AzureDirectoryProviderService(IGraphServiceClient client, IAzureActiveDirectoryClientCredentialsService azureADClientCredentialsService)
+        public AzureDirectoryProviderService(IGraphServiceClient client, IAppConfiguration appConfiguration, IAzureActiveDirectoryClientCredentialsService azureActiveDirectoryClientCredentialsService)
         {
             _client = client;
-            _azureService = azureADClientCredentialsService;
+            _appConfiguration = appConfiguration;
+            _azureActiveDirectoryClientCredentialsService = azureActiveDirectoryClientCredentialsService;
+            _tenantIds = _appConfiguration.AzureActiveDirectoryClientSettings.IssuerWhiteList;
         }
 
         public IFabricPrincipal FindUserBySubjectId(string subjectId)
@@ -43,7 +48,14 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         private async Task<User> GetUserAsync(string subjectId)
         {
-            return await _client.Users[subjectId].Request().GetAsync();
+            var results = Parallel.ForEach(this._tenantIds, async (tenantId) => {
+                var accessToken = _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
+                // _client. TODO: set the access token.
+                await _client.Users[subjectId].Request().GetAsync();
+            });
+
+            // TODO: Parse these for results 
+            return new User(); 
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText)

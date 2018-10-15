@@ -61,7 +61,14 @@ namespace Fabric.IdentityProviderSearchService
         {
             base.ConfigureRequestContainer(container, context);
             container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
-            container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
+            if (_appConfig.UseAzureAuthentication)
+            {
+                container.Register<IExternalIdentityProviderService, AzureDirectoryProviderService>();
+            }
+            else
+            {
+                container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
+            }
             container.Register<PrincipalSearchService, PrincipalSearchService>();
             container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>();
         }

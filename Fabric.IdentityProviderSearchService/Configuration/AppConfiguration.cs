@@ -10,6 +10,8 @@ namespace Fabric.IdentityProviderSearchService.Configuration
 
         public bool UseDiscoveryService { get; set; }
 
+        public bool UseAzureAuthentication { get; set; }
+
         public ApplicationInsights ApplicationInsights { get; set; }
 
         public IdentityServerConfidentialClientSettings IdentityServerConfidentialClientSettings { get; set; }
