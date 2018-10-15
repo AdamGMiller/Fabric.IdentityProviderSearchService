@@ -13,5 +13,7 @@ namespace Fabric.IdentityProviderSearchService.Configuration
         public ApplicationInsights ApplicationInsights { get; set; }
 
         public IdentityServerConfidentialClientSettings IdentityServerConfidentialClientSettings { get; set; }
+
+        public AzureActiveDirectoryClientSettings AzureActiveDirectoryClientSettings { get; set; }
     }
 }

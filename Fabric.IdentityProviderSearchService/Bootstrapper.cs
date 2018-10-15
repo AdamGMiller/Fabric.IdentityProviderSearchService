@@ -3,6 +3,7 @@ using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Infrastructure.PipelineHooks;
 using Fabric.IdentityProviderSearchService.Services;
+using Fabric.IdentityProviderSearchService.Services.Azure;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Configuration;
@@ -62,6 +63,7 @@ namespace Fabric.IdentityProviderSearchService
             container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
             container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
             container.Register<PrincipalSearchService, PrincipalSearchService>();
+            container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>();
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)

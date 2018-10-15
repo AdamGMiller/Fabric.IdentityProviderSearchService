@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Fabric.IdentityProviderSearchService.Models;
+using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
 
 namespace Fabric.IdentityProviderSearchService.Services
@@ -11,10 +12,12 @@ namespace Fabric.IdentityProviderSearchService.Services
     public class AzureDirectoryProviderService : IExternalIdentityProviderService
     {
         private IGraphServiceClient _client;
+        private IAzureActiveDirectoryClientCredentialsService _azureService;
 
-        public AzureDirectoryProviderService(IGraphServiceClient client)
+        public AzureDirectoryProviderService(IGraphServiceClient client, IAzureActiveDirectoryClientCredentialsService azureADClientCredentialsService)
         {
             _client = client;
+            _azureService = azureADClientCredentialsService;
         }
 
         public IFabricPrincipal FindUserBySubjectId(string subjectId)
