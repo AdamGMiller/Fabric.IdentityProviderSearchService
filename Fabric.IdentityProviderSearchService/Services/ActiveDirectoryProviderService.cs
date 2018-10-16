@@ -54,6 +54,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         private bool IsDirectoryEntryAUser(IDirectoryEntry entryResult)
         {
+            // TODO: Add to constants file
             return entryResult.SchemaClassName.Equals("user");
         }
 

@@ -54,6 +54,7 @@ namespace Fabric.IdentityProviderSearchService
             };
 
             container.Register(_appConfig);
+            container.Register(_appConfig.AzureActiveDirectoryClientSettings);  // TODO: move this to a more correct place?
             container.Register(_logger);
         }
 

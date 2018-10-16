@@ -12,19 +12,20 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
     public class AzureActiveDirectoryClientCredentialsService : IAzureActiveDirectoryClientCredentialsService
     {
-        private IAppConfiguration applicationConfiguration;
+        private AzureActiveDirectoryClientSettings azureClientSettings;
         private HttpClient client;
 
-        public AzureActiveDirectoryClientCredentialsService(IAppConfiguration appConfig, HttpClient client)
+        public AzureActiveDirectoryClientCredentialsService(AzureActiveDirectoryClientSettings azureClientSettings, HttpClient client)
         {
-            this.applicationConfiguration = appConfig;
+            this.azureClientSettings = azureClientSettings;
             this.client = client;
         }
         
+        // TODO: Can we use the IdentityModel OIDC client here instead?
         public async Task<AzureActiveDirectoryResponse> GetAzureAccessTokenAsync(string tenantId)
         {
             // Could not find an instance where this is multiple.  Leaving code the room for this.
-            var scopes = applicationConfiguration.AzureActiveDirectoryClientSettings.Scopes;
+            var scopes = azureClientSettings.Scopes;
             if (scopes != null && scopes.Count() <= 0)
             {
                 throw new AzureActiveDirectoryException(Resource.NoScopesDefinedForAzureAD);
@@ -32,13 +33,13 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
             var content = new List<KeyValuePair<string, string>>()
             {
-               new KeyValuePair<string, string>( AzureRequestHeaders.ClientId, applicationConfiguration.AzureActiveDirectoryClientSettings.ClientId ),
-               new KeyValuePair<string, string>( AzureRequestHeaders.ClientSecret, applicationConfiguration.AzureActiveDirectoryClientSettings.ClientSecret ),
-               new KeyValuePair<string, string>( AzureRequestHeaders.Scope, applicationConfiguration.AzureActiveDirectoryClientSettings.Scopes.First() ),  // not sure how to append multiple.  Only looking for first one for now.
-               new KeyValuePair<string, string>( AzureRequestHeaders.GrantType, "client_credentials" )
+               new KeyValuePair<string, string>( AzureRequestHeaders.ClientId, azureClientSettings.ClientId ),
+               new KeyValuePair<string, string>( AzureRequestHeaders.ClientSecret, azureClientSettings.ClientSecret ),
+               new KeyValuePair<string, string>( AzureRequestHeaders.Scope, azureClientSettings.Scopes.First() ),  // not sure how to append multiple.  Only looking for first one for now.
+               new KeyValuePair<string, string>( AzureRequestHeaders.GrantType, AzureRequestHeaders.ClientCredentials )
             };
 
-            string url = $"{applicationConfiguration.AzureActiveDirectoryClientSettings.Authority.TrimEnd('/')}/{tenantId}/oauth2/v2.0/token";
+            string url = $"{azureClientSettings.Authority.TrimEnd('/')}/{tenantId}/oauth2/v2.0/token";
             var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = new FormUrlEncodedContent(content) };
 
             var response = await client.SendAsync(request).ConfigureAwait(false);
@@ -51,11 +52,6 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
             string exceptionMessage = $"Could not retrieve Azure access Token.  The response was: {responseContent}";
             throw new AzureActiveDirectoryException(exceptionMessage);
-        }
-
-        public string[] GetTenants()
-        {
-            return applicationConfiguration.AzureActiveDirectoryClientSettings.IssuerWhiteList;
         }
     }
 }

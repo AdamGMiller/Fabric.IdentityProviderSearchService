@@ -96,6 +96,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {
+                    UserPrincipal = u.UserPrincipal,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     MiddleName = u.MiddleName,

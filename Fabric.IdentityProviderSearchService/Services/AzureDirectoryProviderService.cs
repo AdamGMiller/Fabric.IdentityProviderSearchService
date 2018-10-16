@@ -6,6 +6,7 @@ using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
 
+// TODO: General TODO, catch non-happy path requests, unauthorized, forbidden, 500. Return partial responses in these cases?
 namespace Fabric.IdentityProviderSearchService.Services
 {
     public class AzureDirectoryProviderService : IExternalIdentityProviderService
@@ -27,6 +28,8 @@ namespace Fabric.IdentityProviderSearchService.Services
         private async Task GenerateAccessTokensForTenantsAsync()
         {
             _clients = new List<IGraphServiceClient>();
+
+            // TODO: cache, only renew once token expires
             foreach(var tenant in _tenantIds)
             {
                 var response = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenant).ConfigureAwait(false);
@@ -34,7 +37,7 @@ namespace Fabric.IdentityProviderSearchService.Services
                 var client = new GraphServiceClient(new DelegateAuthenticationProvider((requestMessage) => {
                     requestMessage
                         .Headers
-                        .Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", response.access_token);
+                        .Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", response.AccessToken);
 
                     return Task.FromResult(0);
                 }));
@@ -84,10 +87,10 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText)
         {
-            var results = await Task.WhenAll(
-                Task.Run(() => GetUserPrincipalsAsync(searchText)),
-                Task.Run(() => GetGroupPrincipalsAsync(searchText))
-            ).ConfigureAwait(false);
+            var userSearchTask = GetUserPrincipalsAsync(searchText);
+            var groupSearchTask = GetGroupPrincipalsAsync(searchText);
+            var results = await Task.WhenAll(userSearchTask, groupSearchTask).ConfigureAwait(false);
+
             return results.SelectMany(result => result);
         }
 
@@ -109,13 +112,15 @@ namespace Fabric.IdentityProviderSearchService.Services
             var filterQuery =
                 $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')"; 
 
-            var users = new List<User>();
+            var searchTasks = new List<Task<IGraphServiceUsersCollectionPage>>();
+
             foreach (var client in _clients)
             {
-                 users.AddRange((await client.Users.Request().Filter(filterQuery).GetAsync()));
+                searchTasks.Add(client.Users.Request().Filter(filterQuery).GetAsync());
             }
-
-            return users;
+            var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+            
+            return results.SelectMany(result => result);
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetGroupPrincipalsAsync(string searchText)
@@ -136,19 +141,24 @@ namespace Fabric.IdentityProviderSearchService.Services
             var filterQuery = $"startswith(DisplayName, '{searchText}')";
             var groups = new List<Group>();
 
+            var searchTasks = new List<Task<IGraphServiceGroupsCollectionPage>>();
+
             foreach (var client in _clients)
             {
-                groups.AddRange(await client.Groups.Request().Filter(filterQuery).GetAsync());
+                searchTasks.Add(client.Groups.Request().Filter(filterQuery).GetAsync());
             }
 
-            return groups;
+            var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+
+            return results.SelectMany(result => result);
         }
 
         private IFabricPrincipal CreateUserPrincipal(User userEntry)
         {
             return new FabricPrincipal
             {
-                FirstName = userEntry.GivenName ?? userEntry.DisplayName,   // TODO: other options include UserPrincipal (e.g. user@adname.com) and PreferredName
+                UserPrincipal = userEntry.UserPrincipalName,
+                FirstName = userEntry.GivenName ?? userEntry.DisplayName,
                 LastName = userEntry.Surname,
                 MiddleName = string.Empty,   // this value does not exist in the graph api
                 PrincipalType = PrincipalType.User,

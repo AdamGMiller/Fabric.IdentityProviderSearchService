@@ -6,6 +6,7 @@
         public string LastName { get; set; }
         public string MiddleName { get; set; }
         public string SubjectId { get; set; }
+        public string UserPrincipal { get; set; }
         public PrincipalType PrincipalType { get; set; }
     }
 
