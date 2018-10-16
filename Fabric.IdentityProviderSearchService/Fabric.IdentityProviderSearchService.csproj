@@ -272,6 +272,8 @@
     <Compile Include="Services\DiscoveryServiceClient.cs" />
     <Compile Include="Services\IActiveDirectoryProxy.cs" />
     <Compile Include="Services\IExternalIdentityProviderService.cs" />
+    <Compile Include="Services\IMicrosoftGraphApi.cs" />
+    <Compile Include="Services\MicrosoftGraphApi.cs" />
     <Compile Include="Services\PrincipalSearchService.cs" />
     <Compile Include="SolutionInfo.cs" />
     <Compile Include="Startup.cs" />

@@ -11,43 +11,16 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public class AzureDirectoryProviderService : IExternalIdentityProviderService
     {
-        private IAppConfiguration _appConfiguration;
-        private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
-        private string[] _tenantIds;
-        private ICollection<IGraphServiceClient> _clients;
+        IMicrosoftGraphApi _graphApi;
 
-        public AzureDirectoryProviderService(IAppConfiguration appConfiguration, IAzureActiveDirectoryClientCredentialsService azureActiveDirectoryClientCredentialsService)
+        public AzureDirectoryProviderService(IMicrosoftGraphApi graphApi)
         {
-            _appConfiguration = appConfiguration;
-            _azureActiveDirectoryClientCredentialsService = azureActiveDirectoryClientCredentialsService;
-            _tenantIds = _appConfiguration.AzureActiveDirectoryClientSettings.IssuerWhiteList;
-
-            GenerateAccessTokensForTenantsAsync().Wait();
+            _graphApi = graphApi;
         }
-
-        private async Task GenerateAccessTokensForTenantsAsync()
-        {
-            _clients = new List<IGraphServiceClient>();
-
-            // TODO: cache, only renew once token expires
-            foreach(var tenant in _tenantIds)
-            {
-                var response = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenant).ConfigureAwait(false);
-
-                var client = new GraphServiceClient(new DelegateAuthenticationProvider((requestMessage) => {
-                    requestMessage
-                        .Headers
-                        .Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", response.AccessToken);
-
-                    return Task.FromResult(0);
-                }));
-                _clients.Add(client);
-            }
-        }
-
+        
         public IFabricPrincipal FindUserBySubjectId(string subjectId)
         {
-            var result = GetUserAsync(subjectId).Result;
+            var result = _graphApi.GetUserAsync(subjectId).Result;
             if(result == null)
             {
                 return null;
@@ -69,20 +42,6 @@ namespace Fabric.IdentityProviderSearchService.Services
                 default:
                     return GetUserAndGroupPrincipalsAsync(searchText).Result;
             }
-        }
-
-        private async Task<User> GetUserAsync(string subjectId)
-        {
-            foreach(var client in _clients)
-            {
-                var user = await client.Users[subjectId].Request().GetAsync();
-                if(user != null)
-                {
-                    return user;
-                }
-            }
-
-            return null; 
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText)
@@ -110,15 +69,9 @@ namespace Fabric.IdentityProviderSearchService.Services
         private async Task<IEnumerable<User>> GetAllUsersFromTenantsAsync(string searchText)
         {
             var filterQuery =
-                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')"; 
+                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
 
-            var searchTasks = new List<Task<IGraphServiceUsersCollectionPage>>();
-
-            foreach (var client in _clients)
-            {
-                searchTasks.Add(client.Users.Request().Filter(filterQuery).GetAsync());
-            }
-            var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+            var results = await _graphApi.GetUserCollectionsAsync(filterQuery);
             
             return results.SelectMany(result => result);
         }
@@ -143,12 +96,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 
             var searchTasks = new List<Task<IGraphServiceGroupsCollectionPage>>();
 
-            foreach (var client in _clients)
-            {
-                searchTasks.Add(client.Groups.Request().Filter(filterQuery).GetAsync());
-            }
-
-            var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+            var results = await _graphApi.GetGroupCollectionsAsync(filterQuery);
 
             return results.SelectMany(result => result);
         }

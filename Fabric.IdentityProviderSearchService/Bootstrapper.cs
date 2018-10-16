@@ -71,6 +71,7 @@ namespace Fabric.IdentityProviderSearchService
                 container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
             }
             container.Register<PrincipalSearchService, PrincipalSearchService>();
+            container.Register<IMicrosoftGraphApi, MicrosoftGraphApi>();
             container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>();
         }
 
