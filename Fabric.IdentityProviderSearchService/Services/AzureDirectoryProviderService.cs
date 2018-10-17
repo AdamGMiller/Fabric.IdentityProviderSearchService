@@ -71,9 +71,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var filterQuery =
                 $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
 
-            var results = await _graphApi.GetUserCollectionsAsync(filterQuery);
-            
-            return results.SelectMany(result => result);
+            return await _graphApi.GetUserCollectionsAsync(filterQuery);
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetGroupPrincipalsAsync(string searchText)
@@ -96,9 +94,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 
             var searchTasks = new List<Task<IGraphServiceGroupsCollectionPage>>();
 
-            var results = await _graphApi.GetGroupCollectionsAsync(filterQuery);
-
-            return results.SelectMany(result => result);
+            return await _graphApi.GetGroupCollectionsAsync(filterQuery);
         }
 
         private IFabricPrincipal CreateUserPrincipal(User userEntry)

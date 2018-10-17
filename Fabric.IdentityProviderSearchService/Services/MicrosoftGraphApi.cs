@@ -3,6 +3,7 @@ using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
@@ -69,7 +70,9 @@ namespace Fabric.IdentityProviderSearchService.Services
                 searchTasks.Add(client.Users.Request().Filter(filterQuery).GetAsync());
             }
 
-            return await Task.WhenAll(searchTasks).ConfigureAwait(false);
+            var result = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+
+            return result.Cast<User>();
         }
 
         public async Task<IEnumerable<Group>> GetGroupCollectionsAsync(string filterQuery)
@@ -82,7 +85,9 @@ namespace Fabric.IdentityProviderSearchService.Services
                 searchTasks.Add(client.Groups.Request().Filter(filterQuery).GetAsync());
             }
 
-            return await Task.WhenAll(searchTasks).ConfigureAwait(false);
+            var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+
+            return results.Cast<Group>();
         }
     }
 }

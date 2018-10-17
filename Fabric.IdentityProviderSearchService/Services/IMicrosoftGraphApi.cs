@@ -6,8 +6,8 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public interface IMicrosoftGraphApi
     {
-        Task<IEnumerable<IGraphServiceGroupsCollectionPage>> GetGroupCollectionsAsync(string filterQuery);
+        Task<IEnumerable<Group>> GetGroupCollectionsAsync(string filterQuery);
         Task<User> GetUserAsync(string subjectId);
-        Task<IEnumerable<IGraphServiceUsersCollectionPage>> GetUserCollectionsAsync(string filterQuery);
+        Task<IEnumerable<User>> GetUserCollectionsAsync(string filterQuery);
     }
 }
