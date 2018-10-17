@@ -1,6 +1,5 @@
 ﻿using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services;
-using Microsoft.Graph;
 using Moq;
 using System;
 using System.Collections.Generic;

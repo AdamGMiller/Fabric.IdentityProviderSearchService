@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
-using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
 
 // TODO: General TODO, catch non-happy path requests, unauthorized, forbidden, 500. Return partial responses in these cases?

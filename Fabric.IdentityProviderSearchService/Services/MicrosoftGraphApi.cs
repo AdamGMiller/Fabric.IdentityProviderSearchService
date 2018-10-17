@@ -1,7 +1,6 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public class MicrosoftGraphApi : IMicrosoftGraphApi
     {
-        private static IDictionary<string, IGraphServiceClient> _graphClients = new ConcurrentDictionary<string, IGraphServiceClient>();
+        private IDictionary<string, IGraphServiceClient> _graphClients;
 
         private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
         private IAppConfiguration _appConfiguration;
@@ -20,6 +19,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             _azureActiveDirectoryClientCredentialsService = settingsService;
             _appConfiguration = appConfiguration;
+            GenerateAccessTokensAsync().Wait();
         }
 
         private async Task GenerateAccessTokensAsync()
@@ -29,6 +29,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             // that way the client can call this all the time
             // without figuring out the expiration stuff.
             var tenantIds = _appConfiguration.AzureActiveDirectoryClientSettings.IssuerWhiteList;
+            _graphClients = new Dictionary<string, IGraphServiceClient>();
 
             foreach (var tenant in tenantIds)
             {
