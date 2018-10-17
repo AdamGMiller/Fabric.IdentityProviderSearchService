@@ -56,7 +56,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         private async Task<IEnumerable<IFabricPrincipal>> GetUserPrincipalsAsync(string searchText)
         {
             var principals = new List<IFabricPrincipal>();
-            var users = await GetAllUsersFromTenantsAsync(searchText);
+            var users = await GetAllUsersFromTenantsAsync(searchText).ConfigureAwait(false);
 
             foreach(var result in users)
             {
@@ -66,12 +66,12 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
-        private async Task<IEnumerable<User>> GetAllUsersFromTenantsAsync(string searchText)
+        private async Task<IEnumerable<FabricGraphApiUser>> GetAllUsersFromTenantsAsync(string searchText)
         {
             var filterQuery =
                 $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
 
-            return await _graphApi.GetUserCollectionsAsync(filterQuery);
+            return await _graphApi.GetUserCollectionsAsync(filterQuery).ConfigureAwait(false);
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetGroupPrincipalsAsync(string searchText)
@@ -87,35 +87,37 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
-        private async Task<IEnumerable<Group>> GetAllGroupsFromTenantsAsync(string searchText)
+        private async Task<IEnumerable<FabricGraphApiGroup>> GetAllGroupsFromTenantsAsync(string searchText)
         {
             var filterQuery = $"startswith(DisplayName, '{searchText}')";
             var groups = new List<Group>();
 
             var searchTasks = new List<Task<IGraphServiceGroupsCollectionPage>>();
 
-            return await _graphApi.GetGroupCollectionsAsync(filterQuery);
+            return await _graphApi.GetGroupCollectionsAsync(filterQuery).ConfigureAwait(false);
         }
 
-        private IFabricPrincipal CreateUserPrincipal(User userEntry)
+        private IFabricPrincipal CreateUserPrincipal(FabricGraphApiUser userEntry)
         {
             return new FabricPrincipal
             {
-                UserPrincipal = userEntry.UserPrincipalName,
-                FirstName = userEntry.GivenName ?? userEntry.DisplayName,
-                LastName = userEntry.Surname,
+                UserPrincipal = userEntry.User.UserPrincipalName,
+                TenantId = userEntry.TenantId,
+                FirstName = userEntry.User.GivenName ?? userEntry.User.DisplayName,
+                LastName = userEntry.User.Surname,
                 MiddleName = string.Empty,   // this value does not exist in the graph api
                 PrincipalType = PrincipalType.User,
-                SubjectId = userEntry.Id
+                SubjectId = userEntry.User.Id
             };
         }
 
-        private IFabricPrincipal CreateGroupPrincipal(Group groupEntry)
+        private IFabricPrincipal CreateGroupPrincipal(FabricGraphApiGroup groupEntry)
         {
             return new FabricPrincipal
             {
-                SubjectId = groupEntry.Id,
-                FirstName = groupEntry.DisplayName,     // TODO: What should go here, the principal interface does not describe a graph group well
+                SubjectId = groupEntry.Group.Id,
+                TenantId = groupEntry.TenantId,
+                FirstName = groupEntry.Group.DisplayName,     // TODO: What should go here, the principal interface does not describe a graph group well
                 PrincipalType = PrincipalType.Group
             };
         }

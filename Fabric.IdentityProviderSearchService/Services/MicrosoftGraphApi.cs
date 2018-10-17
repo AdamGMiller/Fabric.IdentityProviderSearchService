@@ -1,16 +1,18 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
     public class MicrosoftGraphApi : IMicrosoftGraphApi
     {
-        //IAzureActiveDirectoryClientCredentialsService azureActiveDirectoryClientCredentialsService
-        private static ICollection<IGraphServiceClient> _graphClients;
+        private static IDictionary<string, IGraphServiceClient> _graphClients = new ConcurrentDictionary<string, IGraphServiceClient>();
+
         private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
         private IAppConfiguration _appConfiguration;
 
@@ -27,7 +29,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             // that way the client can call this all the time
             // without figuring out the expiration stuff.
             var tenantIds = _appConfiguration.AzureActiveDirectoryClientSettings.IssuerWhiteList;
-            _graphClients = new List<IGraphServiceClient>();
+
             foreach (var tenant in tenantIds)
             {
                 var response = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenant).ConfigureAwait(false);
@@ -40,19 +42,23 @@ namespace Fabric.IdentityProviderSearchService.Services
 
                     return Task.FromResult(0);
                 }));
-                _graphClients.Add(client);
+                _graphClients.Add(tenant, client);
             }
         }
 
-        public async Task<User> GetUserAsync(string subjectId)
+        public async Task<FabricGraphApiUser> GetUserAsync(string subjectId)
         {
-            await GenerateAccessTokensAsync();
+            await GenerateAccessTokensAsync().ConfigureAwait(false);
             
             foreach (var client in _graphClients)
             {
-                var user = await client.Users[subjectId].Request().GetAsync();
-                if (user != null)
+                var apiUser = await client.Value.Users[subjectId].Request().GetAsync().ConfigureAwait(false);
+                if (apiUser != null)
                 {
+                    FabricGraphApiUser user = new FabricGraphApiUser(apiUser)
+                    {
+                        TenantId = client.Key
+                    };
                     return user;
                 }
             }
@@ -60,34 +66,51 @@ namespace Fabric.IdentityProviderSearchService.Services
             return null;
         }
 
-        public async Task<IEnumerable<User>> GetUserCollectionsAsync(string filterQuery)
+        public async Task<IEnumerable<FabricGraphApiUser>> GetUserCollectionsAsync(string filterQuery)
         {
-            await GenerateAccessTokensAsync();
-            var searchTasks = new List<Task<IGraphServiceUsersCollectionPage>>();
+            await GenerateAccessTokensAsync().ConfigureAwait(false);
+            var searchTasks = new List<Task<IEnumerable<FabricGraphApiUser>>>();
 
             foreach (var client in _graphClients)
             {
-                searchTasks.Add(client.Users.Request().Filter(filterQuery).GetAsync());
-            }
+                var tenantId = client.Key;
 
-            var result = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+                var tempTask = Task.Run(async () => {
+                    var taskResult = await client.Value.Users.Request().Filter(filterQuery).GetAsync();
+                    return taskResult.Select(user => new FabricGraphApiUser(user as User)
+                    {
+                        TenantId = tenantId
+                    });
+                });
 
-            return result.Cast<User>();
-        }
-
-        public async Task<IEnumerable<Group>> GetGroupCollectionsAsync(string filterQuery)
-        {
-            await GenerateAccessTokensAsync();
-            var searchTasks = new List<Task<IGraphServiceGroupsCollectionPage>>();
-
-            foreach (var client in _graphClients)
-            {
-                searchTasks.Add(client.Groups.Request().Filter(filterQuery).GetAsync());
+                searchTasks.Add(tempTask);
             }
 
             var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+            return results.SelectMany(result => result);
+        }
 
-            return results.Cast<Group>();
+        public async Task<IEnumerable<FabricGraphApiGroup>> GetGroupCollectionsAsync(string filterQuery)
+        {
+            await GenerateAccessTokensAsync().ConfigureAwait(false);
+            var searchTasks = new List<Task<IEnumerable<FabricGraphApiGroup>>>();
+
+            foreach (var client in _graphClients)
+            {
+                var tenantId = client.Key;
+                var tempTask = Task.Run(async () => { 
+                    var taskResult = await client.Value.Groups.Request().Filter(filterQuery).GetAsync();
+                    return taskResult.Select(group => new FabricGraphApiGroup(group as Group)
+                    {
+                        TenantId = tenantId
+                    });
+                });
+
+                searchTasks.Add(tempTask);
+            }
+
+            var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
+            return results.SelectMany(result => result);
         }
     }
 }

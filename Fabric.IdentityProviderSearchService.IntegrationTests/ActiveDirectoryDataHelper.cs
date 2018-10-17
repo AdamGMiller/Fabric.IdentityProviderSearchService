@@ -36,9 +36,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             return principal1.Object;
         }
 
-        public IEnumerable<User> GetMicrosoftGraphUsers()
+        public IEnumerable<FabricGraphApiUser> GetMicrosoftGraphUsers()
         {
-            var principals = new List<User>
+            var principals = new List<FabricGraphApiUser>
             {
                 CreateMicrosoftGraphUser("1", "jason soto"),
                 CreateMicrosoftGraphUser("1", "jorden lowe"),
@@ -51,9 +51,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             return principals;
         }
 
-        private static User CreateMicrosoftGraphUser(string id, string displayName)
+        private static FabricGraphApiUser CreateMicrosoftGraphUser(string id, string displayName)
         {
-            return new User()
+            var user = new User()
             {
                 UserPrincipalName = displayName,
                 GivenName = displayName,
@@ -61,11 +61,16 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
                 Surname = displayName,
                 Id = id
             };
+
+            return new FabricGraphApiUser(user)
+            {
+                TenantId = "someId"
+            };
         }
         
-        public IEnumerable<Group> GetMicrosoftGraphGroups()
+        public IEnumerable<FabricGraphApiGroup> GetMicrosoftGraphGroups()
         {
-            var principals = new List<Group>
+            var principals = new List<FabricGraphApiGroup>
             {
                 CreateMicrosoftGraphGroup("1", "IT"),
                 CreateMicrosoftGraphGroup("1", "Fabric")
@@ -74,12 +79,16 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             return principals;
         }
 
-        private static Group CreateMicrosoftGraphGroup(string id, string displayName)
+        private static FabricGraphApiGroup CreateMicrosoftGraphGroup(string id, string displayName)
         {
-            return new Group()
+            var group = new Group
             {
                 DisplayName = displayName,
                 Id = id
+            };
+            return new FabricGraphApiGroup(group)
+            {
+                TenantId = "someId"
             };
         }
     }

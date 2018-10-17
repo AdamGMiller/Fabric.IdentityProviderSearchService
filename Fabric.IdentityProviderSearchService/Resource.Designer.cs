@@ -61,6 +61,15 @@ namespace Fabric.IdentityProviderSearchService {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not retrieve Azure access Token.
+        /// </summary>
+        internal static string AzureAccessTokenRetrievalFailure {
+            get {
+                return ResourceManager.GetString("AzureAccessTokenRetrievalFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &quot;Must have one scope defined in application settings.&quot;.
         /// </summary>
         internal static string NoScopesDefinedForAzureAD {
