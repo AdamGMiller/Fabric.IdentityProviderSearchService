@@ -1,6 +1,8 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Exceptions;
 using IdentityModel.Client;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,20 +11,23 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
     public class AzureActiveDirectoryClientCredentialsService : IAzureActiveDirectoryClientCredentialsService
     {
-        private AzureActiveDirectoryClientSettings azureClientSettings;
-        private HttpClient client;
+        private HttpClient _client;
+        private string _authority;
+        private IDictionary<string, AzureClientApplicationSettings> _settings;
 
         public AzureActiveDirectoryClientCredentialsService(AzureActiveDirectoryClientSettings azureClientSettings, HttpClient client)
         {
-            this.azureClientSettings = azureClientSettings;
-            this.client = client;
+            this._settings = AzureClientApplicationSettings.CreateDictionary(azureClientSettings);
+            this._authority = azureClientSettings.Authority;
+            this._client = client;
         }
 
         public async Task<TokenResponse> GetAzureAccessTokenAsync(string tenantId)
         {
             // TODO: Move "oauth2/v2.0/token" into some config?
-            TokenClient tokenClient = new TokenClient($"{azureClientSettings.Authority.TrimEnd('/')}/{tenantId}/oauth2/v2.0/token", azureClientSettings.ClientId, azureClientSettings.ClientSecret);
-            var response = await tokenClient.RequestClientCredentialsAsync(azureClientSettings.Scopes.First()).ConfigureAwait(false);
+            var appSettings = this._settings[tenantId];
+            TokenClient tokenClient = new TokenClient($"{this._authority.TrimEnd('/')}/{tenantId}/oauth2/v2.0/token", appSettings.ClientId, appSettings.ClientSecret);
+            var response = await tokenClient.RequestClientCredentialsAsync(appSettings.Scopes.First()).ConfigureAwait(false);
 
             if(!response.IsHttpError)
             {

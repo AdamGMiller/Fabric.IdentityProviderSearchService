@@ -232,6 +232,7 @@
     <Compile Include="Configuration\AppConfigurationExtensions.cs" />
     <Compile Include="Configuration\ApplicationInsights.cs" />
     <Compile Include="Configuration\AzureActiveDirectoryClientSettings.cs" />
+    <Compile Include="Configuration\AzureClientApplicationSettings.cs" />
     <Compile Include="Configuration\IAppConfiguration.cs" />
     <Compile Include="Configuration\WebConfigProvider.cs" />
     <Compile Include="Constants\AzureRequestHeaders.cs" />
@@ -269,14 +270,14 @@
     </Compile>
     <Compile Include="Services\ActiveDirectoryProviderService.cs" />
     <Compile Include="Services\ActiveDirectoryProxy.cs" />
-    <Compile Include="Services\AzureDirectoryProviderService.cs" />
+    <Compile Include="Services\Azure\AzureDirectoryProviderService.cs" />
     <Compile Include="Services\Azure\AzureActiveDirectoryClientCredentialsService.cs" />
     <Compile Include="Services\Azure\IAzureActiveDirectoryClientCredentialsService.cs" />
     <Compile Include="Services\DiscoveryServiceClient.cs" />
     <Compile Include="Services\IActiveDirectoryProxy.cs" />
     <Compile Include="Services\IExternalIdentityProviderService.cs" />
-    <Compile Include="Services\IMicrosoftGraphApi.cs" />
-    <Compile Include="Services\MicrosoftGraphApi.cs" />
+    <Compile Include="Services\Azure\IMicrosoftGraphApi.cs" />
+    <Compile Include="Services\Azure\MicrosoftGraphApi.cs" />
     <Compile Include="Services\PrincipalSearchService.cs" />
     <Compile Include="SolutionInfo.cs" />
     <Compile Include="Startup.cs" />

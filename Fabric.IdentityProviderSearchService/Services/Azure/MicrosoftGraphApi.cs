@@ -15,12 +15,13 @@ namespace Fabric.IdentityProviderSearchService.Services
     {
         // String is tenant id and the Token response wrapper adds the expiry date time for easier cache invalidation.
         private static ConcurrentDictionary<string, TokenResponseWrapper> _tokensOfEachTenant;
-
+        private static IDictionary<string, AzureClientApplicationSettings> _appSettings;
         private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
         private IAppConfiguration _appConfiguration;
 
         public MicrosoftGraphApi(IAppConfiguration appConfiguration, IAzureActiveDirectoryClientCredentialsService settingsService)
         {
+            _appSettings = AzureClientApplicationSettings.CreateDictionary(appConfiguration.AzureActiveDirectoryClientSettings);
             _azureActiveDirectoryClientCredentialsService = settingsService;
             _appConfiguration = appConfiguration;
             _tokensOfEachTenant = new ConcurrentDictionary<string, TokenResponseWrapper>();
@@ -127,7 +128,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         private async Task GenerateAccessTokensAsync()
         {
-            var tenantIds = _appConfiguration.AzureActiveDirectoryClientSettings.IssuerWhiteList;
+            var tenantIds = _appSettings.Keys;
 
             foreach (var tenantId in tenantIds)
             {

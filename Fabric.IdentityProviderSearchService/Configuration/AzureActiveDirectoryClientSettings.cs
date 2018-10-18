@@ -12,10 +12,8 @@ namespace Fabric.IdentityProviderSearchService.Configuration
 
         }
 
+        public AzureClientApplicationSettings[] ClientAppSettings { get; set; }
+
         public string Authority { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string[] Scopes { get; set; }
-        public string[] IssuerWhiteList { get; set; }
     }
 }
