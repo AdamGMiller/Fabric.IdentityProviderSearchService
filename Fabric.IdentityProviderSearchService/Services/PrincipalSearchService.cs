@@ -6,11 +6,11 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public class PrincipalSearchService
     {
-        private readonly IExternalIdentityProviderService _externalIdentityProviderService;
+        private readonly IEnumerable<IExternalIdentityProviderService> _externalIdentityProviderServices;
 
-        public PrincipalSearchService(IExternalIdentityProviderService externalIdentityProviderService)
+        public PrincipalSearchService(IEnumerable<IExternalIdentityProviderService> externalIdentityProviderService)
         {
-            _externalIdentityProviderService = externalIdentityProviderService;
+            _externalIdentityProviderServices = externalIdentityProviderService;
         }
 
         public IEnumerable<IFabricPrincipal> SearchPrincipals(string searchText, string principalTypeString)
@@ -32,13 +32,27 @@ namespace Fabric.IdentityProviderSearchService.Services
             {
                 throw new BadRequestException("invalid principal type provided. valid values are 'user' and 'group'");
             }
-            
-            return _externalIdentityProviderService.SearchPrincipals(searchText, principalType);
+
+            List<IFabricPrincipal> result = new List<IFabricPrincipal>();
+            foreach (var service in _externalIdentityProviderServices)
+            {
+                result.AddRange(service.SearchPrincipals(searchText, principalType));
+            }
+            return result;
         }
 
         public IFabricPrincipal FindUserBySubjectId(string subjectId)
         {
-            return _externalIdentityProviderService.FindUserBySubjectId(subjectId);
+            foreach (var service in _externalIdentityProviderServices)
+            {
+                var subject = service.FindUserBySubjectId(subjectId);
+                if(subject != null)
+                {
+                    return subject;
+                }
+            }
+
+            return null;
         }
     }
 }

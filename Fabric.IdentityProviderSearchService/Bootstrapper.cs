@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Infrastructure.PipelineHooks;
@@ -62,19 +63,22 @@ namespace Fabric.IdentityProviderSearchService
         {
             base.ConfigureRequestContainer(container, context);
             container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
+            ICollection<Type> ActiveDirectoryProviderTypes = new List<Type>()
+            {
+                typeof(ActiveDirectoryProviderService)
+            };
+
             if (_appConfig.UseAzureAuthentication)
             {
-                container.Register<IExternalIdentityProviderService, AzureDirectoryProviderService>();
+                ActiveDirectoryProviderTypes.Add(typeof(AzureDirectoryProviderService));
             }
-            else
-            {
-                container.Register<IExternalIdentityProviderService, ActiveDirectoryProviderService>();
-            }
+
+            container.RegisterMultiple<IExternalIdentityProviderService>(ActiveDirectoryProviderTypes);
             container.Register<PrincipalSearchService, PrincipalSearchService>();
             container.Register<IMicrosoftGraphApi, MicrosoftGraphApi>();
             container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>();
         }
-
+        
         protected override void ConfigureConventions(NancyConventions nancyConventions)
         {
             base.ConfigureConventions(nancyConventions);
