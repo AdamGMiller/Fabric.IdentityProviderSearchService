@@ -257,6 +257,7 @@
     <Compile Include="Models\IFabricPrincipal.cs" />
     <Compile Include="Models\SearchRequest.cs" />
     <Compile Include="Models\SubjectIdRequest.cs" />
+    <Compile Include="Models\TokenResponseWrapper.cs" />
     <Compile Include="Modules\DocsModule.cs" />
     <Compile Include="Modules\PrincipalsMetadataModule.cs" />
     <Compile Include="Modules\PrincipalsModule.cs" />
