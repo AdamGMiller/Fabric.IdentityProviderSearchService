@@ -59,26 +59,30 @@ namespace Fabric.IdentityProviderSearchService
             container.Register(_logger);
         }
 
+        protected override void ConfigureApplicationContainer(TinyIoCContainer container)
+        {
+
+        }
+
         protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
         {
-            base.ConfigureRequestContainer(container, context);
             container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
-            ICollection<Type> ActiveDirectoryProviderTypes = new List<Type>()
+            ICollection<Type> activeDirectoryProviderTypes = new List<Type>()
             {
                 typeof(ActiveDirectoryProviderService)
             };
 
             if (_appConfig.UseAzureAuthentication)
             {
-                ActiveDirectoryProviderTypes.Add(typeof(AzureDirectoryProviderService));
+                activeDirectoryProviderTypes.Add(typeof(AzureDirectoryProviderService));
             }
 
-            container.RegisterMultiple<IExternalIdentityProviderService>(ActiveDirectoryProviderTypes);
+            container.RegisterMultiple<IExternalIdentityProviderService>(activeDirectoryProviderTypes);
             container.Register<PrincipalSearchService, PrincipalSearchService>();
             container.Register<IMicrosoftGraphApi, MicrosoftGraphApi>();
             container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>();
         }
-        
+
         protected override void ConfigureConventions(NancyConventions nancyConventions)
         {
             base.ConfigureConventions(nancyConventions);

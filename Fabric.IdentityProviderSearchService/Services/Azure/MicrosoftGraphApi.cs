@@ -138,12 +138,12 @@ namespace Fabric.IdentityProviderSearchService.Services
                 {
                     if (token.ExpiryTime <= DateTime.Now)
                     {
-                        await GetNewTokenAsync(tenantId);
+                        await GetNewTokenAsync(tenantId).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    await GetNewTokenAsync(tenantId);
+                    await GetNewTokenAsync(tenantId).ConfigureAwait(false);
                 }
 
             }
