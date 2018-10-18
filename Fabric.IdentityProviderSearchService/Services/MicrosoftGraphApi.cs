@@ -67,6 +67,7 @@ namespace Fabric.IdentityProviderSearchService.Services
                     var client = GetNewClient(token);
                     var tempTask = Task.Run(async () =>
                     {
+                        // how does this handle a client not working (i.e. exceptions?)
                         var taskResult = await client.Users.Request().Filter(filterQuery).GetAsync();
                         return taskResult.Select(user => new FabricGraphApiUser(user as User)
                         {
@@ -134,7 +135,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 
                 if (_tokensOfEachTenant.TryGetValue(tenantId, out token))
                 {
-                    if (token.ExpiryTime > DateTime.Now)
+                    if (token.ExpiryTime <= DateTime.Now)
                     {
                         await GetNewTokenAsync(tenantId);
                     }
