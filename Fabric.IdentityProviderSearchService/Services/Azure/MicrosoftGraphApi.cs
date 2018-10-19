@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Linq;
 using Fabric.IdentityProviderSearchService.Models;
 using System.Collections.Concurrent;
-using IdentityModel.Client;
 using System;
 
 namespace Fabric.IdentityProviderSearchService.Services
