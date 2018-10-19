@@ -5,23 +5,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Fabric.IdentityProviderSearchService.Models;
-using System.Collections.Concurrent;
 using System;
+using IdentityModel.Client;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
     public class MicrosoftGraphApi : IMicrosoftGraphApi
     {
-        // String is tenant id and the Token response wrapper adds the expiry date time for easier cache invalidation.
-        private static ConcurrentDictionary<string, TokenResponseWrapper> _tokensOfEachTenant;
         private static IDictionary<string, AzureClientApplicationSettings> _appSettings;
         private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
         private IAppConfiguration _appConfiguration;
-
-        static MicrosoftGraphApi()
-        {
-            _tokensOfEachTenant = new ConcurrentDictionary<string, TokenResponseWrapper>();
-        }        
 
         public MicrosoftGraphApi(IAppConfiguration appConfiguration, IAzureActiveDirectoryClientCredentialsService settingsService)
         {
@@ -32,14 +25,11 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         public async Task<FabricGraphApiUser> GetUserAsync(string subjectId)
         {
-            await GenerateAccessTokensAsync().ConfigureAwait(false);
-            
-            foreach (var tokenPair in _tokensOfEachTenant)
+            foreach (var tenantId in _appSettings.Keys)
             {
-                TokenResponseWrapper token;
-                if (_tokensOfEachTenant.TryGetValue(tokenPair.Key, out token))
+                var token = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
+                if (token != null)
                 {
-                    var tenantId = tokenPair.Key;
                     var client = GetNewClient(token);
                     var apiUser = await client.Users[subjectId].Request().GetAsync().ConfigureAwait(false);
                     if (apiUser != null)
@@ -58,16 +48,13 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         public async Task<IEnumerable<FabricGraphApiUser>> GetUserCollectionsAsync(string filterQuery)
         {
-            await GenerateAccessTokensAsync().ConfigureAwait(false);
             var searchTasks = new List<Task<IEnumerable<FabricGraphApiUser>>>();
 
-            foreach (var tokenPair in _tokensOfEachTenant)
+            foreach (var tenantId in _appSettings.Keys)
             {
-                TokenResponseWrapper token;
-
-                if (_tokensOfEachTenant.TryGetValue(tokenPair.Key, out token))
+                var token = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
+                if (token != null)
                 {
-                    var tenantId = tokenPair.Key;
                     var client = GetNewClient(token);
                     var tempTask = Task.Run(async () =>
                     {
@@ -89,16 +76,13 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         public async Task<IEnumerable<FabricGraphApiGroup>> GetGroupCollectionsAsync(string filterQuery)
         {
-            await GenerateAccessTokensAsync().ConfigureAwait(false);
             var searchTasks = new List<Task<IEnumerable<FabricGraphApiGroup>>>();
 
-            foreach (var tokenPair in _tokensOfEachTenant)
+            foreach (var tenantId in _appSettings.Keys)
             {
-                TokenResponseWrapper token;
-
-                if (_tokensOfEachTenant.TryGetValue(tokenPair.Key, out token))
+                var token = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
+                if (token != null)
                 {
-                    var tenantId = tokenPair.Key;
                     var client = GetNewClient(token);
                     var tempTask = Task.Run(async () =>
                     {
@@ -117,46 +101,16 @@ namespace Fabric.IdentityProviderSearchService.Services
             return results.SelectMany(result => result);
         }
 
-        private IGraphServiceClient GetNewClient(TokenResponseWrapper token)
+        private IGraphServiceClient GetNewClient(TokenResponse token)
         {
             return new GraphServiceClient(new DelegateAuthenticationProvider((requestMessage) =>
             {
                 requestMessage
                     .Headers
-                    .Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token.Response.AccessToken);
+                    .Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token.AccessToken);
 
                 return Task.FromResult(0);
             }));
-        }
-
-        private async Task GenerateAccessTokensAsync()
-        {
-            var tenantIds = _appSettings.Keys;
-
-            foreach (var tenantId in tenantIds)
-            {
-                TokenResponseWrapper token;
-
-                if (_tokensOfEachTenant.TryGetValue(tenantId, out token))
-                {
-                    if (token.ExpiryTime <= DateTime.Now)
-                    {
-                        await GetNewTokenAsync(tenantId).ConfigureAwait(false);
-                    }
-                }
-                else
-                {
-                    await GetNewTokenAsync(tenantId).ConfigureAwait(false);
-                }
-
-            }
-        }
-
-        private async Task GetNewTokenAsync(string tenantId)
-        {
-            var response = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId).ConfigureAwait(false);
-            var newToken = new TokenResponseWrapper() { ExpiryTime = DateTime.Now.AddSeconds(response.ExpiresIn), Response = response };
-            _tokensOfEachTenant.AddOrUpdate(tenantId, newToken, (key, oldValue) => { return newToken; });
         }
     }
 }

@@ -82,7 +82,13 @@ namespace Fabric.IdentityProviderSearchService
             container.RegisterMultiple<IExternalIdentityProviderService>(activeDirectoryProviderTypes);
             container.Register<PrincipalSearchService, PrincipalSearchService>();
             container.Register<IMicrosoftGraphApi, MicrosoftGraphApi>();
-            container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>();
+
+            container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>("inner");
+            container.Register<IAzureActiveDirectoryClientCredentialsService>(
+                (c, p) => c.Resolve<AzureActiveDirectoryCacheService>(new NamedParameterOverloads
+                {
+                    { "innerCredentialService", c.Resolve<IAzureActiveDirectoryClientCredentialsService>("inner") }
+                }));
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)

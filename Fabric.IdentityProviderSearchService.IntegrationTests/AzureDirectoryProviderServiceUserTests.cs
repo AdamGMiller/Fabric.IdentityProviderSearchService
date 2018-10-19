@@ -17,7 +17,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private IEnumerable<FabricGraphApiUser> _oneUserResult;
         private FabricGraphApiUser _firstUser;
         private readonly AzureDirectoryProviderService _providerService;
-        private readonly string _userFilterQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}')";
+        private readonly string _userFilterQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}') or startswith(Surname, '{0}')";
 
         public AzureDirectoryProviderServiceUserTests()
         {
