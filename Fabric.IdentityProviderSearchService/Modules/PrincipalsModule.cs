@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.ApiModels;
 using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Exceptions;
@@ -26,17 +27,17 @@ namespace Fabric.IdentityProviderSearchService.Modules
             _logger = logger;
 
             Get("/search",
-                _ => Search(),
+                async _ => await SearchAsync().ConfigureAwait(false),
                 null,
-                "Search");
+                "SearchAsync");
 
             Get("/user",
-                _ => SearchForUser(),
-                null, 
-                "SearchForUser");
+                async _ => await SearchForUserAsync().ConfigureAwait(false),
+                null,
+                "SearchForUserAsync");
         }
 
-        private dynamic SearchForUser()
+        private async Task<dynamic> SearchForUserAsync()
         {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SubjectIdRequest>();
@@ -50,7 +51,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             try
             {
                 _logger.Information($"searching for user with subject id: {searchRequest.SubjectId}");
-                var user = _searchService.FindUserBySubjectId(searchRequest.SubjectId);
+                var user = await _searchService.FindUserBySubjectIdAsync(searchRequest.SubjectId);
 
                 return new FabricPrincipalApiModel
                 {
@@ -75,8 +76,8 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
         }
 
-        private dynamic Search()
-        {            
+        private async Task<dynamic> SearchAsync()
+        {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchRequest>();
 
@@ -92,7 +93,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for users with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
 
-                var users = _searchService.SearchPrincipals(searchRequest.SearchText, searchRequest.Type);
+                var users = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type);
 
                 principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {

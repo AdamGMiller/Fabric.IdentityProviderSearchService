@@ -16,9 +16,9 @@ namespace Fabric.IdentityProviderSearchService.Services
             _graphApi = graphApi;
         }
         
-        public IFabricPrincipal FindUserBySubjectId(string subjectId)
+        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId)
         {
-            var result = _graphApi.GetUserAsync(subjectId).Result;
+            var result = await _graphApi.GetUserAsync(subjectId);
             if(result == null)
             {
                 return null;
@@ -29,16 +29,16 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principal;
         }
 
-        public IEnumerable<IFabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
+        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType)
         {
             switch(principalType)
             {
                 case PrincipalType.User:
-                    return GetUserPrincipalsAsync(searchText).Result;
+                    return await GetUserPrincipalsAsync(searchText);
                 case PrincipalType.Group:
-                    return GetGroupPrincipalsAsync(searchText).Result;
+                    return await GetGroupPrincipalsAsync(searchText);
                 default:
-                    return GetUserAndGroupPrincipalsAsync(searchText).Result;
+                    return await GetUserAndGroupPrincipalsAsync(searchText);
             }
         }
 
@@ -67,7 +67,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         private async Task<IEnumerable<FabricGraphApiUser>> GetAllUsersFromTenantsAsync(string searchText)
         {
             var filterQuery =
-                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
+                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}') or startswith(Surname, '{searchText}')";
 
             return await _graphApi.GetUserCollectionsAsync(filterQuery).ConfigureAwait(false);
         }
@@ -88,9 +88,6 @@ namespace Fabric.IdentityProviderSearchService.Services
         private async Task<IEnumerable<FabricGraphApiGroup>> GetAllGroupsFromTenantsAsync(string searchText)
         {
             var filterQuery = $"startswith(DisplayName, '{searchText}')";
-            var groups = new List<Group>();
-
-            var searchTasks = new List<Task<IGraphServiceGroupsCollectionPage>>();
 
             return await _graphApi.GetGroupCollectionsAsync(filterQuery).ConfigureAwait(false);
         }

@@ -2,6 +2,7 @@
 using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services;
 using Moq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Fabric.IdentityProviderSearchService.IntegrationTests
@@ -25,9 +26,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_ValidId_Success()
+        public async Task FindUserBySubjectId_ValidId_SuccessAsync()
         {
-            var user = _providerService.FindUserBySubjectId($"{_appConfig.DomainName}\\patrick.jones");
+            var user = await _providerService.FindUserBySubjectIdAsync($"{_appConfig.DomainName}\\patrick.jones");
 
             Assert.NotNull(user);
             Assert.Equal("patrick", user.FirstName);
@@ -36,17 +37,17 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_InvalidSubjectIdFormat_NullResult()
+        public async Task FindUserBySubjectId_InvalidSubjectIdFormat_NullResultAsync()
         {
-            var user = _providerService.FindUserBySubjectId($"{_appConfig.DomainName}.patrick.jones");
+            var user = await _providerService.FindUserBySubjectIdAsync($"{_appConfig.DomainName}.patrick.jones");
 
             Assert.Null(user); 
         }
 
         [Fact]
-        public void FindUserBySubjectId_UserNotFound_NullResult()
+        public async Task FindUserBySubjectId_UserNotFound_NullResultAsync()
         {
-            var user = _providerService.FindUserBySubjectId($"{_appConfig.DomainName}\\patrick.jon");
+            var user = await _providerService.FindUserBySubjectIdAsync($"{_appConfig.DomainName}\\patrick.jon");
 
             Assert.Null(user);
         }

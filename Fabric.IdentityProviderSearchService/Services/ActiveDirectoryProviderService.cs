@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Models;
 using Microsoft.Security.Application;
@@ -16,14 +17,14 @@ namespace Fabric.IdentityProviderSearchService.Services
             _domain = appConfig.DomainName;
         }
 
-        public IEnumerable<IFabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType)
+        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType)
         {
             var ldapQuery = BuildLdapQuery(searchText, principalType);
-            var principals = FindPrincipalsWithDirectorySearcher(ldapQuery);
+            var principals = await Task.Run(() => FindPrincipalsWithDirectorySearcher(ldapQuery));
             return principals;
         }
 
-        public IFabricPrincipal FindUserBySubjectId(string subjectId)
+        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId)
         {
             if (!subjectId.Contains(@"\"))
             {            
@@ -34,7 +35,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            return _activeDirectoryProxy.SearchForUser(Encoder.LdapFilterEncode(domain), Encoder.LdapFilterEncode(accountName));
+            return await Task.Run(() => _activeDirectoryProxy.SearchForUser(Encoder.LdapFilterEncode(domain), Encoder.LdapFilterEncode(accountName)));
         }
 
         private IEnumerable<IFabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)

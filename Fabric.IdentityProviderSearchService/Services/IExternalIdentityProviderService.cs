@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
     public interface IExternalIdentityProviderService
     {
-        IEnumerable<IFabricPrincipal> SearchPrincipals(string searchText, PrincipalType principalType);
-        IFabricPrincipal FindUserBySubjectId(string subjectId);
+        Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType);
+        Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId);
     }
 }

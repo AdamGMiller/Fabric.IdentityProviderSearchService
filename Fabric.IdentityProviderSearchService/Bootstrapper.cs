@@ -67,10 +67,12 @@ namespace Fabric.IdentityProviderSearchService
         protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
         {
             container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
-            ICollection<Type> activeDirectoryProviderTypes = new List<Type>()
+            ICollection<Type> activeDirectoryProviderTypes = new List<Type>();
+
+            if (_appConfig.UseWindowsAuthentication)
             {
-                typeof(ActiveDirectoryProviderService)
-            };
+                activeDirectoryProviderTypes.Add(typeof(ActiveDirectoryProviderService));
+            }
 
             if (_appConfig.UseAzureAuthentication)
             {

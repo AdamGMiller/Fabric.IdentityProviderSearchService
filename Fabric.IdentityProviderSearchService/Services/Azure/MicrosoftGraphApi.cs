@@ -18,12 +18,16 @@ namespace Fabric.IdentityProviderSearchService.Services
         private IAzureActiveDirectoryClientCredentialsService _azureActiveDirectoryClientCredentialsService;
         private IAppConfiguration _appConfiguration;
 
+        static MicrosoftGraphApi()
+        {
+            _tokensOfEachTenant = new ConcurrentDictionary<string, TokenResponseWrapper>();
+        }        
+
         public MicrosoftGraphApi(IAppConfiguration appConfiguration, IAzureActiveDirectoryClientCredentialsService settingsService)
         {
             _appSettings = AzureClientApplicationSettings.CreateDictionary(appConfiguration.AzureActiveDirectoryClientSettings);
             _azureActiveDirectoryClientCredentialsService = settingsService;
             _appConfiguration = appConfiguration;
-            _tokensOfEachTenant = new ConcurrentDictionary<string, TokenResponseWrapper>();
         }
 
         public async Task<FabricGraphApiUser> GetUserAsync(string subjectId)
