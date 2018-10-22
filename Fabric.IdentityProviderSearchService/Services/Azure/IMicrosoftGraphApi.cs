@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Models;
 
-namespace Fabric.IdentityProviderSearchService.Services
+namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
     public interface IMicrosoftGraphApi
     {

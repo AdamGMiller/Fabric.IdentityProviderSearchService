@@ -1,5 +1,4 @@
 ﻿using Fabric.IdentityProviderSearchService.Configuration;
-using Fabric.IdentityProviderSearchService.Services.Azure;
 using Microsoft.Graph;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using Fabric.IdentityProviderSearchService.Models;
 using System;
 using IdentityModel.Client;
 
-namespace Fabric.IdentityProviderSearchService.Services
+namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
     public class MicrosoftGraphApi : IMicrosoftGraphApi
     {

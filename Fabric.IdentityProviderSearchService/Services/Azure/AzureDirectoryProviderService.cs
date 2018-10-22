@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Models;
-using Microsoft.Graph;
 
 // TODO: General TODO, catch non-happy path requests, unauthorized, forbidden, 500. Return partial responses in these cases?
-namespace Fabric.IdentityProviderSearchService.Services
+namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
     public class AzureDirectoryProviderService : IExternalIdentityProviderService
     {
@@ -88,7 +87,6 @@ namespace Fabric.IdentityProviderSearchService.Services
         private async Task<IEnumerable<FabricGraphApiGroup>> GetAllGroupsFromTenantsAsync(string searchText)
         {
             var filterQuery = $"startswith(DisplayName, '{searchText}')";
-
             return await _graphApi.GetGroupCollectionsAsync(filterQuery).ConfigureAwait(false);
         }
 
