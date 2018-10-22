@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Fabric.IdentityProviderSearchService.Models;
-using System;
 using IdentityModel.Client;
 
 namespace Fabric.IdentityProviderSearchService.Services.Azure

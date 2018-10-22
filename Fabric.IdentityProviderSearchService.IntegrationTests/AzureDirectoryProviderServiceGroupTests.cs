@@ -1,10 +1,10 @@
 ﻿using Fabric.IdentityProviderSearchService.Models;
-using Fabric.IdentityProviderSearchService.Services;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fabric.IdentityProviderSearchService.Services.Azure;
 using Xunit;
 
 namespace Fabric.IdentityProviderSearchService.IntegrationTests
