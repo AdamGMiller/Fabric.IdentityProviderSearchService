@@ -15,7 +15,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var appConfiguration = new AppConfiguration
             {
-               DomainName = "testing"               
+               DomainName = "testing",
+               UseWindowsAuthentication = true
             };
 
             var bootstrapper = new TestBootstrapper(appConfiguration, new Mock<ILogger>().Object, principal);

@@ -246,7 +246,6 @@
     <Compile Include="Infrastructure\PipelineHooks\OnErrorHooks.cs" />
     <Compile Include="Infrastructure\PipelineHooks\RequestHooks.cs" />
     <Compile Include="Logging\LogFactory.cs" />
-    <Compile Include="Models\AzureActiveDirectoryResponses.cs" />
     <Compile Include="Models\DirectoryEntryWrapper.cs" />
     <Compile Include="Models\DiscoveryServiceApiModel.cs" />
     <Compile Include="Models\DiscoveryServiceResponseModel.cs" />
@@ -269,6 +268,7 @@
     </Compile>
     <Compile Include="Services\ActiveDirectoryProviderService.cs" />
     <Compile Include="Services\ActiveDirectoryProxy.cs" />
+    <Compile Include="Services\Azure\AzureActiveDirectoryCacheService.cs" />
     <Compile Include="Services\Azure\AzureDirectoryProviderService.cs" />
     <Compile Include="Services\Azure\AzureActiveDirectoryClientCredentialsService.cs" />
     <Compile Include="Services\Azure\IAzureActiveDirectoryClientCredentialsService.cs" />

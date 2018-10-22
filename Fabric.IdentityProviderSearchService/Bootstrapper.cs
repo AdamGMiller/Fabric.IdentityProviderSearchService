@@ -67,10 +67,12 @@ namespace Fabric.IdentityProviderSearchService
         protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
         {
             container.Register<IActiveDirectoryProxy, ActiveDirectoryProxy>();
-            ICollection<Type> activeDirectoryProviderTypes = new List<Type>()
+            ICollection<Type> activeDirectoryProviderTypes = new List<Type>();
+
+            if (_appConfig.UseWindowsAuthentication)
             {
-                typeof(ActiveDirectoryProviderService)
-            };
+                activeDirectoryProviderTypes.Add(typeof(ActiveDirectoryProviderService));
+            }
 
             if (_appConfig.UseAzureAuthentication)
             {
@@ -80,7 +82,13 @@ namespace Fabric.IdentityProviderSearchService
             container.RegisterMultiple<IExternalIdentityProviderService>(activeDirectoryProviderTypes);
             container.Register<PrincipalSearchService, PrincipalSearchService>();
             container.Register<IMicrosoftGraphApi, MicrosoftGraphApi>();
-            container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>();
+
+            container.Register<IAzureActiveDirectoryClientCredentialsService, AzureActiveDirectoryClientCredentialsService>("inner");
+            container.Register<IAzureActiveDirectoryClientCredentialsService>(
+                (c, p) => c.Resolve<AzureActiveDirectoryCacheService>(new NamedParameterOverloads
+                {
+                    { "innerCredentialService", c.Resolve<IAzureActiveDirectoryClientCredentialsService>("inner") }
+                }));
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)

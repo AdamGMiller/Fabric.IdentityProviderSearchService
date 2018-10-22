@@ -17,7 +17,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private IEnumerable<FabricGraphApiUser> _oneUserResult;
         private FabricGraphApiUser _firstUser;
         private readonly AzureDirectoryProviderService _providerService;
-        private readonly string _userFilterQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}')";
+        private readonly string _userFilterQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}') or startswith(Surname, '{0}')";
 
         public AzureDirectoryProviderServiceUserTests()
         {
@@ -40,9 +40,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_ValidId_Success()
+        public async Task FindUserBySubjectId_ValidId_SuccessAsync()
         {
-            var user = _providerService.FindUserBySubjectId(_firstUser.User.Id);
+            var user = await _providerService.FindUserBySubjectIdAsync(_firstUser.User.Id);
 
             Assert.NotNull(user);
             Assert.Equal(_firstUser.User.DisplayName, user.FirstName);
@@ -50,9 +50,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_ValidIdUser_Success()
+        public async Task FindUserBySubjectId_ValidIdUser_SuccessAsync()
         {
-            var user = _providerService.SearchPrincipals(_firstUser.User.DisplayName, PrincipalType.User);
+            var user = await _providerService.SearchPrincipalsAsync(_firstUser.User.DisplayName, PrincipalType.User);
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());
@@ -61,17 +61,17 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public void FindUserBySubjectId_InvalidSubjectIdFormat_NullResult()
+        public async Task FindUserBySubjectId_InvalidSubjectIdFormat_NullResultAsync()
         {
-            var user = _providerService.FindUserBySubjectId($"not found");
+            var user = await _providerService.FindUserBySubjectIdAsync($"not found");
 
             Assert.Null(user);
         }
         
         [Fact]
-        public void FindUserBySubjectId_InvalidSubjectIdFormatUser_NullResult()
+        public async Task FindUserBySubjectId_InvalidSubjectIdFormatUser_NullResultAsync()
         {
-            var principals = _providerService.SearchPrincipals($"not found", PrincipalType.User);
+            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.User);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);
