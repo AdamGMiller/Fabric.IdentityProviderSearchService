@@ -278,6 +278,7 @@
     <Compile Include="Services\Azure\IMicrosoftGraphApi.cs" />
     <Compile Include="Services\Azure\MicrosoftGraphApi.cs" />
     <Compile Include="Services\PrincipalQuery\ActiveDirectoryExactMatchQuery.cs" />
+    <Compile Include="Services\PrincipalQuery\ActiveDirectoryQuery.cs" />
     <Compile Include="Services\PrincipalQuery\ActiveDirectoryWildcardQuery.cs" />
     <Compile Include="Services\PrincipalQuery\AzureExactMatchQuery.cs" />
     <Compile Include="Services\PrincipalQuery\IPrincipalQuery.cs" />

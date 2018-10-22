@@ -1,20 +1,22 @@
-﻿using Fabric.IdentityProviderSearchService.Models;
+﻿using System;
+using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
-    public class AzureExactMatchQuery: IPrincipalQuery
+    public class AzureExactMatchQuery : IPrincipalQuery
     {
         // TODO: switch this to be exact match
-        public string QueryText(string queryText, PrincipalType principalType)
+        public string QueryText(string searchText, PrincipalType principalType)
         {
             switch (principalType)
             {
                 case PrincipalType.User:
-                    return $"startswith(DisplayName, '{queryText}') or startswith(GivenName, '{queryText}') or startswith(UserPrincipalName, '{queryText}')";
+                    return
+                        $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
                 case PrincipalType.Group:
-                    return $"startswith(DisplayName, '{queryText}')";
+                    return $"startswith(DisplayName, '{searchText}')";
                 default:
-                    return $"(&(|(&(objectClass=user)(objectCategory=person))(objectCategory=group)){queryText})";
+                    throw new Exception($"Query type {principalType} not supported in Azure AD.");
             }
         }
     }

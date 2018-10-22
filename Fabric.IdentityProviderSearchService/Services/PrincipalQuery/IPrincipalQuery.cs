@@ -4,6 +4,6 @@ namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
     public interface IPrincipalQuery
     {
-        string QueryText(string queryText, PrincipalType principalType);
+        string QueryText(string searchText, PrincipalType principalType);
     }
 }

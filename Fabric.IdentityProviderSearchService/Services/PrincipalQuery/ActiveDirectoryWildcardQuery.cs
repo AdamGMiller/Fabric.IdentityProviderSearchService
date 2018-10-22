@@ -1,24 +1,10 @@
-﻿using Fabric.IdentityProviderSearchService.Models;
-using Microsoft.Security.Application;
-
-namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
+﻿namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
-    public class ActiveDirectoryWildcardQuery: IPrincipalQuery
+    public class ActiveDirectoryWildcardQuery : ActiveDirectoryQuery
     {
-        public string QueryText(string queryText, PrincipalType principalType)
+        public override string GetFilter(string encodedSearchText)
         {
-            var encodedSearchText = Encoder.LdapFilterEncode(queryText);
-            var nameFilter = $"(|(sAMAccountName={encodedSearchText}*)(givenName={encodedSearchText}*)(sn={encodedSearchText}*)(cn={encodedSearchText}*))";
-
-            switch (principalType)
-            {
-                case PrincipalType.User:
-                    return $"(&(objectClass=user)(objectCategory=person){nameFilter})";
-                case PrincipalType.Group:
-                    return $"(&(objectCategory=group){nameFilter})";
-                default:
-                    return $"(&(|(&(objectClass=user)(objectCategory=person))(objectCategory=group)){nameFilter})";
-            }
+            return $"{encodedSearchText}*";
         }
     }
 }
