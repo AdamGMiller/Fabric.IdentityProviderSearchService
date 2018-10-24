@@ -6,7 +6,7 @@ namespace Fabric.IdentityProviderSearchService.Services
 {
     public interface IExternalIdentityProviderService
     {
-        Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType);
+        Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType, string searchType);
         Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId);
     }
 }

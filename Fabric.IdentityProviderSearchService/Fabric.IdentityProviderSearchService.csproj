@@ -237,6 +237,7 @@
     <Compile Include="Configuration\WebConfigProvider.cs" />
     <Compile Include="Constants\HttpResponseHeaders.cs" />
     <Compile Include="Constants\Scopes.cs" />
+    <Compile Include="Constants\SearchTypes.cs" />
     <Compile Include="Exceptions\AzureActiveDirectoryException.cs" />
     <Compile Include="Exceptions\BadRequestException.cs" />
     <Compile Include="Exceptions\InvalidExternalIdentityProviderException.cs" />
@@ -281,6 +282,8 @@
     <Compile Include="Services\PrincipalQuery\ActiveDirectoryQuery.cs" />
     <Compile Include="Services\PrincipalQuery\ActiveDirectoryWildcardQuery.cs" />
     <Compile Include="Services\PrincipalQuery\AzureExactMatchQuery.cs" />
+    <Compile Include="Services\PrincipalQuery\IActiveDirectoryQuery.cs" />
+    <Compile Include="Services\PrincipalQuery\IAzureQuery.cs" />
     <Compile Include="Services\PrincipalQuery\IPrincipalQuery.cs" />
     <Compile Include="Services\PrincipalQuery\AzureWildcardQuery.cs" />
     <Compile Include="Services\PrincipalSearchService.cs" />

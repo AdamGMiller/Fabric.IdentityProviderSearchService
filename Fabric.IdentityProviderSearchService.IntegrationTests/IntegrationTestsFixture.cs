@@ -9,8 +9,6 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 {
     public class IntegrationTestsFixture
     {
-        public Browser Browser { get; set; }
-
         public Browser GetBrowser(ClaimsPrincipal principal)
         {
             var appConfiguration = new AppConfiguration

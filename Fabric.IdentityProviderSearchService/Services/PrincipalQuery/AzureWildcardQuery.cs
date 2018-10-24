@@ -3,7 +3,7 @@ using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
-    public class AzureWildcardQuery : IPrincipalQuery
+    public class AzureWildcardQuery : IAzureQuery
     {
         public string QueryText(string searchText, PrincipalType principalType)
         {

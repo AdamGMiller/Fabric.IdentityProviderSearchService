@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Configuration;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Models;
+using Fabric.IdentityProviderSearchService.Services.PrincipalQuery;
 using Microsoft.Security.Application;
 
 namespace Fabric.IdentityProviderSearchService.Services
@@ -10,6 +13,7 @@ namespace Fabric.IdentityProviderSearchService.Services
     {
         private readonly IActiveDirectoryProxy _activeDirectoryProxy;
         private readonly string _domain;
+        private IActiveDirectoryQuery _activeDirectoryQuery;
 
         public ActiveDirectoryProviderService(IActiveDirectoryProxy activeDirectoryProxy, IAppConfiguration appConfig)
         {
@@ -17,9 +21,23 @@ namespace Fabric.IdentityProviderSearchService.Services
             _domain = appConfig.DomainName;
         }
 
-        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType)
+        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType, string searchType)
         {
-            var ldapQuery = BuildLdapQuery(searchText, principalType);
+            switch (searchType)
+            {
+                case SearchTypes.Wildcard:
+                    _activeDirectoryQuery = new ActiveDirectoryWildcardQuery();
+                    break;
+
+                case SearchTypes.Exact:
+                    _activeDirectoryQuery = new ActiveDirectoryExactMatchQuery();
+                    break;
+
+                default:
+                    throw new Exception($"{searchType} is not a valid search type");
+            }
+
+            var ldapQuery = _activeDirectoryQuery.QueryText(searchText, principalType);
             var principals = await Task.Run(() => FindPrincipalsWithDirectorySearcher(ldapQuery));
             return principals;
         }
@@ -78,22 +96,6 @@ namespace Fabric.IdentityProviderSearchService.Services
                 SubjectId = GetSubjectId(groupEntry.Name),
                 PrincipalType = PrincipalType.Group
             };
-        }
-
-        private static string BuildLdapQuery(string searchText, PrincipalType principalType)
-        {
-            var encodedSearchText = Encoder.LdapFilterEncode(searchText);
-            var nameFilter = $"(|(sAMAccountName={encodedSearchText}*)(givenName={encodedSearchText}*)(sn={encodedSearchText}*)(cn={encodedSearchText}*))";
-
-            switch (principalType)
-            {
-                case PrincipalType.User:
-                    return $"(&(objectClass=user)(objectCategory=person){nameFilter})";
-                case PrincipalType.Group:
-                    return $"(&(objectCategory=group){nameFilter})";
-                default:
-                    return $"(&(|(&(objectClass=user)(objectCategory=person))(objectCategory=group)){nameFilter})";
-            }
         }
 
         private string GetSubjectId(string sAmAccountName)

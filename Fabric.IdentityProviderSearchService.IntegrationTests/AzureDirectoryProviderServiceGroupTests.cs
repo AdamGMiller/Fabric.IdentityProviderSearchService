@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Services.Azure;
 using Xunit;
 
@@ -39,21 +40,23 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindGroupBySubjectId_ValidIdGroup_SuccessAsync()
         {
-            var Group = await  _providerService.SearchPrincipalsAsync(_firstGroup.Group.DisplayName, PrincipalType.Group);
+            var groups =
+                (await _providerService.SearchPrincipalsAsync(_firstGroup.Group.DisplayName, PrincipalType.Group, SearchTypes.Wildcard))
+                .ToList();
 
-            Assert.NotNull(Group);
-            Assert.True(1 == Group.Count());
-            Assert.Equal(_firstGroup.Group.Id, Group.First().SubjectId);
-            Assert.Equal(PrincipalType.Group, Group.First().PrincipalType);
+            Assert.NotNull(groups);
+            Assert.True(1 == groups.Count);
+            Assert.Equal(_firstGroup.Group.Id, groups.First().SubjectId);
+            Assert.Equal(PrincipalType.Group, groups.First().PrincipalType);
         }
                 
         [Fact]
         public async Task FindGroupBySubjectId_InvalidSubjectIdFormatGroup_NullResultAsync()
         {
-            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.Group);
+            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.Group, SearchTypes.Wildcard);
 
             Assert.NotNull(principals);
-            Assert.True(principals.Count() == 0);
+            Assert.Empty(principals);
         }
     }
 }

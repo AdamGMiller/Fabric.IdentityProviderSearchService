@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Services.Azure;
 using Xunit;
 
@@ -52,7 +53,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindUserBySubjectId_ValidIdUser_SuccessAsync()
         {
-            var user = await _providerService.SearchPrincipalsAsync(_firstUser.User.DisplayName, PrincipalType.User);
+            var user = await _providerService.SearchPrincipalsAsync(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Wildcard);
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());
@@ -71,7 +72,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindUserBySubjectId_InvalidSubjectIdFormatUser_NullResultAsync()
         {
-            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.User);
+            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.User, SearchTypes.Wildcard);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);
