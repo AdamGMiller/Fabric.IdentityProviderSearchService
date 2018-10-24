@@ -224,6 +224,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiModels\FabricGroupApiModel.cs" />
     <Compile Include="ApiModels\FabricPrincipalApiModel.cs" />
     <Compile Include="ApiModels\IdpSearchResultApiModel.cs" />
     <Compile Include="ApiModels\ErrorFactory.cs" />
@@ -236,6 +237,7 @@
     <Compile Include="Configuration\IAppConfiguration.cs" />
     <Compile Include="Configuration\WebConfigProvider.cs" />
     <Compile Include="Constants\HttpResponseHeaders.cs" />
+    <Compile Include="Constants\PrincipalType.cs" />
     <Compile Include="Constants\Scopes.cs" />
     <Compile Include="Exceptions\AzureActiveDirectoryException.cs" />
     <Compile Include="Exceptions\BadRequestException.cs" />
@@ -251,9 +253,13 @@
     <Compile Include="Models\DiscoveryServiceResponseModel.cs" />
     <Compile Include="Models\FabricGraphApiGroup.cs" />
     <Compile Include="Models\FabricGraphApiUser.cs" />
+    <Compile Include="Models\FabricGroup.cs" />
     <Compile Include="Models\FabricPrincipal.cs" />
     <Compile Include="ApiModels\Error.cs" />
+    <Compile Include="Models\FabricUserGroup.cs" />
+    <Compile Include="Models\IFabricGroup.cs" />
     <Compile Include="Models\IFabricPrincipal.cs" />
+    <Compile Include="Models\IFabricUserGroup.cs" />
     <Compile Include="Models\SearchRequest.cs" />
     <Compile Include="Models\SubjectIdRequest.cs" />
     <Compile Include="Models\TokenResponseWrapper.cs" />

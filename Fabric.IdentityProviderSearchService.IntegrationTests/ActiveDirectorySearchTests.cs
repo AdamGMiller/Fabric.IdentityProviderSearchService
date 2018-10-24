@@ -55,7 +55,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
             
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(3, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
             Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("group")));
@@ -73,7 +73,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(1, users.ResultCount);            
             Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("group")));
         }
@@ -90,7 +90,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(2, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
         }
@@ -106,7 +106,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(0, users.ResultCount);            
         }
 
@@ -145,7 +145,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(1, users.ResultCount);
             Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("user")));
         }

@@ -8,6 +8,8 @@ using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services;
+using Fabric.IdentityProviderSearchService.Services.Azure;
+using Fabric.IdentityProviderSearchService.Services.PrincipalQuery;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
@@ -27,6 +29,11 @@ namespace Fabric.IdentityProviderSearchService.Modules
             _logger = logger;
 
             Get("/search",
+                async _ => await SearchActiveDirectoryAsync().ConfigureAwait(false),
+                null,
+                "SearchActiveDirectoryAsync");
+
+            Get("{idP}/search",
                 async _ => await SearchAsync().ConfigureAwait(false),
                 null,
                 "SearchAsync");
@@ -35,6 +42,11 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 async _ => await SearchForUserAsync().ConfigureAwait(false),
                 null,
                 "SearchForUserAsync");
+
+            Get("/{idP}/groups/{groupName}?tenant={tenant}",
+                async _ => await SearchForGroupsAsync().ConfigureAwait(false),
+                null,
+                "SearchForGroupsAsync");
         }
 
         private async Task<dynamic> SearchForUserAsync()
@@ -76,6 +88,101 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
         }
 
+        private async Task<dynamic> SearchForGroupsAsync()
+        {
+            this.RequiresClaims(SearchPrincipalClaim);
+            var searchRequest = this.Bind<SearchRequest>();
+
+            if (string.IsNullOrEmpty(searchRequest.SearchText))
+            {
+                return CreateFailureResponse<FabricGroupApiModel>("Search text was not provided and is required",
+                    HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                var principals = new List<FabricGroupApiModel>();
+
+                string tenantInfo = "";
+
+                if (!string.IsNullOrEmpty(searchRequest.Tenant))
+                {
+                    tenantInfo = ($", Tenant={searchRequest.Tenant}");
+                }
+
+                _logger.Information($"searching for groups with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
+
+                var groups = await _searchService.SearchGroupsAsync(searchRequest.SearchText, searchRequest.Type);
+
+                principals.AddRange(groups.Select(g => new FabricGroupApiModel
+                {
+                    FirstName = g.GroupFirstName,
+                    GroupId = g.GroupId,
+                    TenantId = g.TenantId,
+                    PrincipalType = g.PrincipalType
+                }));
+
+                return new IdpSearchResultApiModel<FabricGroupApiModel>
+                {
+                    Principals = principals,
+                    ResultCount = principals.Count
+                };
+            }
+            catch (InvalidExternalIdentityProviderException e)
+            {
+                return CreateFailureResponse<FabricGroupApiModel>(e.Message, HttpStatusCode.BadRequest);
+            }
+            catch (BadRequestException e)
+            {
+                return CreateFailureResponse<FabricGroupApiModel>(e.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        private async Task<dynamic> SearchActiveDirectoryAsync()
+        {
+            this.RequiresClaims(SearchPrincipalClaim);
+            var searchRequest = this.Bind<SearchRequest>();
+
+            if (string.IsNullOrEmpty(searchRequest.SearchText))
+            {
+                return CreateFailureResponse<FabricPrincipalApiModel>("Search text was not provided and is required",
+                    HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                var principals = new List<FabricPrincipalApiModel>();
+
+                _logger.Information($"searching for users with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
+
+                var users = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type);
+
+                principals.AddRange(users.Select(u => new FabricPrincipalApiModel
+                {
+                    UserPrincipal = u.UserPrincipal,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    MiddleName = u.MiddleName,
+                    SubjectId = u.SubjectId,
+                    PrincipalType = u.PrincipalType.ToString().ToLower()
+                }));
+
+                return new IdpSearchResultApiModel<FabricPrincipalApiModel>
+                {
+                    Principals = principals,
+                    ResultCount = principals.Count
+                };
+            }
+            catch (InvalidExternalIdentityProviderException e)
+            {
+                return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
+            }
+            catch (BadRequestException e)
+            {
+                return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
         private async Task<dynamic> SearchAsync()
         {
             this.RequiresClaims(SearchPrincipalClaim);
@@ -105,7 +212,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     PrincipalType = u.PrincipalType.ToString().ToLower()
                 }));
 
-                return new IdpSearchResultApiModel
+                return new IdpSearchResultApiModel<FabricPrincipalApiModel>
                 {
                     Principals = principals,
                     ResultCount = principals.Count

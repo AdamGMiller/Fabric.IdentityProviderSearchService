@@ -2,9 +2,9 @@
 
 namespace Fabric.IdentityProviderSearchService.ApiModels
 {
-    public class IdpSearchResultApiModel
+    public class IdpSearchResultApiModel<T>
     {
-        public ICollection<FabricPrincipalApiModel> Principals { get; set; }
+        public ICollection<T> Principals { get; set; }
         public int ResultCount { get; set; }
     }
 }

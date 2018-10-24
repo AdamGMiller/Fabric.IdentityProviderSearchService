@@ -1,4 +1,4 @@
-﻿using Fabric.IdentityProviderSearchService.Models;
+﻿using Fabric.IdentityProviderSearchService.Constants;
 using Microsoft.Security.Application;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery

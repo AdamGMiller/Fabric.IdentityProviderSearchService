@@ -1,4 +1,5 @@
-﻿using Fabric.IdentityProviderSearchService.Models;
+﻿using Fabric.IdentityProviderSearchService.Constants;
+using Fabric.IdentityProviderSearchService.Models;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -39,18 +40,18 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindGroupBySubjectId_ValidIdGroup_SuccessAsync()
         {
-            var Group = await  _providerService.SearchPrincipalsAsync(_firstGroup.Group.DisplayName, PrincipalType.Group);
+            var Group = await  _providerService.SearchPrincipalsAsync<IFabricGroup>(_firstGroup.Group.DisplayName, PrincipalType.Group);
 
             Assert.NotNull(Group);
             Assert.True(1 == Group.Count());
-            Assert.Equal(_firstGroup.Group.Id, Group.First().SubjectId);
+            Assert.Equal(_firstGroup.Group.Id, Group.First().GroupId);
             Assert.Equal(PrincipalType.Group, Group.First().PrincipalType);
         }
                 
         [Fact]
         public async Task FindGroupBySubjectId_InvalidSubjectIdFormatGroup_NullResultAsync()
         {
-            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.Group);
+            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>($"not found", PrincipalType.Group);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);

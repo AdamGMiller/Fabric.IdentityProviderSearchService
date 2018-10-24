@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Configuration;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Models;
 using Microsoft.Security.Application;
 
@@ -17,11 +18,11 @@ namespace Fabric.IdentityProviderSearchService.Services
             _domain = appConfig.DomainName;
         }
 
-        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, PrincipalType principalType)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType)
         {
             var ldapQuery = BuildLdapQuery(searchText, principalType);
             var principals = await Task.Run(() => FindPrincipalsWithDirectorySearcher(ldapQuery));
-            return principals;
+            return (IEnumerable<T>)principals;
         }
 
         public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId)

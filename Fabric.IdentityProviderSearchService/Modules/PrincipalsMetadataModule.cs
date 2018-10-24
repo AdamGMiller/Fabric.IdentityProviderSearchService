@@ -62,7 +62,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 "Searches for users and groups in an identity provider",
                 new[]
                 {
-                    new HttpResponseMetadata<IdpSearchResultApiModel>
+                    new HttpResponseMetadata<IdpSearchResultApiModel<FabricPrincipalApiModel>>
                     {
                         Code = (int) HttpStatusCode.OK,
                         Message = "Search was successful"

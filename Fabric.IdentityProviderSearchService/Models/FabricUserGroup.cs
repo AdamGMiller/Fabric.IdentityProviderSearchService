@@ -1,13 +1,20 @@
-﻿namespace Fabric.IdentityProviderSearchService.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Fabric.IdentityProviderSearchService.Models
 {
     using Fabric.IdentityProviderSearchService.Constants;
-    public class FabricPrincipal : IFabricPrincipal
-    {       
+    public class FabricUserGroup
+    {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MiddleName { get; set; }
         public string SubjectId { get; set; }
         public string UserPrincipal { get; set; }
+        public string GroupId { get; set; }
+        public string GroupFirstName { get; set; }
         public string TenantId { get; set; }
         public PrincipalType PrincipalType { get; set; }
     }
