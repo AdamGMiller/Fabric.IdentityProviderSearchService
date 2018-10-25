@@ -21,49 +21,59 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             _appConfiguration = appConfiguration;
         }
 
-        public async Task<FabricGraphApiUser> GetUserAsync(string subjectId)
+        public async Task<FabricGraphApiUser> GetUserAsync(string subjectId, string tenantId = null)
         {
-            foreach (var tenantId in _appSettings.Keys)
+            if (!string.IsNullOrWhiteSpace(tenantId))
             {
-                var token = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
-                if (token != null)
+                return await GetUserByTenantAsync(subjectId, tenantId);
+            }
+
+            foreach (var key in _appSettings.Keys)
+            {
+                var user = await GetUserByTenantAsync(subjectId, key);
+                if (user != null)
                 {
-                    var client = GetNewClient(token);
-                    var apiUser = await client.Users[subjectId].Request().GetAsync().ConfigureAwait(false);
-                    if (apiUser != null)
-                    {
-                        FabricGraphApiUser user = new FabricGraphApiUser(apiUser)
-                        {
-                            TenantId = tenantId
-                        };
-                        return user;
-                    }
+                    return user;
                 }
             }
 
             return null;
         }
 
-        public async Task<IEnumerable<FabricGraphApiUser>> GetUserCollectionsAsync(string filterQuery)
+        private async Task<FabricGraphApiUser> GetUserByTenantAsync(string subjectId, string tenantId)
         {
+            var token = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
+            if (token != null)
+            {
+                var client = GetNewClient(token);
+                var apiUser = await client.Users[subjectId].Request().GetAsync().ConfigureAwait(false);
+                if (apiUser != null)
+                {
+                    FabricGraphApiUser user = new FabricGraphApiUser(apiUser)
+                    {
+                        TenantId = tenantId
+                    };
+                    return user;
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<FabricGraphApiUser>> GetUserCollectionsAsync(string filterQuery, string tenantId = null)
+        {
+            if (!string.IsNullOrWhiteSpace(tenantId))
+            {
+                return await GetUserCollectionsByTenantAsync(filterQuery, tenantId);
+            }
+
             var searchTasks = new List<Task<IEnumerable<FabricGraphApiUser>>>();
 
-            foreach (var tenantId in _appSettings.Keys)
+            foreach (var key in _appSettings.Keys)
             {
-                var token = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
-                if (token != null)
+                var tempTask = GetUserCollectionsByTenantAsync(filterQuery, key);
+                if (tempTask != null)
                 {
-                    var client = GetNewClient(token);
-                    var tempTask = Task.Run(async () =>
-                    {
-                        // how does this handle a client not working (i.e. exceptions?)
-                        var taskResult = await client.Users.Request().Filter(filterQuery).GetAsync();
-                        return taskResult.Select(user => new FabricGraphApiUser(user as User)
-                        {
-                            TenantId = tenantId
-                        });
-                    });
-
                     searchTasks.Add(tempTask);
                 }
             }
@@ -72,31 +82,65 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return results.SelectMany(result => result);
         }
 
-        public async Task<IEnumerable<FabricGraphApiGroup>> GetGroupCollectionsAsync(string filterQuery)
+        private Task<IEnumerable<FabricGraphApiUser>> GetUserCollectionsByTenantAsync(string filterQuery, string tenantId)
         {
+            var token = _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId).Result;
+            if (token != null)
+            {
+                var client = GetNewClient(token);
+                return Task.Run(async () =>
+                {
+                    // how does this handle a client not working (i.e. exceptions?)
+                    var taskResult = await client.Users.Request().Filter(filterQuery).GetAsync();
+                    return taskResult.Select(user => new FabricGraphApiUser(user as User)
+                    {
+                        TenantId = tenantId
+                    });
+                });
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<FabricGraphApiGroup>> GetGroupCollectionsAsync(string filterQuery, string tenantId = null)
+        {
+            if (!string.IsNullOrWhiteSpace(tenantId))
+            {
+                return await GetGroupCollectionsByTenantAsync(filterQuery, tenantId);
+            }
+
             var searchTasks = new List<Task<IEnumerable<FabricGraphApiGroup>>>();
 
-            foreach (var tenantId in _appSettings.Keys)
+            foreach (var key in _appSettings.Keys)
             {
-                var token = await _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId);
-                if (token != null)
+                var tempTask = GetGroupCollectionsByTenantAsync(filterQuery, key);
+                if (tempTask != null)
                 {
-                    var client = GetNewClient(token);
-                    var tempTask = Task.Run(async () =>
-                    {
-                        var taskResult = await client.Groups.Request().Filter(filterQuery).GetAsync();
-                        return taskResult.Select(group => new FabricGraphApiGroup(group as Group)
-                        {
-                            TenantId = tenantId
-                        });
-                    });
-
                     searchTasks.Add(tempTask);
                 }
             }
 
             var results = await Task.WhenAll(searchTasks).ConfigureAwait(false);
             return results.SelectMany(result => result);
+        }
+
+        private Task<IEnumerable<FabricGraphApiGroup>> GetGroupCollectionsByTenantAsync(string filterQuery, string tenantId)
+        {
+            var token = _azureActiveDirectoryClientCredentialsService.GetAzureAccessTokenAsync(tenantId).Result;
+            if (token != null)
+            {
+                var client = GetNewClient(token);
+                return Task.Run(async () =>
+                {
+                    var taskResult = await client.Groups.Request().Filter(filterQuery).GetAsync();
+                    return taskResult.Select(group => new FabricGraphApiGroup(group as Group)
+                    {
+                        TenantId = tenantId
+                    });
+                });
+            }
+
+            return null;
         }
 
         private IGraphServiceClient GetNewClient(TokenResponse token)
