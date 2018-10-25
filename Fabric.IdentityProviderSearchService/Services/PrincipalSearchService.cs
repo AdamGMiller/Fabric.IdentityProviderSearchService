@@ -38,14 +38,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var result = new List<T>();
             foreach (var service in _externalIdentityProviderServices)
             {
-                if (identityProvider == "windows")
-                {
-                    result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, identityProvider));
-                }
-                else
-                {
-                    result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, identityProvider));
-                }
+              result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, identityProvider));
             }
             return result;
         }
