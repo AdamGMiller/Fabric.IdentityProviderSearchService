@@ -27,13 +27,13 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             _emptyUsers = new List<FabricGraphApiUser>();
             _oneUserResult = new List<FabricGraphApiUser>() { _firstUser };
 
-            _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(It.IsAny<string>()))
+            _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(It.IsAny<string>(), null))
                             .Returns(Task.FromResult(_emptyUsers));
             var filterSetting = String.Format(_userFilterQuery, _firstUser.User.DisplayName);
-            _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(filterSetting))
+            _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(filterSetting, null))
                             .Returns(Task.FromResult(_oneUserResult));
 
-            _mockGraphClient.Setup(p => p.GetUserAsync(_firstUser.User.Id))
+            _mockGraphClient.Setup(p => p.GetUserAsync(_firstUser.User.Id, null))
                             .Returns(Task.FromResult(_firstUser));
 
             _providerService = new AzureDirectoryProviderService(_mockGraphClient.Object);

@@ -27,10 +27,10 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             _emptyGroups = new List<FabricGraphApiGroup>();
             _oneGroupResult = new List<FabricGraphApiGroup>() { _firstGroup };
 
-            _mockGraphClient.Setup(p => p.GetGroupCollectionsAsync(It.IsAny<string>()))
+            _mockGraphClient.Setup(p => p.GetGroupCollectionsAsync(It.IsAny<string>(), null))
                             .Returns(Task.FromResult(_emptyGroups));
             var filterSetting = String.Format(_groupFilterQuery, _firstGroup.Group.DisplayName);
-            _mockGraphClient.Setup(p => p.GetGroupCollectionsAsync(filterSetting))
+            _mockGraphClient.Setup(p => p.GetGroupCollectionsAsync(filterSetting, null))
                             .Returns(Task.FromResult(_oneGroupResult));
             
             _providerService = new AzureDirectoryProviderService(_mockGraphClient.Object);
