@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Models;
+using Fabric.IdentityProviderSearchService.Services.PrincipalQuery;
 using Microsoft.Security.Application;
 
 namespace Fabric.IdentityProviderSearchService.Services
@@ -11,16 +13,26 @@ namespace Fabric.IdentityProviderSearchService.Services
     {
         private readonly IActiveDirectoryProxy _activeDirectoryProxy;
         private readonly string _domain;
-
+        private IActiveDirectoryQuery _activeDirectoryQuery;
         public ActiveDirectoryProviderService(IActiveDirectoryProxy activeDirectoryProxy, IAppConfiguration appConfig)
         {
             _activeDirectoryProxy = activeDirectoryProxy;
             _domain = appConfig.DomainName;
         }
-
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType)
         {
-            var ldapQuery = BuildLdapQuery(searchText, principalType);
+            switch (searchType)
+            {
+                case SearchTypes.Wildcard:
+                    _activeDirectoryQuery = new ActiveDirectoryWildcardQuery();
+                    break;
+                case SearchTypes.Exact:
+                    _activeDirectoryQuery = new ActiveDirectoryExactMatchQuery();
+                    break;
+                default:
+                    throw new Exception($"{searchType} is not a valid search type");
+            }
+            var ldapQuery = _activeDirectoryQuery.QueryText(searchText, principalType);
             var principals = await Task.Run(() => FindPrincipalsWithDirectorySearcher(ldapQuery));
             return (IEnumerable<T>)principals;
         }

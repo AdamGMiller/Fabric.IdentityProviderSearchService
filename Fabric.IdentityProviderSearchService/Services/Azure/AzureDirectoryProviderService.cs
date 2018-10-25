@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Models;
-using Fabric.IdentityProviderSearchService.Exceptions;
+using Fabric.IdentityProviderSearchService.Services.PrincipalQuery;
 using System;
 
 // TODO: General TODO, catch non-happy path requests, unauthorized, forbidden, 500. Return partial responses in these cases?
@@ -11,7 +11,8 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 {
     public class AzureDirectoryProviderService : IExternalIdentityProviderService
     {
-        IMicrosoftGraphApi _graphApi;
+        private readonly IMicrosoftGraphApi _graphApi;
+        private IAzureQuery _azureQuery;
 
         public AzureDirectoryProviderService(IMicrosoftGraphApi graphApi)
         {
@@ -31,16 +32,30 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return principal;
         }
 
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType)
         {
-            switch(principalType)
+            switch (searchType)
+            {
+                case SearchTypes.Wildcard:
+                    _azureQuery = new AzureWildcardQuery();
+                    break;
+                case SearchTypes.Exact:
+                    _azureQuery = new AzureExactMatchQuery();
+                    break;
+                default:
+                    throw new Exception($"{searchType} is not a valid search type");
+            }
+
+            var filterQuery = _azureQuery.QueryText(searchText, principalType);
+
+            switch (principalType)
             {
                 case PrincipalType.User:
-                    return (IEnumerable<T>) await GetUserPrincipalsAsync<IFabricPrincipal>(searchText);
+                    return (IEnumerable<T>) await GetUserPrincipalsAsync<IFabricPrincipal>(filterQuery);
                 case PrincipalType.Group:
-                    return (IEnumerable<T>) await GetGroupPrincipalsAsync<IFabricGroup>(searchText);
+                    return (IEnumerable<T>) await GetGroupPrincipalsAsync<IFabricGroup>(filterQuery);
                 default:
-                    return (IEnumerable<T>) await GetUserAndGroupPrincipalsAsync(searchText);
+                    return (IEnumerable<T>) await GetUserAndGroupPrincipalsAsync(filterQuery);
             }
         }
 
@@ -68,10 +83,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
         private async Task<IEnumerable<FabricGraphApiUser>> GetAllUsersFromTenantsAsync(string searchText)
         {
-            var filterQuery =
-                $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}') or startswith(Surname, '{searchText}')";
-
-            return await _graphApi.GetUserCollectionsAsync(filterQuery).ConfigureAwait(false);
+           return await _graphApi.GetUserCollectionsAsync(searchText);
         }
 
         private async Task<IEnumerable<T>> GetGroupPrincipalsAsync<T>(string searchText)

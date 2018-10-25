@@ -4,7 +4,7 @@ using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
-    public class AzureExactMatchQuery : IPrincipalQuery
+    public class AzureExactMatchQuery : IAzureQuery
     {
         public string QueryText(string searchText, PrincipalType principalType)
         {

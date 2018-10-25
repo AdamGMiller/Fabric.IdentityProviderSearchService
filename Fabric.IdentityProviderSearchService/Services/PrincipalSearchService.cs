@@ -15,7 +15,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _externalIdentityProviderServices = externalIdentityProviderService;
         }
 
-        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, string principalTypeString)
+        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, string principalTypeString, string searchType)
         {           
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
@@ -38,12 +38,12 @@ namespace Fabric.IdentityProviderSearchService.Services
             List <IFabricPrincipal> result = new List<IFabricPrincipal>();
             foreach (var service in _externalIdentityProviderServices)
             {
-                result.AddRange(await service.SearchPrincipalsAsync<IFabricPrincipal>(searchText, principalType));
+                result.AddRange(await service.SearchPrincipalsAsync<IFabricPrincipal>(searchText, principalType, searchType));
             }
             return result;
         }
 
-        public async Task<IEnumerable<IFabricGroup>> SearchGroupsAsync(string searchText, string principalTypeString)
+        public async Task<IEnumerable<IFabricGroup>> SearchGroupsAsync(string searchText, string principalTypeString, string searchType)
         {
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
@@ -66,7 +66,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             List<IFabricGroup> result = new List<IFabricGroup>();
             foreach (var service in _externalIdentityProviderServices)
             {
-                result.AddRange(await service.SearchPrincipalsAsync<IFabricGroup>(searchText, principalType));
+                result.AddRange(await service.SearchPrincipalsAsync<IFabricGroup>(searchText, principalType, searchType));
             }
             return result;
         }

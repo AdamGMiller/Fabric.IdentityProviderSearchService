@@ -29,14 +29,14 @@ namespace Fabric.IdentityProviderSearchService.Modules
             _logger = logger;
 
             Get("/search",
-                async _ => await SearchActiveDirectoryAsync().ConfigureAwait(false),
-                null,
-                "SearchActiveDirectoryAsync");
-
-            Get("{idP}/search",
                 async _ => await SearchAsync().ConfigureAwait(false),
                 null,
                 "SearchAsync");
+
+            Get("{idP}/search",
+                async _ => await SearchByIdpAsync().ConfigureAwait(false),
+                null,
+                "SearchByIdpAsync");
 
             Get("/user",
                 async _ => await SearchForUserAsync().ConfigureAwait(false),
@@ -112,7 +112,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for groups with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
 
-                var groups = await _searchService.SearchGroupsAsync(searchRequest.SearchText, searchRequest.Type);
+                var groups = await _searchService.SearchGroupsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Exact);
 
                 principals.AddRange(groups.Select(g => new FabricGroupApiModel
                 {
@@ -138,7 +138,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
         }
 
-        private async Task<dynamic> SearchActiveDirectoryAsync()
+        private async Task<dynamic> SearchAsync()
         {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchRequest>();
@@ -155,7 +155,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for users with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
 
-                var users = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type);
+                var users = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard);
 
                 principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {
@@ -183,7 +183,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
         }
 
-        private async Task<dynamic> SearchAsync()
+        private async Task<dynamic> SearchByIdpAsync()
         {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchRequest>();
@@ -200,7 +200,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for users with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
 
-                var users = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type);
+                var users = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard);
 
                 principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {
