@@ -19,7 +19,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _activeDirectoryProxy = activeDirectoryProxy;
             _domain = appConfig.DomainName;
         }
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string identityProvider = "")
         {
             switch (searchType)
             {

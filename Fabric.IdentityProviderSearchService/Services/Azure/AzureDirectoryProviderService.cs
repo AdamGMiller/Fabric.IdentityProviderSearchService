@@ -32,7 +32,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return principal;
         }
 
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string identityProvider)
         {
             switch (searchType)
             {
@@ -51,7 +51,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             switch (principalType)
             {
                 case PrincipalType.User:
-                    return (IEnumerable<T>) await GetUserPrincipalsAsync<IFabricPrincipal>(filterQuery);
+                    return (IEnumerable<T>) await GetUserPrincipalsAsync<IFabricUserGroup>(filterQuery);
                 case PrincipalType.Group:
                     return (IEnumerable<T>) await GetGroupPrincipalsAsync<IFabricGroup>(filterQuery);
                 default:

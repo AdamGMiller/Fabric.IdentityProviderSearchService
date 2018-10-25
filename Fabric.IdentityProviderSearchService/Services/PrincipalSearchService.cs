@@ -15,7 +15,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _externalIdentityProviderServices = externalIdentityProviderService;
         }
 
-        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, string principalTypeString, string searchType)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, string principalTypeString, string searchType, string identityProvider = "")
         {           
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
@@ -35,15 +35,22 @@ namespace Fabric.IdentityProviderSearchService.Services
                 throw new BadRequestException("invalid principal type provided. valid values are 'user' and 'group'");
             }
 
-            List <IFabricPrincipal> result = new List<IFabricPrincipal>();
+            var result = new List<T>();
             foreach (var service in _externalIdentityProviderServices)
             {
-                result.AddRange(await service.SearchPrincipalsAsync<IFabricPrincipal>(searchText, principalType, searchType));
+                if (identityProvider == "windows")
+                {
+                    result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, identityProvider));
+                }
+                else
+                {
+                    result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, identityProvider));
+                }
             }
             return result;
         }
 
-        public async Task<IEnumerable<IFabricGroup>> SearchGroupsAsync(string searchText, string principalTypeString, string searchType)
+        public async Task<IEnumerable<IFabricGroup>> SearchGroupsAsync(string searchText, string principalTypeString, string searchType, string identityProvider)
         {
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
@@ -66,7 +73,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             List<IFabricGroup> result = new List<IFabricGroup>();
             foreach (var service in _externalIdentityProviderServices)
             {
-                result.AddRange(await service.SearchPrincipalsAsync<IFabricGroup>(searchText, principalType, searchType));
+                result.AddRange(await service.SearchPrincipalsAsync<IFabricGroup>(searchText, principalType, searchType, identityProvider));
             }
             return result;
         }

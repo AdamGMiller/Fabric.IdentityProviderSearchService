@@ -261,6 +261,7 @@
     <Compile Include="Models\IFabricGroup.cs" />
     <Compile Include="Models\IFabricPrincipal.cs" />
     <Compile Include="Models\IFabricUserGroup.cs" />
+    <Compile Include="Models\SearchGroupRequest.cs" />
     <Compile Include="Models\SearchRequest.cs" />
     <Compile Include="Models\SubjectIdRequest.cs" />
     <Compile Include="Models\TokenResponseWrapper.cs" />
