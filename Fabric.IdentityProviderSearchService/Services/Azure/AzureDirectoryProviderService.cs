@@ -19,9 +19,9 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             _graphApi = graphApi;
         }
         
-        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId)
+        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantId = null)
         {
-            var result = await _graphApi.GetUserAsync(subjectId);
+            var result = await _graphApi.GetUserAsync(subjectId, tenantId);
             if(result == null)
             {
                 return null;
@@ -32,7 +32,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return principal;
         }
 
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string identityProvider)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string identityProvider, string tenantId = null)
         {
             switch (searchType)
             {
@@ -51,27 +51,27 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             switch (principalType)
             {
                 case PrincipalType.User:
-                    return (IEnumerable<T>) await GetUserPrincipalsAsync<IFabricUserGroup>(filterQuery);
+                    return (IEnumerable<T>) await GetUserPrincipalsAsync<IFabricPrincipal>(filterQuery, tenantId);
                 case PrincipalType.Group:
-                    return (IEnumerable<T>) await GetGroupPrincipalsAsync<IFabricGroup>(filterQuery);
+                    return (IEnumerable<T>) await GetGroupPrincipalsAsync<IFabricGroup>(filterQuery, tenantId);
                 default:
-                    return (IEnumerable<T>) await GetUserAndGroupPrincipalsAsync(filterQuery);
+                    return (IEnumerable<T>) await GetUserAndGroupPrincipalsAsync(filterQuery, tenantId);
             }
         }
 
-        private async Task<IEnumerable<IFabricUserGroup>> GetUserAndGroupPrincipalsAsync(string searchText)
+        private async Task<IEnumerable<IFabricUserGroup>> GetUserAndGroupPrincipalsAsync(string searchText, string tenantId = null)
         {
-            var userSearchTask = GetUserPrincipalsAsync<IFabricUserGroup>(searchText);
-            var groupSearchTask = GetGroupPrincipalsAsync<IFabricUserGroup>(searchText);
+            var userSearchTask = GetUserPrincipalsAsync<IFabricUserGroup>(searchText, tenantId);
+            var groupSearchTask = GetGroupPrincipalsAsync<IFabricUserGroup>(searchText, tenantId);
             var results = await Task.WhenAll(userSearchTask, groupSearchTask).ConfigureAwait(false);
 
             return results.SelectMany(result => result);
         }
 
-        private async Task<IEnumerable<T>> GetUserPrincipalsAsync<T>(string searchText)
+        private async Task<IEnumerable<T>> GetUserPrincipalsAsync<T>(string searchText, string tenantId = null)
         {
             var principals = new List<T>();
-            var users = await GetAllUsersFromTenantsAsync(searchText).ConfigureAwait(false);
+            var users = await GetAllUsersFromTenantsAsync(searchText, tenantId).ConfigureAwait(false);
 
             foreach(var result in users)
             {
@@ -81,15 +81,15 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return principals;
         }
 
-        private async Task<IEnumerable<FabricGraphApiUser>> GetAllUsersFromTenantsAsync(string searchText)
+        private async Task<IEnumerable<FabricGraphApiUser>> GetAllUsersFromTenantsAsync(string searchText, string tenantId = null)
         {
-           return await _graphApi.GetUserCollectionsAsync(searchText);
+           return await _graphApi.GetUserCollectionsAsync(searchText, tenantId);
         }
 
-        private async Task<IEnumerable<T>> GetGroupPrincipalsAsync<T>(string searchText)
+        private async Task<IEnumerable<T>> GetGroupPrincipalsAsync<T>(string searchText, string tenantId = null)
         {
             var principals = new List<T>();
-            var groups = await GetAllGroupsFromTenantsAsync(searchText).ConfigureAwait(false);
+            var groups = await GetAllGroupsFromTenantsAsync(searchText, tenantId).ConfigureAwait(false);
 
             foreach(var result in groups)
             {
@@ -99,10 +99,9 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return principals;
         }
 
-        private async Task<IEnumerable<FabricGraphApiGroup>> GetAllGroupsFromTenantsAsync(string searchText)
+        private async Task<IEnumerable<FabricGraphApiGroup>> GetAllGroupsFromTenantsAsync(string searchText, string tenantId = null)
         {
-            var filterQuery = $"startswith(DisplayName, '{searchText}')";
-            return await _graphApi.GetGroupCollectionsAsync(filterQuery).ConfigureAwait(false);
+            return await _graphApi.GetGroupCollectionsAsync(searchText, tenantId).ConfigureAwait(false);
         }
 
         private T CreateUserPrincipal<T>(FabricGraphApiUser userEntry)
@@ -148,7 +147,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
                 {
                     GroupId = groupEntry.Group.Id,
                     TenantId = groupEntry.TenantId,
-                    GroupFirstName = groupEntry.Group.DisplayName,     // TODO: What should go here, the principal interface does not describe a graph group well
+                    GroupName = groupEntry.Group.DisplayName,     // TODO: What should go here, the principal interface does not describe a graph group well
                     PrincipalType = PrincipalType.Group
                 };
                 return (T)result;

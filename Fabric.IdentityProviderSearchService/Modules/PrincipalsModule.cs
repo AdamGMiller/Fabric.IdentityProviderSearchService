@@ -92,7 +92,8 @@ namespace Fabric.IdentityProviderSearchService.Modules
         {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchGroupRequest>();
-            var identityProvider = p.identityProvider;
+            searchRequest.IdentityProvider = p.identityProvider;
+            searchRequest.GroupName = p.groupName;
 
             if (string.IsNullOrEmpty(searchRequest.SearchText))
             {
@@ -105,23 +106,23 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 
                 var principals = new List<FabricGroupApiModel>();
 
-                string tenantInfo = "";
+                string tenantInfo = null;
 
-                if (!string.IsNullOrEmpty(searchRequest.Tenant))
+                if (!string.IsNullOrEmpty(searchRequest.TenantId))
                 {
-                    tenantInfo = ($", Tenant={searchRequest.Tenant}");
+                    tenantInfo = ($", TenantId={searchRequest.TenantId}");
                 }
 
                 _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.GroupName}, SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
 
-                var groups = await _searchService.SearchGroupsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Exact, identityProvider);
+                var groups = await _searchService.SearchGroupsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Exact, searchRequest.IdentityProvider);
 
-                principals.AddRange(groups.Select(new FabricGroupApiModel
+                principals.AddRange(groups.Select(g => new FabricGroupApiModel
                 {
-                    FirstName = groups.GroupName,
-                    GroupId = groups.GroupId,
-                    TenantId = groups.TenantId,
-                    PrincipalType = groups.PrincipalType
+                    GroupId = g.GroupId,
+                    GroupName = g.GroupName,
+                    TenantId = g.TenantId,
+                    PrincipalType = g.PrincipalType
                 }));
 
                 return new IdpSearchResultApiModel<FabricGroupApiModel>
@@ -189,7 +190,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
         {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchRequest>();
-            var identityProvider = p.identityProvider;
+            searchRequest.IdentityProvider = p.identityProvider;
 
             if (string.IsNullOrEmpty(searchRequest.SearchText))
             {
@@ -203,16 +204,16 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for users with IdentityProvider={searchRequest.IdentityProvider}, SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
 
-                var users = await _searchService.SearchPrincipalsAsync<IFabricUserGroup>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, identityProvider);
+                var users = await _searchService.SearchPrincipalsAsync<IFabricUserGroup>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.IdentityProvider);
 
-                principals.AddRange(users.Select(new FabricPrincipalApiModel
+                principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {
-                    UserPrincipal = users.UserPrincipal,
-                    FirstName = users.FirstName,
-                    LastName = users.LastName,
-                    MiddleName = users.MiddleName,
-                    SubjectId = users.SubjectId,
-                    PrincipalType = users.PrincipalType.ToString().ToLower()
+                    UserPrincipal = u.UserPrincipal,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    MiddleName = u.MiddleName,
+                    SubjectId = u.SubjectId,
+                    PrincipalType = u.PrincipalType.ToString().ToLower()
                 }));
 
                 return new IdpSearchResultApiModel<FabricPrincipalApiModel>

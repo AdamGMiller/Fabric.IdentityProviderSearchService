@@ -4,7 +4,7 @@
     public interface IFabricGroup
     {
         string GroupId { get; set; }
-        string GroupFirstName { get; set; }
+        string GroupName { get; set; }
         string TenantId { get; set; }
         PrincipalType PrincipalType { get; set; }
     }

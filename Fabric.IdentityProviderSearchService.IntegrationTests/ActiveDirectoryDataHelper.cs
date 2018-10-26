@@ -74,7 +74,11 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var principals = new List<FabricGraphApiGroup>
             {
                 CreateMicrosoftGraphGroup("1", "IT"),
-                CreateMicrosoftGraphGroup("1", "Fabric")
+                CreateMicrosoftGraphGroup("1", "Fabric"),
+                CreateMicrosoftGraphGroup("1", "ITGroup"),
+                CreateMicrosoftGraphGroup("2", "ITGroup"),
+                CreateMicrosoftGraphGroup("1", "ITGrouper"),
+                CreateMicrosoftGraphGroup("2", "ITGrouper")
             };
 
             return principals;

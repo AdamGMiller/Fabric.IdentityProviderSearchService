@@ -19,7 +19,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _activeDirectoryProxy = activeDirectoryProxy;
             _domain = appConfig.DomainName;
         }
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string identityProvider = "")
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string identityProvider = null, string tenantId = null)
         {
             switch (searchType)
             {
@@ -37,7 +37,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             return (IEnumerable<T>)principals;
         }
 
-        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId)
+        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantID = null)
         {
             if (!subjectId.Contains(@"\"))
             {            

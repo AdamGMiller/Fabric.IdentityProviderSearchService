@@ -1,4 +1,6 @@
 ﻿using Fabric.IdentityProviderSearchService.Constants;
+using Fabric.IdentityProviderSearchService.Configuration;
+using Fabric.IdentityProviderSearchService.Services;
 using Fabric.IdentityProviderSearchService.Models;
 using Moq;
 using System;
@@ -18,7 +20,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private IEnumerable<FabricGraphApiUser> _oneUserResult;
         private FabricGraphApiUser _firstUser;
         private readonly AzureDirectoryProviderService _providerService;
-        private readonly string _userFilterQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}') or startswith(Surname, '{0}')";
+        private readonly string _userFilterQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}')";
         private readonly string _identityProvider = "TestIdentityProvider";
 
         public AzureDirectoryProviderServiceUserTests()
@@ -54,7 +56,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindUserBySubjectId_ValidIdUser_SuccessAsync()
         {
-            var user = await _providerService.SearchPrincipalsAsync<IFabricUserGroup>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Wildcard, _identityProvider);
+            var user = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Wildcard, _identityProvider);
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());
@@ -73,7 +75,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindUserBySubjectId_InvalidSubjectIdFormatUser_NullResultAsync()
         {
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricUserGroup>($"not found", PrincipalType.User, SearchTypes.Exact, _identityProvider);
+            var principals = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>($"not found", PrincipalType.User, SearchTypes.Exact, _identityProvider);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);

@@ -137,6 +137,7 @@
     <Compile Include="ActiveDirectorySearchTests.cs" />
     <Compile Include="AzureDirectoryProviderServiceGroupTests.cs" />
     <Compile Include="AzureDirectoryProviderServiceUserTests.cs" />
+    <Compile Include="AzureDirectorySearchTests.cs" />
     <Compile Include="Configuration\WebConfigProviderTests.cs" />
     <Compile Include="IntegrationTestsFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
