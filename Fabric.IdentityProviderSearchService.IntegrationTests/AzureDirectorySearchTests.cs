@@ -14,7 +14,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
     {
         private readonly IntegrationTestsFixture _integrationTestsFixture;
         private readonly Browser _browser;
-
+        private readonly string identityProvider = "Azure";
         public AzureDirectorySearchTests(IntegrationTestsFixture integrationTestsFixture)
         {
             _integrationTestsFixture = integrationTestsFixture;
@@ -23,7 +23,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
                 new Claim("scope", Scopes.SearchPrincipalsScope)
             }, "testprincipal"));
 
-            _browser = integrationTestsFixture.GetBrowser(claimsPrincipal);
+            _browser = integrationTestsFixture.GetBrowser(claimsPrincipal, identityProvider);
         }
 
         [Fact]

@@ -11,13 +11,13 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
     {
         public Browser Browser { get; set; }
 
-        public Browser GetBrowser(ClaimsPrincipal principal)
+        public Browser GetBrowser(ClaimsPrincipal principal, string identityProvider)
         {
             var appConfiguration = new AppConfiguration
             {
                 DomainName = "testing",
-                UseWindowsAuthentication = false,
-                UseAzureAuthentication = true,
+                UseWindowsAuthentication = (identityProvider == "Windows" ? true : false),
+                UseAzureAuthentication = (identityProvider == "Azure" ? true : false),
                 AzureActiveDirectoryClientSettings = new AzureActiveDirectoryClientSettings
                 {
                         ClientAppSettings = new AzureClientApplicationSettings[]
