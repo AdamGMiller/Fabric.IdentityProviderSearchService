@@ -135,6 +135,7 @@
     <Compile Include="ActiveDirectoryMockProxyExtensions.cs" />
     <Compile Include="ActiveDirectoryProviderServiceTests.cs" />
     <Compile Include="ActiveDirectorySearchTests.cs" />
+    <Compile Include="AzureDirectoryMockExtensions.cs" />
     <Compile Include="AzureDirectoryProviderServiceGroupTests.cs" />
     <Compile Include="AzureDirectoryProviderServiceUserTests.cs" />
     <Compile Include="AzureDirectorySearchTests.cs" />

@@ -15,8 +15,21 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var appConfiguration = new AppConfiguration
             {
-               DomainName = "testing",
-               UseWindowsAuthentication = true
+                DomainName = "testing",
+                UseWindowsAuthentication = false,
+                UseAzureAuthentication = true,
+                AzureActiveDirectoryClientSettings = new AzureActiveDirectoryClientSettings
+                {
+                        ClientAppSettings = new AzureClientApplicationSettings[]
+                        {
+                            new AzureClientApplicationSettings{
+                            ClientId = "registration-api",
+                            ClientSecret = "",
+                            TenantId = "tenantid",
+                            Scopes = new string[] { "https://graph.microsoft.com/.default" }
+                            }
+                        }
+                }
             };
 
             var bootstrapper = new TestBootstrapper(appConfiguration, new Mock<ILogger>().Object, principal);

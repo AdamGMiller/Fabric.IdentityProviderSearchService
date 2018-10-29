@@ -14,8 +14,9 @@ namespace Fabric.IdentityProviderSearchService.Models
         string SubjectId { get; set; }
         string UserPrincipal { get; set; }
         string GroupId { get; set; }
-        string GroupFirstName { get; set; }
+        string GroupName { get; set; }
         string TenantId { get; set; }
+        string IdentityProvider { get; set; }
         PrincipalType PrincipalType { get; set; }
     }
 }

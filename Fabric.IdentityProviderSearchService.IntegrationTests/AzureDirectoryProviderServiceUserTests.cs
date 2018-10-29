@@ -20,8 +20,14 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private IEnumerable<FabricGraphApiUser> _oneUserResult;
         private FabricGraphApiUser _firstUser;
         private readonly AzureDirectoryProviderService _providerService;
-        private readonly string _userFilterQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}')";
+        private readonly string _userFilterWildQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}')";
+        private readonly string _userFilterExactQuery = "DisplayName eq '{0}' or GivenName eq '{0}' or UserPrincipalName eq '{0}'";
         private readonly string _identityProvider = "TestIdentityProvider";
+        private readonly string _directorySearchForJason = "jason soto";
+
+        private static readonly Func<FabricGraphApiUser, string, bool> AzureSearchEqualsPredicate =
+            (u, searchText) =>
+                u.User.DisplayName.Equals(searchText, StringComparison.OrdinalIgnoreCase);
 
         public AzureDirectoryProviderServiceUserTests()
         {
@@ -33,9 +39,27 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(It.IsAny<string>(), null))
                             .Returns(Task.FromResult(_emptyUsers));
-            var filterSetting = String.Format(_userFilterQuery, _firstUser.User.DisplayName);
-            _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(filterSetting, null))
+            var filterWildSetting = String.Format(_userFilterWildQuery, _firstUser.User.DisplayName);
+            var filterExactSetting = String.Format(_userFilterExactQuery, _firstUser.User.DisplayName);
+            _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(filterWildSetting, null))
                             .Returns(Task.FromResult(_oneUserResult));
+
+            _mockGraphClient.Setup(p => p.GetUserCollectionsAsync(filterExactSetting, null))
+                            .Returns(() =>
+                            {
+                               var userEntry =
+                               _allUsers.FirstOrDefault(p =>
+                                   AzureSearchEqualsPredicate(p, _directorySearchForJason));
+
+                                if (userEntry == null)
+                                {
+                                    return null;
+                                }
+
+                                List<FabricGraphApiUser> user = new List<FabricGraphApiUser>();
+                                user.Add(userEntry);
+                                return Task.FromResult((IEnumerable<FabricGraphApiUser>)user);
+                            });
 
             _mockGraphClient.Setup(p => p.GetUserAsync(_firstUser.User.Id, null))
                             .Returns(Task.FromResult(_firstUser));
@@ -54,9 +78,20 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
-        public async Task FindUserBySubjectId_ValidIdUser_SuccessAsync()
+        public async Task FindUserBySubjectId_ValidUserWild_SuccessAsync()
         {
             var user = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Wildcard, _identityProvider);
+
+            Assert.NotNull(user);
+            Assert.True(1 == user.Count());
+            Assert.Equal(_firstUser.User.Id, user.First().SubjectId);
+            Assert.Equal(PrincipalType.User, user.First().PrincipalType);
+        }
+
+        [Fact]
+        public async Task FindUserBySubjectId_ValidUserExact_SuccessAsync()
+        {
+            var user = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Exact, _identityProvider);
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());

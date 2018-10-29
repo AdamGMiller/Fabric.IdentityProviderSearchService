@@ -34,7 +34,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 "SearchAsync");
 
             Get("{identityProvider}/search",
-                async p => await SearchByIdpAsync(p).ConfigureAwait(false),
+                async _ => await SearchByIdpAsync().ConfigureAwait(false),
                 null,
                 "SearchByIdpAsync");
 
@@ -44,7 +44,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 "SearchForUserAsync");
 
             Get("/{identityProvider}/groups/{groupName}",
-                async p => await SearchForGroupsAsync(p).ConfigureAwait(false),
+                async _ => await SearchForGroupsAsync().ConfigureAwait(false),
                 null,
                 "SearchForGroupsAsync");
         }
@@ -88,14 +88,13 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
         }
 
-        private async Task<dynamic> SearchForGroupsAsync(dynamic p)
+        private async Task<dynamic> SearchForGroupsAsync()
         {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchGroupRequest>();
-            searchRequest.IdentityProvider = p.identityProvider;
-            searchRequest.GroupName = p.groupName;
+            searchRequest.Type = PrincipalType.Group.ToString();
 
-            if (string.IsNullOrEmpty(searchRequest.SearchText))
+            if (string.IsNullOrEmpty(searchRequest.GroupName))
             {
                 return CreateFailureResponse<FabricGroupApiModel>("Search text was not provided and is required",
                     HttpStatusCode.BadRequest);
@@ -113,15 +112,16 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     tenantInfo = ($", TenantId={searchRequest.TenantId}");
                 }
 
-                _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.GroupName}, SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
+                _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.GroupName}, SearchType={searchRequest.Type} {tenantInfo}");
 
-                var groups = await _searchService.SearchGroupsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Exact, searchRequest.IdentityProvider);
+                var groups = await _searchService.SearchPrincipalsAsync<IFabricGroup>(searchRequest.GroupName, searchRequest.Type, SearchTypes.Exact, searchRequest.IdentityProvider, searchRequest.TenantId);
 
                 principals.AddRange(groups.Select(g => new FabricGroupApiModel
                 {
                     GroupId = g.GroupId,
                     GroupName = g.GroupName,
                     TenantId = g.TenantId,
+                    IdentityProvider = g.IdentityProvider,
                     PrincipalType = g.PrincipalType
                 }));
 
@@ -158,7 +158,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for users with SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
 
-                var users = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard);
+                var users = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard).ConfigureAwait(false);
 
                 principals.AddRange(users.Select(u => new FabricPrincipalApiModel
                 {
@@ -186,37 +186,42 @@ namespace Fabric.IdentityProviderSearchService.Modules
             }
         }
 
-        private async Task<dynamic> SearchByIdpAsync(dynamic p)
+        private async Task<dynamic> SearchByIdpAsync()
         {
             this.RequiresClaims(SearchPrincipalClaim);
             var searchRequest = this.Bind<SearchRequest>();
-            searchRequest.IdentityProvider = p.identityProvider;
 
             if (string.IsNullOrEmpty(searchRequest.SearchText))
             {
-                return CreateFailureResponse<FabricPrincipalApiModel>("Search text was not provided and is required",
+                return CreateFailureResponse<FabricGroupApiModel>("Search text was not provided and is required",
                     HttpStatusCode.BadRequest);
             }
 
             try
             {
-                var principals = new List<FabricPrincipalApiModel>();
+                var principals = new List<FabricGroupApiModel>();
 
-                _logger.Information($"searching for users with IdentityProvider={searchRequest.IdentityProvider}, SearchText={searchRequest.SearchText}, SearchType={searchRequest.Type}");
+                string tenantInfo = null;
 
-                var users = await _searchService.SearchPrincipalsAsync<IFabricUserGroup>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.IdentityProvider);
-
-                principals.AddRange(users.Select(u => new FabricPrincipalApiModel
+                if (!string.IsNullOrEmpty(searchRequest.TenantId))
                 {
-                    UserPrincipal = u.UserPrincipal,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    MiddleName = u.MiddleName,
-                    SubjectId = u.SubjectId,
-                    PrincipalType = u.PrincipalType.ToString().ToLower()
+                    tenantInfo = ($", TenantId={searchRequest.TenantId}");
+                }
+
+                _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
+
+                var groups = await _searchService.SearchPrincipalsAsync<IFabricGroup>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.IdentityProvider, searchRequest.TenantId);
+
+                principals.AddRange(groups.Select(g => new FabricGroupApiModel
+                {
+                    GroupId = g.GroupId,
+                    GroupName = g.GroupName,
+                    TenantId = g.TenantId,
+                    IdentityProvider = g.IdentityProvider,
+                    PrincipalType = g.PrincipalType
                 }));
 
-                return new IdpSearchResultApiModel<FabricPrincipalApiModel>
+                return new IdpSearchResultApiModel<FabricGroupApiModel>
                 {
                     Principals = principals,
                     ResultCount = principals.Count

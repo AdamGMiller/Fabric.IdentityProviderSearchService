@@ -33,7 +33,7 @@ namespace Fabric.IdentityProviderSearchService.Services
                     throw new Exception($"{searchType} is not a valid search type");
             }
             var ldapQuery = _activeDirectoryQuery.QueryText(searchText, principalType);
-            var principals = await Task.Run(() => FindPrincipalsWithDirectorySearcher(ldapQuery));
+            var principals = await Task.Run(() => FindPrincipalsWithDirectorySearcher(ldapQuery)).ConfigureAwait(false);
             return (IEnumerable<T>)principals;
         }
 
@@ -48,7 +48,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            return await Task.Run(() => _activeDirectoryProxy.SearchForUser(Encoder.LdapFilterEncode(domain), Encoder.LdapFilterEncode(accountName)));
+            return await Task.Run(() => _activeDirectoryProxy.SearchForUser(Encoder.LdapFilterEncode(domain), Encoder.LdapFilterEncode(accountName))).ConfigureAwait(false);
         }
 
         private IEnumerable<IFabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
