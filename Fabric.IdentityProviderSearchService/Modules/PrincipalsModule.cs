@@ -62,8 +62,15 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
             try
             {
-                _logger.Information($"searching for user with subject id: {searchRequest.SubjectId}");
-                var user = await _searchService.FindUserBySubjectIdAsync(searchRequest.SubjectId);
+                string tenantInfo = null;
+
+                if (!string.IsNullOrEmpty(searchRequest.TenantId))
+                {
+                    tenantInfo = ($", TenantId={searchRequest.TenantId}");
+                }
+
+                _logger.Information($"searching for user with subject id: {searchRequest.SubjectId} {tenantInfo}");
+                var user = await _searchService.FindUserBySubjectIdAsync(searchRequest.SubjectId, searchRequest.TenantId);
 
                 return new FabricPrincipalApiModel
                 {
@@ -71,6 +78,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     LastName = user?.LastName,
                     MiddleName = user?.MiddleName,
                     SubjectId = user?.SubjectId,
+                    TenantId = user?.TenantId,
                     PrincipalType = user?.PrincipalType.ToString().ToLower()
                 };
             }

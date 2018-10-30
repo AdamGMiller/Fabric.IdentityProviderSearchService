@@ -43,7 +43,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             return result;
         }
 
-        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId)
+        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantId)
         {
             foreach (var service in _externalIdentityProviderServices)
             {
