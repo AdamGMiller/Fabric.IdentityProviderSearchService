@@ -60,21 +60,18 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText, string tenantId = null)
         {
-            string queryText = null;
             try
             {
-                queryText = GetQueryText(searchText, PrincipalType.User);
-                var userSearchTask = GetUserPrincipalsAsync(queryText, tenantId);
+                var userSearchTask = GetUserPrincipalsAsync(searchText, tenantId);
 
-                queryText = GetQueryText(searchText, PrincipalType.Group);
-                var groupSearchTask = GetGroupPrincipalsAsync<IFabricPrincipal>(queryText, tenantId);
+                var groupSearchTask = GetGroupPrincipalsAsync<IFabricPrincipal>(searchText, tenantId);
 
                 var results = await Task.WhenAll(userSearchTask, groupSearchTask).ConfigureAwait(false);
                 return results.SelectMany(result => result);
             }
             catch
             {
-                throw new BadRequestException($"SearchText contained in {queryText} is not valid");
+                throw new BadRequestException($"SearchText contained in {searchText} is not valid");
             }
         }
 
