@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Services;
+using Fabric.IdentityProviderSearchService.Services.Azure;
 using Moq;
 using Nancy;
 using Nancy.Bootstrapper;
@@ -32,6 +33,10 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var mockProxy = new Mock<IActiveDirectoryProxy>()
                 .SetupActiveDirectoryProxy(new ActiveDirectoryDataHelper().GetPrincipals());
             container.Register(mockProxy.Object);
+
+            var mockGraph = new Mock<IMicrosoftGraphApi>()
+                .SetupAzureDirectoryGraph(new ActiveDirectoryDataHelper().GetMicrosoftGraphGroups());
+            container.Register(mockGraph.Object);
         }
     }
 }

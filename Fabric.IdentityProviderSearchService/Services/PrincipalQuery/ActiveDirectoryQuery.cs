@@ -1,9 +1,9 @@
-﻿using Fabric.IdentityProviderSearchService.Models;
+﻿using Fabric.IdentityProviderSearchService.Constants;
 using Microsoft.Security.Application;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
-    public abstract class ActiveDirectoryQuery : IPrincipalQuery
+    public abstract class ActiveDirectoryQuery : IActiveDirectoryQuery
     {
         public abstract string GetFilter(string encodedSearchText);
 

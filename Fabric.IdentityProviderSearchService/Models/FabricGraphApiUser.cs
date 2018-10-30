@@ -10,7 +10,7 @@ namespace Fabric.IdentityProviderSearchService.Models
         {
             this.User = user;
         }
-
+        public string IdentityProvider { get; set; }
         public string TenantId { get; set; }
     }
 }

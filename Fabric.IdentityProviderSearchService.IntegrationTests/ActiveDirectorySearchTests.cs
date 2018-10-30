@@ -14,7 +14,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
     {
         private readonly IntegrationTestsFixture _integrationTestsFixture;
         private readonly Browser _browser;
-
+        private readonly string identityProvider =  "Windows";
         public ActiveDirectorySearchTests(IntegrationTestsFixture integrationTestsFixture)
         {
             _integrationTestsFixture = integrationTestsFixture;
@@ -23,7 +23,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
                 new Claim("scope", Scopes.SearchPrincipalsScope)
             }, "testprincipal"));
 
-            _browser = integrationTestsFixture.GetBrowser(claimsPrincipal);
+            _browser = integrationTestsFixture.GetBrowser(claimsPrincipal, identityProvider);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             {
                 new Claim("scope", "foo")
             }, "testprincipal"));
-            var browser = _integrationTestsFixture.GetBrowser(invalidScopePrincipal);
+            var browser = _integrationTestsFixture.GetBrowser(invalidScopePrincipal, identityProvider);
 
             var searchResult = await browser.Get("/principals/search", with =>
             {
@@ -55,7 +55,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
             
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(3, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
             Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("group")));
@@ -73,7 +73,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(1, users.ResultCount);            
             Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("group")));
         }
@@ -90,7 +90,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(2, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
         }
@@ -106,7 +106,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(0, users.ResultCount);            
         }
 
@@ -145,7 +145,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel>();
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(1, users.ResultCount);
             Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("user")));
         }

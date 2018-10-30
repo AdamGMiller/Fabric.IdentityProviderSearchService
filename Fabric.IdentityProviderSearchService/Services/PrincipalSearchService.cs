@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
+using Fabric.IdentityProviderSearchService.Constants;
 
 namespace Fabric.IdentityProviderSearchService.Services
 {
@@ -14,7 +15,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _externalIdentityProviderServices = externalIdentityProviderService;
         }
 
-        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, string principalTypeString)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, string principalTypeString, string searchType, string tenantId = null)
         {           
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
@@ -34,15 +35,15 @@ namespace Fabric.IdentityProviderSearchService.Services
                 throw new BadRequestException("invalid principal type provided. valid values are 'user' and 'group'");
             }
 
-            List <IFabricPrincipal> result = new List<IFabricPrincipal>();
+            var result = new List<T>();
             foreach (var service in _externalIdentityProviderServices)
             {
-                result.AddRange(await service.SearchPrincipalsAsync(searchText, principalType));
+               result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, tenantId).ConfigureAwait(false));
             }
             return result;
         }
 
-        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId)
+        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantId)
         {
             foreach (var service in _externalIdentityProviderServices)
             {

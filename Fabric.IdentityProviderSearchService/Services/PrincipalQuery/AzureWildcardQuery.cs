@@ -1,9 +1,10 @@
 ﻿using System;
+using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
-    public class AzureWildcardQuery : IPrincipalQuery
+    public class AzureWildcardQuery : IAzureQuery
     {
         public string QueryText(string searchText, PrincipalType principalType)
         {
@@ -15,7 +16,7 @@ namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
                 case PrincipalType.Group:
                     return $"startswith(DisplayName, '{searchText}')";
                 default:
-                    throw new Exception($"Query type {principalType} not supported in Azure AD.");
+                    return $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
             }
         }
     }

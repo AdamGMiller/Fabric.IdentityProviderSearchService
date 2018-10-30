@@ -1,4 +1,5 @@
-﻿using Fabric.IdentityProviderSearchService.Models;
+﻿using Fabric.IdentityProviderSearchService.Constants;
+using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
 {
