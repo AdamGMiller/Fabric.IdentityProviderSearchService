@@ -16,7 +16,7 @@ namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
                 case PrincipalType.Group:
                     return $"startswith(DisplayName, '{searchText}')";
                 default:
-                    return $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
+                    throw new Exception($"Query type {principalType} not supported in Azure AD.");
             }
         }
     }

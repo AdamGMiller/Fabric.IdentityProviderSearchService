@@ -47,47 +47,54 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
                     throw new Exception($"{searchType} is not a valid search type");
             }
 
-            var filterQuery = _azureQuery.QueryText(searchText, principalType);
-
             switch (principalType)
             {
                 case PrincipalType.User:
-                    return (IEnumerable<T>) await GetUserPrincipalsAsync(filterQuery, tenantId).ConfigureAwait(false);
+                    return (IEnumerable<T>) await GetUserPrincipalsAsync(searchText, tenantId).ConfigureAwait(false);
                 case PrincipalType.Group:
-                    return (IEnumerable<T>) await GetGroupPrincipalsAsync<T>(filterQuery, tenantId).ConfigureAwait(false);
+                    return await GetGroupPrincipalsAsync<T>(searchText, tenantId).ConfigureAwait(false);
                 default:
-                    return (IEnumerable<T>) await GetUserAndGroupPrincipalsAsync(filterQuery, tenantId).ConfigureAwait(false);
+                    return (IEnumerable<T>) await GetUserAndGroupPrincipalsAsync(searchText, tenantId).ConfigureAwait(false);
             }
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText, string tenantId = null)
         {
-            var userSearchTask = GetUserPrincipalsAsync(searchText, tenantId);
-            var location = searchText.IndexOf(") or");
-            var newSearchText = searchText.Substring(0, location + 1);
             try
             {
-                var groupSearchTask = GetGroupPrincipalsAsync<IFabricPrincipal>(newSearchText, tenantId);
+                var userSearchTask = GetUserPrincipalsAsync(searchText, tenantId);
+
+                var groupSearchTask = GetGroupPrincipalsAsync<IFabricPrincipal>(searchText, tenantId);
+
                 var results = await Task.WhenAll(userSearchTask, groupSearchTask).ConfigureAwait(false);
                 return results.SelectMany(result => result);
             }
             catch
             {
-                throw new BadRequestException($"SearchText contained in {newSearchText} is not valid");
+                throw new BadRequestException($"SearchText contained in {searchText} is not valid");
             }
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserPrincipalsAsync(string searchText, string tenantId = null)
         {
+            string queryText = null;
             var principals = new List<IFabricPrincipal>();
-            var users = await GetAllUsersFromTenantsAsync(searchText, tenantId).ConfigureAwait(false);
-
-            foreach(var result in users)
+            try
             {
-                principals.Add(CreateUserPrincipal(result));
-            }
+                queryText = GetQueryText(searchText, PrincipalType.User);
+                var users = await GetAllUsersFromTenantsAsync(queryText, tenantId).ConfigureAwait(false);
 
-            return principals;
+                foreach (var result in users)
+                {
+                    principals.Add(CreateUserPrincipal(result));
+                }
+
+                return principals;
+            }
+            catch
+            {
+                throw new BadRequestException($"SearchText contained in {queryText} is not valid");
+            }
         }
 
         private async Task<IEnumerable<FabricGraphApiUser>> GetAllUsersFromTenantsAsync(string searchText, string tenantId = null)
@@ -97,17 +104,28 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
         private async Task<IEnumerable<T>> GetGroupPrincipalsAsync<T>(string searchText, string tenantId = null)
         {
+            string queryText = null;
             var principals = new List<T>();
-            var groups = await GetAllGroupsFromTenantsAsync(searchText, tenantId).ConfigureAwait(false);
-
-            if (groups != null)
+            try
             {
-                foreach (var result in groups)
+                queryText = GetQueryText(searchText, PrincipalType.Group);
+                var groups = await GetAllGroupsFromTenantsAsync(queryText, tenantId).ConfigureAwait(false);
+
+                if (groups != null)
                 {
-                    principals.Add(CreateGroupPrincipal<T>(result));
+                    foreach (var result in groups)
+                    {
+                        principals.Add(CreateGroupPrincipal<T>(result));
+                    }
+
+                    return principals;
                 }
+                return null;
             }
-            return principals;
+            catch
+            {
+                throw new BadRequestException($"SearchText contained in {queryText} is not valid");
+            }
         }
 
         private async Task<IEnumerable<FabricGraphApiGroup>> GetAllGroupsFromTenantsAsync(string searchText, string tenantId = null)
@@ -159,6 +177,11 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             }
 
             return default(T);
+        }
+
+        private string GetQueryText (string searchText, PrincipalType principalType)
+        {
+            return _azureQuery.QueryText(searchText, principalType);
         }
     }
 }
