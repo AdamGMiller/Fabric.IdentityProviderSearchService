@@ -20,8 +20,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private IEnumerable<FabricGraphApiUser> _oneUserResult;
         private FabricGraphApiUser _firstUser;
         private readonly AzureDirectoryProviderService _providerService;
-        private readonly string _userFilterWildQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}')";
-        private readonly string _userFilterExactQuery = "DisplayName eq '{0}' or GivenName eq '{0}' or UserPrincipalName eq '{0}'";
+        private readonly string _userFilterWildQuery = "startswith(DisplayName, '{0}') or startswith(GivenName, '{0}') or startswith(UserPrincipalName, '{0}') or startswith(Surname, '{0}')";
+        private readonly string _userFilterExactQuery = "DisplayName eq '{0}' or GivenName eq '{0}' or UserPrincipalName eq '{0}' or Surname eq '{0}'";
         private readonly string _identityProvider = "TestIdentityProvider";
         private readonly string _directorySearchForJason = "jason soto";
 

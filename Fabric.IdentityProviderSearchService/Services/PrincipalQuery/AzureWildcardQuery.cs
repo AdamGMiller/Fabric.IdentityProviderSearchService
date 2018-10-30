@@ -12,7 +12,7 @@ namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
             {
                 case PrincipalType.User:
                     return
-                        $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}')";
+                        $"startswith(DisplayName, '{searchText}') or startswith(GivenName, '{searchText}') or startswith(UserPrincipalName, '{searchText}') or startswith(Surname, '{searchText}')";
                 case PrincipalType.Group:
                     return $"startswith(DisplayName, '{searchText}')";
                 default:

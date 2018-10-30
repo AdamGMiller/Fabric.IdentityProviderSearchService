@@ -12,7 +12,7 @@ namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
             {
                 case PrincipalType.User:
                     return
-                        $"DisplayName eq '{searchText}' or GivenName eq '{searchText}' or UserPrincipalName eq '{searchText}'";
+                        $"DisplayName eq '{searchText}' or GivenName eq '{searchText}' or UserPrincipalName eq '{searchText}' or Surname eq '{searchText}'";
                 case PrincipalType.Group:
                     return $"DisplayName eq '{searchText}'";
                 default:
