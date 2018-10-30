@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Constants;
+using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services.PrincipalQuery;
 using System;
@@ -62,12 +63,18 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText, string tenantId = null)
         {
             var userSearchTask = GetUserPrincipalsAsync(searchText, tenantId);
-            var location = searchText.IndexOf("or");
-            var newSearchText = searchText.Substring(0, location - 1);
-            var groupSearchTask = GetGroupPrincipalsAsync<IFabricPrincipal>(newSearchText, tenantId);
-            var results = await Task.WhenAll(userSearchTask, groupSearchTask).ConfigureAwait(false);
-
-            return results.SelectMany(result => result);
+            var location = searchText.IndexOf(") or");
+            var newSearchText = searchText.Substring(0, location + 1);
+            try
+            {
+                var groupSearchTask = GetGroupPrincipalsAsync<IFabricPrincipal>(newSearchText, tenantId);
+                var results = await Task.WhenAll(userSearchTask, groupSearchTask).ConfigureAwait(false);
+                return results.SelectMany(result => result);
+            }
+            catch
+            {
+                throw new BadRequestException($"SearchText contained in {newSearchText} is not valid");
+            }
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserPrincipalsAsync(string searchText, string tenantId = null)
