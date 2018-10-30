@@ -15,7 +15,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _externalIdentityProviderServices = externalIdentityProviderService;
         }
 
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, string principalTypeString, string searchType, string identityProvider = null, string tenantId = null)
+        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, string principalTypeString, string searchType, string tenantId = null)
         {           
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
@@ -38,7 +38,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             var result = new List<T>();
             foreach (var service in _externalIdentityProviderServices)
             {
-               result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, identityProvider, tenantId).ConfigureAwait(false));
+               result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, tenantId).ConfigureAwait(false));
             }
             return result;
         }

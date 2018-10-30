@@ -80,7 +80,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindUserBySubjectId_ValidUserWild_SuccessAsync()
         {
-            var user = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Wildcard, _identityProvider);
+            var user = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Wildcard);
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());
@@ -91,7 +91,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindUserBySubjectId_ValidUserExact_SuccessAsync()
         {
-            var user = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Exact, _identityProvider);
+            var user = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>(_firstUser.User.DisplayName, PrincipalType.User, SearchTypes.Exact);
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());
@@ -110,7 +110,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task FindUserBySubjectId_InvalidSubjectIdFormatUser_NullResultAsync()
         {
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>($"not found", PrincipalType.User, SearchTypes.Exact, _identityProvider);
+            var principals = await _providerService.SearchPrincipalsAsync<IFabricPrincipal>($"not found", PrincipalType.User, SearchTypes.Exact);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);

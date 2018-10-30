@@ -38,7 +38,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var groups = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricGroupApiModel>>();
+            var groups = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(4, groups.ResultCount);
             Assert.Equal(4, groups.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(4, groups.Principals.Select(p => p.PrincipalType.Equals("group")).Count());
@@ -57,7 +57,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var groups = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricGroupApiModel>>();
+            var groups = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(4, groups.ResultCount);
             Assert.Equal(4, groups.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(4, groups.Principals.Select(p => p.PrincipalType.Equals("group")).Count());

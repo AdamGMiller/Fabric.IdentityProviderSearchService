@@ -43,7 +43,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var searchText = _listGroups.First(g => g.Group.DisplayName == "Fabric").Group.DisplayName;
             this.SetupGraphClient(searchText, "Exact");
 
-            var Group = await  _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Exact, _identityProvider);
+            var Group = await  _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Exact);
 
             Assert.NotNull(Group);
             Assert.True(1 == Group.Count());
@@ -56,7 +56,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var searchText = _listGroups.First(g => g.Group.DisplayName == "ITGroup").Group.DisplayName;
             this.SetupGraphClient(searchText, "Exact");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Exact, _identityProvider);
+            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Exact);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 2);
@@ -66,7 +66,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         public async Task FindGroupByGroupName_InvalidGroupName_NullResultAsync()
         {
             this.SetupGraphClient("not found", "Exact");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>($"not found", PrincipalType.Group, SearchTypes.Exact, _identityProvider);
+            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>($"not found", PrincipalType.Group, SearchTypes.Exact);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);
@@ -76,7 +76,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         public async Task FindGroupsThatContainGroupName_InvalidGroupName_NullResultAsync()
         {
             this.SetupGraphClient("not found", "Wild");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>($"not found", PrincipalType.Group, SearchTypes.Wildcard, _identityProvider);
+            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>($"not found", PrincipalType.Group, SearchTypes.Wildcard);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);
@@ -87,7 +87,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var searchText = _listGroups.First(g => g.Group.DisplayName == "ITGroup").Group.DisplayName;
             this.SetupGraphClient(searchText, "Wild");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Wildcard, _identityProvider);
+            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Wildcard);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 4);

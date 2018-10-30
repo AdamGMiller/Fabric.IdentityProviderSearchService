@@ -16,8 +16,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var appConfiguration = new AppConfiguration
             {
                 DomainName = "testing",
-                UseWindowsAuthentication = (identityProvider == "Windows" ? true : false),
-                UseAzureAuthentication = (identityProvider == "Azure" ? true : false),
+                UseWindowsAuthentication = (identityProvider.ToLower() == "windows"),
+                UseAzureAuthentication = (identityProvider.ToLower() == "azure"),
                 AzureActiveDirectoryClientSettings = new AzureActiveDirectoryClientSettings
                 {
                         ClientAppSettings = new AzureClientApplicationSettings[]
