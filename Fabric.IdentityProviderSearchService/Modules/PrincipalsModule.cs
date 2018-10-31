@@ -108,19 +108,17 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
             try
             {
-                
                 var principals = new List<FabricGroupApiModel>();
+                string tenantId = null;
 
-                string tenantInfo = null;
-
-                if (!string.IsNullOrEmpty(searchRequest.TenantId))
+                if (Request.Query["tenantId"].HasValue)
                 {
-                    tenantInfo = ($", TenantId={searchRequest.TenantId}");
+                    tenantId = Request.Query["tenantId"].ToString();
                 }
 
-                _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.GroupName}, SearchType={searchRequest.Type} {tenantInfo}");
+                _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.GroupName}, SearchType={searchRequest.Type} {tenantId}");
 
-                var groups = await _searchService.SearchPrincipalsAsync<IFabricGroup>(searchRequest.GroupName, searchRequest.Type, SearchTypes.Exact, searchRequest.TenantId);
+                var groups = await _searchService.SearchPrincipalsAsync<IFabricGroup>(searchRequest.GroupName, searchRequest.Type, SearchTypes.Exact, tenantId);
 
                 principals.AddRange(groups.Select(g => new FabricGroupApiModel
                 {
@@ -128,7 +126,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     GroupName = g.GroupName,
                     TenantId = g.TenantId,
                     IdentityProvider = searchRequest.IdentityProvider,
-                    PrincipalType = g.PrincipalType
+                    PrincipalType = g.PrincipalType                    
                 }));
 
                 return new IdpSearchResultApiModel<FabricGroupApiModel>
@@ -183,7 +181,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     SubjectId = ug.SubjectId,
                     UniqueId = ug.UniqueId,
                     TenantId = ug.TenantId,
-                    IdentityProvider = searchRequest.IdentityProvider,
+                    IdentityProvider = ug.IdentityProvider,
                     PrincipalType = ug.PrincipalType.ToString().ToLower()
                 }));
 

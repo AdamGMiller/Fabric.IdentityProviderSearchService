@@ -37,7 +37,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             return (IEnumerable<T>)principals;
         }
 
-        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantID = null)
+        public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantId = null)
         {
             if (!subjectId.Contains(@"\"))
             {            
