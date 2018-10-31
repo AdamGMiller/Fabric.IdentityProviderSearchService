@@ -11,8 +11,6 @@ namespace Fabric.IdentityProviderSearchService.Models
 
         public Group Group { get; set; }
 
-        public string IdentityProvider { get; set; }
-
         public string TenantId { get; set; }
     }
 }

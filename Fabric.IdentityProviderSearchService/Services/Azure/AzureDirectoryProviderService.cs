@@ -135,7 +135,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
 
         private IFabricPrincipal CreateUserPrincipal(FabricGraphApiUser userEntry)
         {
-            return new FabricPrincipal
+            var principal = new FabricPrincipal
             {
                 UserPrincipal = userEntry.User.UserPrincipalName,
                 TenantId = userEntry.TenantId,
@@ -144,33 +144,38 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
                 MiddleName = string.Empty,   // this value does not exist in the graph api
                 IdentityProvider = userEntry.IdentityProvider,
                 PrincipalType = PrincipalType.User,
-                SubjectId = userEntry.User.Id
+                SubjectId = userEntry.User.Id,
+                UniqueId = userEntry.User.Id
             };
+
+            principal.DisplayName = $"{principal.FirstName} {principal.LastName}";
+            return principal;
         }
 
         private T CreateGroupPrincipal<T>(FabricGraphApiGroup groupEntry)
         {
-            Type modelType = typeof(T);
+            var modelType = typeof(T);
             if (modelType == typeof(IFabricGroup))
             {
                 object result = new FabricGroup
                 {
                     GroupId = groupEntry.Group.Id,
                     TenantId = groupEntry.TenantId,
-                    GroupName = groupEntry.Group.DisplayName,     // TODO: What should go here, the principal interface does not describe a graph group well
-                    IdentityProvider = groupEntry.IdentityProvider,
+                    GroupName = groupEntry.Group.DisplayName,
+                    IdentityProvider = IdentityProviders.AzureActiveDirectory,
                     PrincipalType = PrincipalType.Group
                 };
                 return (T)result;
             }
-            else if (modelType == typeof(IFabricPrincipal))
+            if (modelType == typeof(IFabricPrincipal))
             {
                 object result = new FabricPrincipal
                 {
-                    GroupId = groupEntry.Group.Id,
+                    SubjectId = groupEntry.Group.DisplayName,
+                    UniqueId = groupEntry.Group.Id,
                     TenantId = groupEntry.TenantId,
-                    GroupName = groupEntry.Group.DisplayName,     // TODO: What should go here, the principal interface does not describe a graph group well
-                    IdentityProvider = groupEntry.IdentityProvider,
+                    DisplayName = groupEntry.Group.DisplayName,
+                    IdentityProvider = IdentityProviders.AzureActiveDirectory,
                     PrincipalType = PrincipalType.Group
                 };
                 return (T)result;

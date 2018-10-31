@@ -8,8 +8,6 @@ using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 using Fabric.IdentityProviderSearchService.Services;
-using Fabric.IdentityProviderSearchService.Services.Azure;
-using Fabric.IdentityProviderSearchService.Services.PrincipalQuery;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
@@ -173,17 +171,17 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
 
-                var usersgroups = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId).ConfigureAwait(false);
+                var usersAndGroups = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId).ConfigureAwait(false);
 
-                principals.AddRange(usersgroups.Select(ug => new FabricPrincipalApiModel
+                principals.AddRange(usersAndGroups.Select(ug => new FabricPrincipalApiModel
                 {
                     UserPrincipal = ug.UserPrincipal,
                     FirstName = ug.FirstName,
-                    LastName = ug.LastName,
                     MiddleName = ug.MiddleName,
+                    LastName = ug.LastName,
+                    DisplayName = ug.DisplayName,
                     SubjectId = ug.SubjectId,
-                    GroupId = ug.GroupId,
-                    GroupName = ug.GroupName,
+                    UniqueId = ug.UniqueId,
                     TenantId = ug.TenantId,
                     IdentityProvider = searchRequest.IdentityProvider,
                     PrincipalType = ug.PrincipalType.ToString().ToLower()
@@ -229,17 +227,17 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
 
-                var usersgroups = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId);
+                var usersAndGroups = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId);
 
-                principals.AddRange(usersgroups.Select(ug => new FabricPrincipalApiModel
+                principals.AddRange(usersAndGroups.Select(ug => new FabricPrincipalApiModel
                 {
                     UserPrincipal = ug.UserPrincipal,
                     FirstName = ug.FirstName,
-                    LastName = ug.LastName,
                     MiddleName = ug.MiddleName,
+                    LastName = ug.LastName,
+                    DisplayName = ug.DisplayName,
                     SubjectId = ug.SubjectId,
-                    GroupId = ug.GroupId,
-                    GroupName = ug.GroupName,
+                    UniqueId = ug.UniqueId,
                     TenantId = ug.TenantId,
                     IdentityProvider = searchRequest.IdentityProvider,
                     PrincipalType = ug.PrincipalType.ToString().ToLower()

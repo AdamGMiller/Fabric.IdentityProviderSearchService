@@ -237,6 +237,7 @@
     <Compile Include="Configuration\IAppConfiguration.cs" />
     <Compile Include="Configuration\WebConfigProvider.cs" />
     <Compile Include="Constants\HttpResponseHeaders.cs" />
+    <Compile Include="Constants\IdentityProviders.cs" />
     <Compile Include="Constants\PrincipalType.cs" />
     <Compile Include="Constants\Scopes.cs" />
     <Compile Include="Constants\SearchTypes.cs" />

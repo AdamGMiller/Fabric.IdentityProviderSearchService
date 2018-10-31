@@ -1,6 +1,6 @@
 ﻿namespace Fabric.IdentityProviderSearchService.Models
 {
-    using Fabric.IdentityProviderSearchService.Constants;
+    using Constants;
     public interface IFabricGroup
     {
         string GroupId { get; set; }

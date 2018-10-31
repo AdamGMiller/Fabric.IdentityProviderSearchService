@@ -74,39 +74,32 @@ namespace Fabric.IdentityProviderSearchService.Services
 
         private IFabricPrincipal CreateUserPrincipal(IDirectoryEntry userEntry)
         {
-            return new FabricPrincipal
-            {              
+            var subjectId = GetSubjectId(userEntry.SamAccountName);
+            var principal = new FabricPrincipal
+            {
                 FirstName = userEntry.FirstName,
                 LastName = userEntry.LastName,
                 MiddleName = userEntry.MiddleName,
-                PrincipalType = PrincipalType.User,                
-                SubjectId = GetSubjectId(userEntry.SamAccountName)
+                PrincipalType = PrincipalType.User,
+                SubjectId = subjectId,
+                UniqueId = $"{subjectId}-{PrincipalType.User}"
             };
+
+            principal.DisplayName = $"{principal.FirstName} {principal.LastName}";
+            return principal;
         }
 
         private IFabricPrincipal CreateGroupPrincipal(IDirectoryEntry groupEntry)
         {
+            var subjectId = GetSubjectId(groupEntry.Name);
             return new FabricPrincipal
             {
-                SubjectId = GetSubjectId(groupEntry.Name),
+                SubjectId = subjectId,
+                UniqueId = $"{subjectId}-{PrincipalType.Group}",
+                DisplayName = subjectId,
+                IdentityProvider = IdentityProviders.ActiveDirectory,
                 PrincipalType = PrincipalType.Group
             };
-        }
-
-        private static string BuildLdapQuery(string searchText, PrincipalType principalType)
-        {
-            var encodedSearchText = Encoder.LdapFilterEncode(searchText);
-            var nameFilter = $"(|(sAMAccountName={encodedSearchText}*)(givenName={encodedSearchText}*)(sn={encodedSearchText}*)(cn={encodedSearchText}*))";
-
-            switch (principalType)
-            {
-                case PrincipalType.User:
-                    return $"(&(objectClass=user)(objectCategory=person){nameFilter})";
-                case PrincipalType.Group:
-                    return $"(&(objectCategory=group){nameFilter})";
-                default:
-                    return $"(&(|(&(objectClass=user)(objectCategory=person))(objectCategory=group)){nameFilter})";
-            }
         }
 
         private string GetSubjectId(string sAmAccountName)
