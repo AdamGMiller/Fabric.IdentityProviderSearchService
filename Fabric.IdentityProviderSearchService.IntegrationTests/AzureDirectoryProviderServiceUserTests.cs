@@ -84,7 +84,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());
-            Assert.Equal(_firstUser.User.Id, user.First().SubjectId);
+            Assert.Equal(_firstUser.User.UserPrincipalName, user.First().SubjectId);
             Assert.Equal(PrincipalType.User, user.First().PrincipalType);
         }
 
@@ -95,7 +95,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.NotNull(user);
             Assert.True(1 == user.Count());
-            Assert.Equal(_firstUser.User.Id, user.First().SubjectId);
+            Assert.Equal(_firstUser.User.UserPrincipalName, user.First().SubjectId);
             Assert.Equal(PrincipalType.User, user.First().PrincipalType);
         }
 
