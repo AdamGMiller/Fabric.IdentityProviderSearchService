@@ -47,7 +47,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.NotNull(Group);
             Assert.True(1 == Group.Count());
-            Assert.Equal(_firstGroup.Group.Id, Group.First().GroupId);
+            Assert.Equal(_firstGroup.Group.Id, Group.First().ExternalIdentifier);
             Assert.Equal(PrincipalType.Group, Group.First().PrincipalType);
         }
 

@@ -122,7 +122,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 principals.AddRange(groups.Select(g => new FabricGroupApiModel
                 {
-                    GroupId = g.GroupId,
+                    ExternalIdentifier = g.ExternalIdentifier,
                     GroupName = g.GroupName,
                     TenantId = g.TenantId,
                     IdentityProvider = searchRequest.IdentityProvider,
@@ -179,7 +179,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     LastName = ug.LastName,
                     DisplayName = ug.DisplayName,
                     SubjectId = ug.SubjectId,
-                    UniqueId = ug.UniqueId,
+                    ExternalIdentifier = ug.ExternalIdentifier,
                     TenantId = ug.TenantId,
                     IdentityProvider = ug.IdentityProvider,
                     PrincipalType = ug.PrincipalType.ToString().ToLower()
@@ -235,7 +235,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     LastName = ug.LastName,
                     DisplayName = ug.DisplayName,
                     SubjectId = ug.SubjectId,
-                    UniqueId = ug.UniqueId,
+                    ExternalIdentifier = ug.ExternalIdentifier,
                     TenantId = ug.TenantId,
                     IdentityProvider = searchRequest.IdentityProvider,
                     PrincipalType = ug.PrincipalType.ToString().ToLower()

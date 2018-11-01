@@ -142,10 +142,10 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
                 FirstName = userEntry.User.GivenName ?? userEntry.User.DisplayName,
                 LastName = userEntry.User.Surname,
                 MiddleName = string.Empty,   // this value does not exist in the graph api
-                IdentityProvider = userEntry.IdentityProvider,
+                IdentityProvider = IdentityProviders.AzureActiveDirectory,
                 PrincipalType = PrincipalType.User,
-                SubjectId = userEntry.User.Id,
-                UniqueId = userEntry.User.Id
+                SubjectId = userEntry.User.UserPrincipalName,
+                ExternalIdentifier = userEntry.User.Id
             };
 
             principal.DisplayName = $"{principal.FirstName} {principal.LastName}";
@@ -159,7 +159,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             {
                 object result = new FabricGroup
                 {
-                    GroupId = groupEntry.Group.Id,
+                    ExternalIdentifier = groupEntry.Group.Id,
                     TenantId = groupEntry.TenantId,
                     GroupName = groupEntry.Group.DisplayName,
                     IdentityProvider = IdentityProviders.AzureActiveDirectory,
@@ -172,7 +172,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
                 object result = new FabricPrincipal
                 {
                     SubjectId = groupEntry.Group.DisplayName,
-                    UniqueId = groupEntry.Group.Id,
+                    ExternalIdentifier = groupEntry.Group.Id,
                     TenantId = groupEntry.TenantId,
                     DisplayName = groupEntry.Group.DisplayName,
                     IdentityProvider = IdentityProviders.AzureActiveDirectory,

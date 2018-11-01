@@ -77,12 +77,13 @@ namespace Fabric.IdentityProviderSearchService.Services
             var subjectId = GetSubjectId(userEntry.SamAccountName);
             var principal = new FabricPrincipal
             {
+                SubjectId = subjectId,
+                DisplayName = $"{userEntry.FirstName} {userEntry.LastName}",
                 FirstName = userEntry.FirstName,
                 LastName = userEntry.LastName,
                 MiddleName = userEntry.MiddleName,
-                PrincipalType = PrincipalType.User,
-                SubjectId = subjectId,
-                UniqueId = $"{subjectId}-{PrincipalType.User}"
+                IdentityProvider = IdentityProviders.ActiveDirectory,
+                PrincipalType = PrincipalType.User
             };
 
             principal.DisplayName = $"{principal.FirstName} {principal.LastName}";
@@ -95,7 +96,6 @@ namespace Fabric.IdentityProviderSearchService.Services
             return new FabricPrincipal
             {
                 SubjectId = subjectId,
-                UniqueId = $"{subjectId}-{PrincipalType.Group}",
                 DisplayName = subjectId,
                 IdentityProvider = IdentityProviders.ActiveDirectory,
                 PrincipalType = PrincipalType.Group

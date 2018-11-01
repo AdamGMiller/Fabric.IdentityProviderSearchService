@@ -8,7 +8,7 @@
         string MiddleName { get; set; }
         string SubjectId { get; set; }
         string UserPrincipal { get; set; }
-        string UniqueId { get; set; }
+        string ExternalIdentifier { get; set; }
         string DisplayName { get; set; }
         string IdentityProvider { get; set; }
         string TenantId { get; set; }
