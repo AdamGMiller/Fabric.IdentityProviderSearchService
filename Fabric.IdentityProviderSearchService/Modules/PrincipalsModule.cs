@@ -160,14 +160,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             {
                 var principals = new List<FabricPrincipalApiModel>();
 
-                string tenantInfo = null;
-
-                if (!string.IsNullOrEmpty(searchRequest.TenantId))
-                {
-                    tenantInfo = ($", TenantId={searchRequest.TenantId}");
-                }
-
-                _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
+                _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.SearchText}, SearchType={searchRequest.Type} {searchRequest.TenantId}");
 
                 var usersAndGroups = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId).ConfigureAwait(false);
 

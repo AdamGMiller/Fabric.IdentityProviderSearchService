@@ -1,6 +1,4 @@
 ﻿using Fabric.IdentityProviderSearchService.Constants;
-using Fabric.IdentityProviderSearchService.Configuration;
-using Fabric.IdentityProviderSearchService.Services;
 using Fabric.IdentityProviderSearchService.Models;
 using Moq;
 using System;
