@@ -142,6 +142,7 @@
     <Compile Include="Configuration\WebConfigProviderTests.cs" />
     <Compile Include="IntegrationTestsFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceTests\IdentityProviderSearchServiceConfigurationProviderTests.cs" />
     <Compile Include="TestBootstrapper.cs" />
   </ItemGroup>
   <ItemGroup>

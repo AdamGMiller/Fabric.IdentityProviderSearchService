@@ -234,7 +234,9 @@
     <Compile Include="Configuration\ApplicationInsights.cs" />
     <Compile Include="Configuration\AzureActiveDirectoryClientSettings.cs" />
     <Compile Include="Configuration\AzureClientApplicationSettings.cs" />
+    <Compile Include="Configuration\EncryptionCertificateSettings.cs" />
     <Compile Include="Configuration\IAppConfiguration.cs" />
+    <Compile Include="Configuration\IdentityProviderSearchServiceConfigurationProvider.cs" />
     <Compile Include="Configuration\WebConfigProvider.cs" />
     <Compile Include="Constants\HttpResponseHeaders.cs" />
     <Compile Include="Constants\IdentityProviders.cs" />
@@ -243,6 +245,7 @@
     <Compile Include="Constants\SearchTypes.cs" />
     <Compile Include="Exceptions\AzureActiveDirectoryException.cs" />
     <Compile Include="Exceptions\BadRequestException.cs" />
+    <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Exceptions\InvalidExternalIdentityProviderException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -279,8 +282,10 @@
     <Compile Include="Services\Azure\AzureDirectoryProviderService.cs" />
     <Compile Include="Services\Azure\AzureActiveDirectoryClientCredentialsService.cs" />
     <Compile Include="Services\Azure\IAzureActiveDirectoryClientCredentialsService.cs" />
+    <Compile Include="Services\DecryptionService.cs" />
     <Compile Include="Services\DiscoveryServiceClient.cs" />
     <Compile Include="Services\IActiveDirectoryProxy.cs" />
+    <Compile Include="Services\ICertificateService.cs" />
     <Compile Include="Services\IExternalIdentityProviderService.cs" />
     <Compile Include="Services\Azure\IMicrosoftGraphApi.cs" />
     <Compile Include="Services\Azure\MicrosoftGraphApi.cs" />
@@ -293,6 +298,7 @@
     <Compile Include="Services\PrincipalQuery\IPrincipalQuery.cs" />
     <Compile Include="Services\PrincipalQuery\AzureWildcardQuery.cs" />
     <Compile Include="Services\PrincipalSearchService.cs" />
+    <Compile Include="Services\WindowsCertificateService.cs" />
     <Compile Include="SolutionInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
