@@ -19,5 +19,7 @@ namespace Fabric.IdentityProviderSearchService.Configuration
         IdentityServerConfidentialClientSettings IdentityServerConfidentialClientSettings { get; set; }
 
         AzureActiveDirectoryClientSettings AzureActiveDirectoryClientSettings { get; set; }
+
+        EncryptionCertificateSettings EncryptionCertificateSettings { get; set; }
     }
 }
