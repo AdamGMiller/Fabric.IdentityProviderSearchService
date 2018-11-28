@@ -23,7 +23,7 @@ namespace Fabric.IdentityProviderSearchService
             var appConfig = new AppConfiguration();
             ConfigurationBinder.Bind(configuration, appConfig);
 
-            var provider = new IdentityProviderSearchServiceConfigurationProvider(appConfig.EncryptionCertificateSettings, _certificateService, decryptionService);
+            var provider = new IdentityProviderSearchServiceConfigurationProvider(appConfig.EncryptionCertificateSettings, decryptionService);
             provider.GetAppConfiguration(appConfig);
 
             var logger = LogFactory.CreateTraceLogger(new LoggingLevelSwitch(), appConfig.ApplicationInsights);

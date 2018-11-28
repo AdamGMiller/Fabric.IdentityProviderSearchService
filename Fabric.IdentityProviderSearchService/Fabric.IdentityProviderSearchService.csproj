@@ -245,6 +245,7 @@
     <Compile Include="Constants\SearchTypes.cs" />
     <Compile Include="Exceptions\AzureActiveDirectoryException.cs" />
     <Compile Include="Exceptions\BadRequestException.cs" />
+    <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Exceptions\InvalidExternalIdentityProviderException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

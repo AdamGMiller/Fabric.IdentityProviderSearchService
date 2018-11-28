@@ -1,22 +1,16 @@
 ﻿using Fabric.IdentityProviderSearchService.Services;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Fabric.IdentityProviderSearchService.Configuration
 {
     public class IdentityProviderSearchServiceConfigurationProvider
     {
-        private ICertificateService _certificateService;
         private DecryptionService _decryptionService;
         private EncryptionCertificateSettings _encryptionCertificateSettings;
 
-        public IdentityProviderSearchServiceConfigurationProvider(EncryptionCertificateSettings encryptionCertificateSettings, ICertificateService certificateService, DecryptionService decryptionService)
+        public IdentityProviderSearchServiceConfigurationProvider(EncryptionCertificateSettings encryptionCertificateSettings, DecryptionService decryptionService)
         {
             _encryptionCertificateSettings = encryptionCertificateSettings ?? throw new ArgumentNullException(nameof(encryptionCertificateSettings));
-            _certificateService = certificateService ?? throw new ArgumentNullException(nameof(certificateService));
             _decryptionService = decryptionService ?? throw new ArgumentNullException(nameof(decryptionService));
         }
 
@@ -28,7 +22,7 @@ namespace Fabric.IdentityProviderSearchService.Configuration
 
         private void DecryptEncryptedValues(IAppConfiguration appConfig)
         {
-            if(appConfig.EncryptionCertificateSettings != null)
+            if(_encryptionCertificateSettings != null)
             {
                 foreach (var setting in appConfig.AzureActiveDirectoryClientSettings.ClientAppSettings)
                 {
