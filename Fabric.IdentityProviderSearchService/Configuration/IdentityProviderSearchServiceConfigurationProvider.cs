@@ -22,7 +22,7 @@ namespace Fabric.IdentityProviderSearchService.Configuration
 
         private void DecryptEncryptedValues(IAppConfiguration appConfig)
         {
-            if(_encryptionCertificateSettings != null)
+            if(_encryptionCertificateSettings != null && appConfig.AzureActiveDirectoryClientSettings.ClientAppSettings != null)
             {
                 foreach (var setting in appConfig.AzureActiveDirectoryClientSettings.ClientAppSettings)
                 {
