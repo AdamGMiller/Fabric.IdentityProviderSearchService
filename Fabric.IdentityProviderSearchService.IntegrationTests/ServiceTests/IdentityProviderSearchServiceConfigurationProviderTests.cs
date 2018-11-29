@@ -35,7 +35,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests.ServiceTests
 
             // Assert
             Assert.NotNull(appConfig);
-            for (int i = 0; i <= count; i++)
+            for (int i = 0; i < count; i++)
             {
                 Assert.Equal(clientSecret, appConfig.AzureActiveDirectoryClientSettings.ClientAppSettings[i].ClientSecret);
             }
@@ -52,7 +52,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests.ServiceTests
         private string GetEncryptedAppSettings(RSA privateKey, string clientSecret, int appSettingsCount = 1)
         {
             var appSettingsList = new List<AzureClientApplicationSettings>();
-            for(int i = 0; i <= appSettingsCount; i++)
+            for(int i = 0; i < appSettingsCount; i++)
             {
                 appSettingsList.Add(new AzureClientApplicationSettings
                 {
