@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.ApiModels;
 using Fabric.IdentityProviderSearchService.Constants;
+using Fabric.IdentityProviderSearchService.Configuration;
 using Nancy;
 using Nancy.Testing;
 using Xunit;
@@ -14,7 +15,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
     {
         private readonly IntegrationTestsFixture _integrationTestsFixture;
         private readonly Browser _browser;
-        private readonly string identityProvider = "Azure";
+        private readonly string identityProvider = IdentityProviders.AzureActiveDirectory;
+        private readonly AppConfiguration _appConfig;
         public AzureDirectorySearchTests(IntegrationTestsFixture integrationTestsFixture)
         {
             _integrationTestsFixture = integrationTestsFixture;
@@ -24,12 +26,17 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             }, "testprincipal"));
 
             _browser = integrationTestsFixture.GetBrowser(claimsPrincipal, identityProvider);
+
+            _appConfig = new AppConfiguration
+            {
+                DomainName = "testing"
+            };
         }
 
         [Fact]
         public async Task SearchPrincipals_FindGroups_Succeeds_Async()
         {
-            var searchResult = await _browser.Get("/principals/Azure/search", with =>
+            var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/search", with =>
             {
                 with.HttpRequest();
                 with.Query("searchtext", "ITGroup");
@@ -47,7 +54,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task SearchPrincipals_FindGroupsWithTenant_Succeeds_Async()
         {
-            var searchResult = await _browser.Get("/principals/Azure/search", with =>
+            var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/search", with =>
             {
                 with.HttpRequest();
                 with.Query("searchtext", "ITGroup");
@@ -65,9 +72,72 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
+        public async Task SearchPrincipals_FindAzureUser_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("searchtext", "johnny");
+                with.Query("type", "user");
+                with.Query("tenantid", "2");
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
+            Assert.Equal(1, users.ResultCount);
+            Assert.Single(users.Principals.Select(p => p.IdentityProvider.Equals("Azure")));
+            Assert.Single(users.Principals.Select(p => p.PrincipalType.Equals("user")));
+            Assert.Single(users.Principals.Select(p => p.TenantId.Equals("tenantid")));
+            Assert.Single(users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipalName")));
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_FindAzureUsers_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("searchtext", "johnny");
+                with.Query("type", "user");
+                with.Query("tenantid", "1");
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
+            Assert.Equal(2, users.ResultCount);
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipalName")).Count());
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_FindUsers_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("searchtext", "johnny");
+                with.Query("type", "user");
+                with.Query("tenantid", "1");
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
+            Assert.Equal(2, users.ResultCount);
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipalName")).Count());
+        }
+
+        [Fact]
         public async Task SearchPrincipalsByGroup_FindGroup_Succeeds_Async()
         {
-            var searchResult = await _browser.Get("/principals/Azure/groups/IT", with =>
+            var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/groups/IT", with =>
             {
                 with.HttpRequest();
             });
@@ -84,7 +154,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         [Fact]
         public async Task SearchPrincipalsByGroup_FindGroupByTenant_Succeeds_Async()
         {
-            var searchResult = await _browser.Get("/principals/Azure/groups/IT", with =>
+            var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/groups/IT", with =>
             {
                 with.HttpRequest();
                 with.Query("tenantid", "2");

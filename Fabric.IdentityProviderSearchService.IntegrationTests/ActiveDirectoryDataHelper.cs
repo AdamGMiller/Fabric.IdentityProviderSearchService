@@ -42,17 +42,20 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var principals = new List<FabricGraphApiUser>
             {
                 CreateMicrosoftGraphUser("1", "jason soto"),
-                CreateMicrosoftGraphUser("1", "jorden lowe"),
-                CreateMicrosoftGraphUser("1", "ryan orbaker"),
-                CreateMicrosoftGraphUser("1", "michael vidal"),
-                CreateMicrosoftGraphUser("1", "brian smith"),
-                CreateMicrosoftGraphUser("1", "ken miller")
+                CreateMicrosoftGraphUser("2", "jorden lowe"),
+                CreateMicrosoftGraphUser("3", "ryan orbaker"),
+                CreateMicrosoftGraphUser("4", "michael vidal"),
+                CreateMicrosoftGraphUser("5", "brian smith"),
+                CreateMicrosoftGraphUser("6", "ken miller"),
+                CreateMicrosoftGraphUser("7", "johnny depp", "1"),
+                CreateMicrosoftGraphUser("8", "johnny cash", "1"),
+                CreateMicrosoftGraphUser("9", "johnny depp", "2")
             };
 
             return principals;
         }
 
-        private static FabricGraphApiUser CreateMicrosoftGraphUser(string id, string displayName)
+        private static FabricGraphApiUser CreateMicrosoftGraphUser(string id, string displayName, string tenantId = "null")
         {
             var user = new User()
             {
@@ -65,7 +68,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             return new FabricGraphApiUser(user)
             {
-                TenantId = "someId"
+                TenantId = tenantId
             };
         }
         
@@ -74,17 +77,17 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var principals = new List<FabricGraphApiGroup>
             {
                 CreateMicrosoftGraphGroup("1", "IT"),
-                CreateMicrosoftGraphGroup("1", "Fabric"),
-                CreateMicrosoftGraphGroup("1", "ITGroup"),
-                CreateMicrosoftGraphGroup("2", "ITGroup"),
-                CreateMicrosoftGraphGroup("1", "ITGrouper"),
-                CreateMicrosoftGraphGroup("2", "ITGrouper")
+                CreateMicrosoftGraphGroup("2", "Fabric"),
+                CreateMicrosoftGraphGroup("3", "ITGroup", "1"),
+                CreateMicrosoftGraphGroup("4", "ITGroup", "2"),
+                CreateMicrosoftGraphGroup("5", "ITGrouper", "1"),
+                CreateMicrosoftGraphGroup("6", "ITGrouper", "2")
             };
 
             return principals;
         }
 
-        private static FabricGraphApiGroup CreateMicrosoftGraphGroup(string id, string displayName)
+        private static FabricGraphApiGroup CreateMicrosoftGraphGroup(string id, string displayName, string tenantId = "someId")
         {
             var group = new Group
             {
@@ -93,7 +96,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             };
             return new FabricGraphApiGroup(group)
             {
-                TenantId = "someId"
+                TenantId = tenantId
             };
         }
     }

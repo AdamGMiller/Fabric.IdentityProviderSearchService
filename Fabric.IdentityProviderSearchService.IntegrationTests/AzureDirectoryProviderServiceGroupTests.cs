@@ -41,13 +41,14 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         public async Task FindGroupByGroupName_ValidGroup_SuccessAsync()
         {
             var searchText = _listGroups.First(g => g.Group.DisplayName == "Fabric").Group.DisplayName;
+            var GroupId = _listGroups.First(g => g.Group.DisplayName == "Fabric").Group.Id;
             this.SetupGraphClient(searchText, "Exact");
 
             var Group = await  _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Exact);
 
             Assert.NotNull(Group);
             Assert.True(1 == Group.Count());
-            Assert.Equal(_firstGroup.Group.Id, Group.First().ExternalIdentifier);
+            Assert.Equal(GroupId, Group.First().ExternalIdentifier);
             Assert.Equal(PrincipalType.Group, Group.First().PrincipalType);
         }
 

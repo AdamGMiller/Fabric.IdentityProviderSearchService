@@ -13,12 +13,6 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
     public static class AzureDirectoryMockExtensions
     {
-        private static IEnumerable<FabricGraphApiGroup> _allGroupResult;
-
-        private static IEnumerable<FabricGraphApiGroup> _allGroups;
-
-        private static IEnumerable<FabricGraphApiGroup> _listGroups;
-
         private static string getITGroupWildCard =
         "startswith(DisplayName, 'ITGroup')";
 
@@ -29,38 +23,57 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
         private static readonly string directorySearchForITGroup = "ITGroup";
 
+        private static string getUserWildCard =
+        "startswith(DisplayName, 'johnny') or startswith(GivenName, 'johnny') or startswith(UserPrincipalName, 'johnny') or startswith(Surname, 'johnny')";
 
-        private static readonly Func<FabricGraphApiGroup, string, bool> AzureSearchStartsWithPredicate =
+        private static string getUserExact =
+        "DisplayName eq 'johnny depp'";
+
+        private static readonly string directorySearchForUserJohnny = "johnny";
+
+        private static readonly string directorySearchForUserJohnnyD = "johnny depp";
+
+
+        private static readonly Func<FabricGraphApiGroup, string, bool> AzureGroupSearchStartsWithPredicate =
             (fg, searchText) =>
                 fg.Group.DisplayName.StartsWith(searchText, StringComparison.OrdinalIgnoreCase);
 
-        private static readonly Func<FabricGraphApiGroup, string, bool> AzureSearchEqualsPredicate =
+        private static readonly Func<FabricGraphApiGroup, string, bool> AzureGroupSearchEqualsPredicate =
             (fg, searchText) =>
                 fg.Group.DisplayName.Equals(searchText, StringComparison.OrdinalIgnoreCase);
 
+        private static readonly Func<FabricGraphApiUser, string, string, bool> AzureUserSearchStartsWithPredicate =
+            (fg, searchText, tenant) =>
+                fg.TenantId.Equals(tenant, StringComparison.OrdinalIgnoreCase) && fg.User.DisplayName.StartsWith(searchText, StringComparison.OrdinalIgnoreCase) ||
+                fg.User.GivenName.StartsWith(searchText, StringComparison.OrdinalIgnoreCase) ||
+                fg.User.UserPrincipalName.StartsWith(searchText, StringComparison.OrdinalIgnoreCase) ||
+                fg.User.Surname.StartsWith(searchText, StringComparison.OrdinalIgnoreCase);
 
-        public static Mock<IMicrosoftGraphApi> SetupAzureDirectoryGraph(this Mock<IMicrosoftGraphApi> mockAdGraph, IEnumerable<FabricGraphApiGroup> principals)
+        private static readonly Func<FabricGraphApiUser, string, bool> AzureUserSearchEqualsPredicate =
+            (fg, searchText) =>
+                fg.User.DisplayName.Equals(searchText, StringComparison.OrdinalIgnoreCase);
+
+
+        public static Mock<IMicrosoftGraphApi> SetupAzureDirectoryGraphGroups(this Mock<IMicrosoftGraphApi> mockAdGraphGroups, IEnumerable<FabricGraphApiGroup> principals)
         {
-            mockAdGraph.Setup(p => p.GetGroupCollectionsAsync(getITGroupWildCard, null))
+            mockAdGraphGroups.Setup(p => p.GetGroupCollectionsAsync(getITGroupWildCard, null))
             .Returns((string filterQuery, string tenantId) =>
             {
-                return Task.FromResult(principals.Where(g => g.Group.DisplayName.Contains(directorySearchForITGroup) &&
-                                             AzureSearchStartsWithPredicate(g, directorySearchForITGroup)));
+                return Task.FromResult(principals.Where(g => AzureGroupSearchStartsWithPredicate(g, directorySearchForITGroup)));
             });
 
-            mockAdGraph.Setup(p => p.GetGroupCollectionsAsync(getITGroupWildCard, "1"))
+            mockAdGraphGroups.Setup(p => p.GetGroupCollectionsAsync(getITGroupWildCard, "1"))
             .Returns((string filterQuery, string tenantId) =>
             {
-                return Task.FromResult(principals.Where(g => g.Group.DisplayName.Contains(directorySearchForITGroup) &&
-                                             AzureSearchStartsWithPredicate(g, directorySearchForITGroup)));
+                return Task.FromResult(principals.Where(g => AzureGroupSearchStartsWithPredicate(g, directorySearchForITGroup)));
             });
             
-            mockAdGraph.Setup(p => p.GetGroupCollectionsAsync(getITExact, null))
+            mockAdGraphGroups.Setup(p => p.GetGroupCollectionsAsync(getITExact, null))
             .Returns(() =>
             {
                 var groupEntry =
                     principals.FirstOrDefault(p =>
-                        AzureSearchEqualsPredicate(p, directorySearchForIT));
+                        AzureGroupSearchEqualsPredicate(p, directorySearchForIT));
 
                 if (groupEntry == null)
                 {
@@ -72,12 +85,12 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
                 return Task.FromResult((IEnumerable<FabricGraphApiGroup>)group);
             });
 
-            mockAdGraph.Setup(p => p.GetGroupCollectionsAsync(getITExact, "2"))
+            mockAdGraphGroups.Setup(p => p.GetGroupCollectionsAsync(getITExact, "2"))
             .Returns(() =>
             {
                 var groupEntry =
                     principals.FirstOrDefault(p =>
-                        AzureSearchEqualsPredicate(p, directorySearchForIT));
+                        AzureGroupSearchEqualsPredicate(p, directorySearchForIT));
 
                 if (groupEntry == null)
                 {
@@ -89,7 +102,67 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
                 return Task.FromResult((IEnumerable<FabricGraphApiGroup>)group);
             });
 
-            return mockAdGraph;
+            return mockAdGraphGroups;
+        }
+
+        public static Mock<IMicrosoftGraphApi> SetupAzureDirectoryGraphUsers(this Mock<IMicrosoftGraphApi> mockAdGraphUsers, IEnumerable<FabricGraphApiUser> principals)
+        {
+            mockAdGraphUsers.Setup(p => p.GetUserCollectionsAsync(getUserWildCard, null))
+            .Returns((string filterQuery, string tenantId) =>
+            {
+                return Task.FromResult(principals.Where(g => g.TenantId.Equals(tenantId, StringComparison.OrdinalIgnoreCase) && 
+                                                             AzureUserSearchStartsWithPredicate(g, directorySearchForUserJohnny, tenantId)));
+            });
+
+            mockAdGraphUsers.Setup(p => p.GetUserCollectionsAsync(getUserWildCard, "1"))
+            .Returns((string filterQuery, string tenantId) =>
+            {
+                return Task.FromResult(principals.Where(g => g.TenantId.Equals(tenantId, StringComparison.OrdinalIgnoreCase) && 
+                                                             AzureUserSearchStartsWithPredicate(g, directorySearchForUserJohnny, tenantId)));
+            });
+
+            mockAdGraphUsers.Setup(p => p.GetUserCollectionsAsync(getUserWildCard, "2"))
+            .Returns((string filterQuery, string tenantId) =>
+            {
+                return Task.FromResult(principals.Where(g => g.TenantId.Equals(tenantId, StringComparison.OrdinalIgnoreCase) &&
+                                                             AzureUserSearchStartsWithPredicate(g, directorySearchForUserJohnny, tenantId)));
+            });
+
+            mockAdGraphUsers.Setup(p => p.GetUserCollectionsAsync(getUserExact, null))
+            .Returns(() =>
+            {
+                var userEntry =
+                    principals.FirstOrDefault(p =>
+                        AzureUserSearchEqualsPredicate(p, directorySearchForUserJohnnyD));
+
+                if (userEntry == null)
+                {
+                    return null;
+                }
+
+                List<FabricGraphApiUser> user = new List<FabricGraphApiUser>();
+                user.Add(userEntry);
+                return Task.FromResult((IEnumerable<FabricGraphApiUser>)user);
+            });
+
+            mockAdGraphUsers.Setup(p => p.GetUserCollectionsAsync(getUserExact, "2"))
+            .Returns(() =>
+            {
+                var userEntry =
+                    principals.FirstOrDefault(p =>
+                        AzureUserSearchEqualsPredicate(p, directorySearchForUserJohnnyD));
+
+                if (userEntry == null)
+                {
+                    return null;
+                }
+
+                List<FabricGraphApiUser> user = new List<FabricGraphApiUser>();
+                user.Add(userEntry);
+                return Task.FromResult((IEnumerable<FabricGraphApiUser>)user);
+            });
+
+            return mockAdGraphUsers;
         }
     }
 }
