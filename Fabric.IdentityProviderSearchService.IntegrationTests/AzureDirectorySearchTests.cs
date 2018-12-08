@@ -72,6 +72,26 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         }
 
         [Fact]
+        public async Task SearchPrincipals_FindAzureUsersNoTenant_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/search", with =>
+            {
+                with.HttpRequest();
+                with.Query("searchtext", "johnny");
+                with.Query("type", "user");
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
+            Assert.Equal(3, users.ResultCount);
+            Assert.Equal(3, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
+            Assert.Equal(3, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
+            Assert.Equal(3, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
+            Assert.Equal(3, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")).Count());
+        }
+
+        [Fact]
         public async Task SearchPrincipals_FindAzureUser_Succeeds_Async()
         {
             var searchResult = await _browser.Get("/principals/" + IdentityProviders.AzureActiveDirectory + "/search", with =>
@@ -89,7 +109,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Single(users.Principals.Select(p => p.IdentityProvider.Equals("Azure")));
             Assert.Single(users.Principals.Select(p => p.PrincipalType.Equals("user")));
             Assert.Single(users.Principals.Select(p => p.TenantId.Equals("tenantid")));
-            Assert.Single(users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipalName")));
+            Assert.Single(users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")));
         }
 
         [Fact]
@@ -110,7 +130,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(2, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(2, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
             Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
-            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipalName")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")).Count());
         }
 
         [Fact]
@@ -131,7 +151,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(2, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(2, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
             Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
-            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipalName")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")).Count());
         }
 
         [Fact]

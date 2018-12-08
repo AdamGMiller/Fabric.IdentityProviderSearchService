@@ -100,8 +100,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(2, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
-            Assert.Equal(1, users.Principals.Count(p => p.IdentityProviderUserPrincipalName.Equals("testing\\patrick.jones")));
-            Assert.Equal(1, users.Principals.Count(p => p.IdentityProviderUserPrincipalName.Equals("testing\\patricia.smith")));
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("subjectId")).Count());
         }
       
         [Fact]
@@ -191,8 +190,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
             Assert.Equal(2, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
-            Assert.Equal(1, users.Principals.Count(p => p.IdentityProviderUserPrincipalName.Equals("testing\\patrick.jones")));
-            Assert.Equal(1, users.Principals.Count(p => p.IdentityProviderUserPrincipalName.Equals("testing\\patricia.smith")));
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("subjectId")).Count());
         }
 
         [Fact]
@@ -211,6 +209,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(3, users.ResultCount);
             Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
             Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("group")));
+            Assert.Equal(3, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("subjectId")).Count());
         }
     }
 }
