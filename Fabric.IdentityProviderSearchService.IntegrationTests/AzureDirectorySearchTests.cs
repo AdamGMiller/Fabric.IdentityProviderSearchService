@@ -29,7 +29,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             _appConfig = new AppConfiguration
             {
-                DomainName = "testing"
+                DomainName = "testingAzure"
             };
         }
 

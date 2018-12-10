@@ -70,28 +70,8 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for user with subject id: {searchRequest.SubjectId} {tenantInfo}");
                 var user = await _searchService.FindUserBySubjectIdAsync(searchRequest.SubjectId, searchRequest.TenantId);
-                if (user != null)
-                {
-                    principals.Add(new FabricPrincipalApiModel
-                    {
-                        FirstName = user?.FirstName,
-                        LastName = user?.LastName,
-                        MiddleName = user?.MiddleName,
-                        SubjectId = user?.SubjectId,
-                        TenantId = user?.TenantId,
-                        PrincipalType = user?.PrincipalType.ToString().ToLower(),
-                        IdentityProviderUserPrincipalName = user?.SubjectId
-                    });
 
-                    return new IdpSearchResultApiModel<FabricPrincipalApiModel>
-                    {
-                        Principals = principals,
-                        ResultCount = principals.Count
-                    };
-                }
-                else
-                {
-                    return new FabricPrincipalApiModel
+                return new FabricPrincipalApiModel
                     {
                         FirstName = user?.FirstName,
                         LastName = user?.LastName,
@@ -99,9 +79,8 @@ namespace Fabric.IdentityProviderSearchService.Modules
                         SubjectId = user?.SubjectId,
                         TenantId = user?.TenantId,
                         PrincipalType = user?.PrincipalType.ToString().ToLower(),
-                        IdentityProviderUserPrincipalName = user?.SubjectId
+                        IdentityProviderUserPrincipalName = user?.IdentityProviderUserPrincipalName
                     };
-                }
             }
             catch (InvalidExternalIdentityProviderException e)
             {
@@ -199,7 +178,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     TenantId = ug.TenantId,
                     IdentityProvider = ug.IdentityProvider,
                     PrincipalType = ug.PrincipalType.ToString().ToLower(),
-                    IdentityProviderUserPrincipalName = ug.IdentityProvider == "Windows" ? ug.SubjectId : ug.UserPrincipal
+                    IdentityProviderUserPrincipalName = ug.IdentityProviderUserPrincipalName
                 }));
 
                 return new IdpSearchResultApiModel<FabricPrincipalApiModel>
@@ -256,7 +235,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     TenantId = ug.TenantId,
                     IdentityProvider = searchRequest.IdentityProvider,
                     PrincipalType = ug.PrincipalType.ToString().ToLower(),
-                    IdentityProviderUserPrincipalName = searchRequest.IdentityProvider == "Windows" ? ug.SubjectId : ug.UserPrincipal
+                    IdentityProviderUserPrincipalName = ug.IdentityProviderUserPrincipalName
                 }));
 
                 return new IdpSearchResultApiModel<FabricPrincipalApiModel>

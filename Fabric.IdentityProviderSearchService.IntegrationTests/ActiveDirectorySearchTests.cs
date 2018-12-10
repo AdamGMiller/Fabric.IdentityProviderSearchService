@@ -169,10 +169,9 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
-            Assert.Equal(1, users.ResultCount);
-            Assert.Single(users.Principals.Select(p => p.PrincipalType.Equals("user")));
-            Assert.Single(users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("subjectId")));
+            var users = searchResult.Body.DeserializeJson<FabricPrincipalApiModel>();
+            Assert.Equal("user", users.PrincipalType);
+            Assert.Equal(users.SubjectId, users.IdentityProviderUserPrincipalName);
         }
 
         [Fact]
@@ -205,11 +204,14 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
 
-            var users = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
-            Assert.Equal(3, users.ResultCount);
-            Assert.Equal(2, users.Principals.Count(p => p.PrincipalType.Equals("user")));
-            Assert.Equal(1, users.Principals.Count(p => p.PrincipalType.Equals("group")));
-            Assert.Equal(3, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("subjectId")).Count());
+            var usersAndGroups = searchResult.Body.DeserializeJson<IdpSearchResultApiModel<FabricPrincipalApiModel>>();
+            var userList = usersAndGroups.Principals.Where(p => p.PrincipalType.Equals("user"));
+            var groupList = usersAndGroups.Principals.Where(p => p.PrincipalType.Equals("group"));
+
+            Assert.Equal(2, userList.Count());
+            Assert.Single(groupList);
+            Assert.Equal(2, userList.Select(p => p.IdentityProviderUserPrincipalName.Equals("SubjectId")).Count());
+            Assert.Null(groupList.Select(p => p.IdentityProviderUserPrincipalName).Single());
         }
     }
 }

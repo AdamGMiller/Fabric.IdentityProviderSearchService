@@ -13,5 +13,6 @@
         public string IdentityProvider { get; set; }
         public string TenantId { get; set; }
         public PrincipalType PrincipalType { get; set; }
+        public string IdentityProviderUserPrincipalName { get; set; }
     }
 }
