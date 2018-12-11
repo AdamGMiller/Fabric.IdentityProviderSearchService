@@ -120,8 +120,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.GroupName}, SearchType={searchRequest.Type} {tenantId}");
 
-                var groups = await _searchService.SearchPrincipalsAsync<IFabricGroup>(searchRequest.GroupName, searchRequest.Type, SearchTypes.Exact, tenantId);
-
+                var groups = await _searchService.SearchGroupsAsync(searchRequest.GroupName, SearchTypes.Exact, tenantId);
                 principals.AddRange(groups.Select(g => new FabricGroupApiModel
                 {
                     ExternalIdentifier = g.ExternalIdentifier,
@@ -164,8 +163,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.SearchText}, SearchType={searchRequest.Type} {searchRequest.TenantId}");
 
-                var usersAndGroups = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId).ConfigureAwait(false);
-
+                var usersAndGroups = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId).ConfigureAwait(false);
                 principals.AddRange(usersAndGroups.Select(ug => new FabricPrincipalApiModel
                 {
                     UserPrincipal = ug.UserPrincipal,
@@ -221,7 +219,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 _logger.Information($"searching for groups with IdentityProvider={searchRequest.IdentityProvider}, GroupName={searchRequest.SearchText}, SearchType={searchRequest.Type} {tenantInfo}");
 
-                var usersAndGroups = await _searchService.SearchPrincipalsAsync<IFabricPrincipal>(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId);
+                var usersAndGroups = await _searchService.SearchPrincipalsAsync(searchRequest.SearchText, searchRequest.Type, SearchTypes.Wildcard, searchRequest.TenantId);
 
                 principals.AddRange(usersAndGroups.Select(ug => new FabricPrincipalApiModel
                 {

@@ -15,7 +15,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             _externalIdentityProviderServices = externalIdentityProviderService;
         }
 
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, string principalTypeString, string searchType, string tenantId = null)
+        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(string searchText, string principalTypeString, string searchType, string tenantId = null)
         {           
             PrincipalType principalType;
             if (string.IsNullOrEmpty(principalTypeString))
@@ -35,10 +35,10 @@ namespace Fabric.IdentityProviderSearchService.Services
                 throw new BadRequestException("invalid principal type provided. valid values are 'user' and 'group'");
             }
 
-            var result = new List<T>();
+            var result = new List<IFabricPrincipal>();
             foreach (var service in _externalIdentityProviderServices)
             {
-               result.AddRange(await service.SearchPrincipalsAsync<T>(searchText, principalType, searchType, tenantId).ConfigureAwait(false));
+               result.AddRange(await service.SearchPrincipalsAsync(searchText, principalType, searchType, tenantId).ConfigureAwait(false));
             }
             return result;
         }
@@ -55,6 +55,16 @@ namespace Fabric.IdentityProviderSearchService.Services
             }
 
             return null;
+        }
+
+        public async Task<IEnumerable<IFabricGroup>> SearchGroupsAsync(string searchText, string searchType, string tenantId = null)
+        {
+            var groups = new List<IFabricGroup>();
+            foreach (var service in _externalIdentityProviderServices)
+            {
+                groups.AddRange(await service.SearchGroupsAsync(searchText, searchType, tenantId).ConfigureAwait(false));
+            }
+            return groups;
         }
     }
 }

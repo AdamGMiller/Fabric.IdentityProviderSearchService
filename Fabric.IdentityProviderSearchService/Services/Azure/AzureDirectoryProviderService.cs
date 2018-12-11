@@ -19,11 +19,11 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
         {
             _graphApi = graphApi;
         }
-        
+
         public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantId = null)
         {
             var result = await _graphApi.GetUserAsync(subjectId, tenantId).ConfigureAwait(false);
-            if(result == null)
+            if (result == null)
             {
                 return null;
             }
@@ -33,7 +33,11 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return principal;
         }
 
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string tenantId = null)
+        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(
+            string searchText,
+            PrincipalType principalType,
+            string searchType,
+            string tenantId = null)
         {
             switch (searchType)
             {
@@ -50,12 +54,37 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             switch (principalType)
             {
                 case PrincipalType.User:
-                    return (IEnumerable<T>) await GetUserPrincipalsAsync(searchText, tenantId).ConfigureAwait(false);
+                    return await GetUserPrincipalsAsync(searchText, tenantId).ConfigureAwait(false);
                 case PrincipalType.Group:
-                    return await GetGroupPrincipalsAsync<T>(searchText, tenantId).ConfigureAwait(false);
+                    return await GetGroupPrincipalsAsync(searchText, tenantId).ConfigureAwait(false);
                 default:
-                    return (IEnumerable<T>) await GetUserAndGroupPrincipalsAsync(searchText, tenantId).ConfigureAwait(false);
+                    return await GetUserAndGroupPrincipalsAsync(searchText, tenantId).ConfigureAwait(false);
             }
+        }
+
+        public async Task<IEnumerable<IFabricGroup>> SearchGroupsAsync(string searchText, string searchType, string tenantId = null)
+        {
+            var fabricGroups = new List<IFabricGroup>();
+
+            switch (searchType)
+            {
+                case SearchTypes.Wildcard:
+                    _azureQuery = new AzureWildcardQuery();
+                    break;
+                case SearchTypes.Exact:
+                    _azureQuery = new AzureExactMatchQuery();
+                    break;
+                default:
+                    throw new Exception($"{searchType} is not a valid search type");
+            }
+
+            var queryText = _azureQuery.QueryText(searchText, PrincipalType.Group);
+            var fabricGraphApiGroups = await GetAllGroupsFromTenantsAsync(queryText, tenantId);
+            foreach (var fabricGraphApiGroup in fabricGraphApiGroups)
+            {
+                fabricGroups.Add(CreateFabricGroup(fabricGraphApiGroup));
+            }
+            return fabricGroups;
         }
 
         private async Task<IEnumerable<IFabricPrincipal>> GetUserAndGroupPrincipalsAsync(string searchText, string tenantId = null)
@@ -63,9 +92,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             try
             {
                 var userSearchTask = GetUserPrincipalsAsync(searchText, tenantId);
-
-                var groupSearchTask = GetGroupPrincipalsAsync<IFabricPrincipal>(searchText, tenantId);
-
+                var groupSearchTask = GetGroupPrincipalsAsync(searchText, tenantId);
                 var results = await Task.WhenAll(userSearchTask, groupSearchTask).ConfigureAwait(false);
                 return results.SelectMany(result => result);
             }
@@ -81,7 +108,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             var principals = new List<IFabricPrincipal>();
             try
             {
-                queryText = GetQueryText(searchText, PrincipalType.User);
+                queryText = _azureQuery.QueryText(searchText, PrincipalType.User);
                 var users = await GetAllUsersFromTenantsAsync(queryText, tenantId).ConfigureAwait(false);
 
                 foreach (var result in users)
@@ -102,20 +129,20 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
            return await _graphApi.GetUserCollectionsAsync(searchText, tenantId).ConfigureAwait(false);
         }
 
-        private async Task<IEnumerable<T>> GetGroupPrincipalsAsync<T>(string searchText, string tenantId = null)
+        private async Task<IEnumerable<IFabricPrincipal>> GetGroupPrincipalsAsync(string searchText, string tenantId = null)
         {
             string queryText = null;
-            var principals = new List<T>();
+            var principals = new List<IFabricPrincipal>();
             try
             {
-                queryText = GetQueryText(searchText, PrincipalType.Group);
+                queryText = _azureQuery.QueryText(searchText, PrincipalType.Group);
                 var groups = await GetAllGroupsFromTenantsAsync(queryText, tenantId).ConfigureAwait(false);
 
                 if (groups != null)
                 {
                     foreach (var result in groups)
                     {
-                        principals.Add(CreateGroupPrincipal<T>(result));
+                        principals.Add(CreateGroupPrincipal(result));
                     }
 
                     return principals;
@@ -133,7 +160,7 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return await _graphApi.GetGroupCollectionsAsync(searchText, tenantId).ConfigureAwait(false);
         }
 
-        private IFabricPrincipal CreateUserPrincipal(FabricGraphApiUser userEntry)
+        private static IFabricPrincipal CreateUserPrincipal(FabricGraphApiUser userEntry)
         {
             var principal = new FabricPrincipal
             {
@@ -152,41 +179,31 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
             return principal;
         }
 
-        private T CreateGroupPrincipal<T>(FabricGraphApiGroup groupEntry)
+        private static IFabricPrincipal CreateGroupPrincipal(FabricGraphApiGroup groupEntry)
         {
-            var modelType = typeof(T);
-            if (modelType == typeof(IFabricGroup))
+            var result = new FabricPrincipal
             {
-                object result = new FabricGroup
-                {
-                    ExternalIdentifier = groupEntry.Group.Id,
-                    TenantId = groupEntry.TenantId,
-                    GroupName = groupEntry.Group.DisplayName,
-                    IdentityProvider = IdentityProviders.AzureActiveDirectory,
-                    PrincipalType = PrincipalType.Group
-                };
-                return (T)result;
-            }
-            if (modelType == typeof(IFabricPrincipal))
-            {
-                object result = new FabricPrincipal
-                {
-                    SubjectId = groupEntry.Group.DisplayName,
-                    ExternalIdentifier = groupEntry.Group.Id,
-                    TenantId = groupEntry.TenantId,
-                    DisplayName = groupEntry.Group.DisplayName,
-                    IdentityProvider = IdentityProviders.AzureActiveDirectory,
-                    PrincipalType = PrincipalType.Group
-                };
-                return (T)result;
-            }
+                SubjectId = groupEntry.Group.DisplayName,
+                ExternalIdentifier = groupEntry.Group.Id,
+                TenantId = groupEntry.TenantId,
+                DisplayName = groupEntry.Group.DisplayName,
+                IdentityProvider = IdentityProviders.AzureActiveDirectory,
+                PrincipalType = PrincipalType.Group
+            };
 
-            return default(T);
+            return result;
         }
 
-        private string GetQueryText (string searchText, PrincipalType principalType)
+        private static IFabricGroup CreateFabricGroup(FabricGraphApiGroup groupEntry)
         {
-            return _azureQuery.QueryText(searchText, principalType);
+            return new FabricGroup
+            {
+                ExternalIdentifier = groupEntry.Group.Id,
+                TenantId = groupEntry.TenantId,
+                GroupName = groupEntry.Group.DisplayName,
+                IdentityProvider = IdentityProviders.AzureActiveDirectory,
+                PrincipalType = PrincipalType.Group
+            };
         }
     }
 }

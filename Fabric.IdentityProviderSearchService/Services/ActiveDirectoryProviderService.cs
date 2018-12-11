@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Fabric.IdentityProviderSearchService.Configuration;
 using Fabric.IdentityProviderSearchService.Constants;
@@ -14,12 +15,18 @@ namespace Fabric.IdentityProviderSearchService.Services
         private readonly IActiveDirectoryProxy _activeDirectoryProxy;
         private readonly string _domain;
         private IActiveDirectoryQuery _activeDirectoryQuery;
+
         public ActiveDirectoryProviderService(IActiveDirectoryProxy activeDirectoryProxy, IAppConfiguration appConfig)
         {
             _activeDirectoryProxy = activeDirectoryProxy;
             _domain = appConfig.DomainName;
         }
-        public async Task<IEnumerable<T>> SearchPrincipalsAsync<T>(string searchText, PrincipalType principalType, string searchType, string tenantId = null)
+
+        public async Task<IEnumerable<IFabricPrincipal>> SearchPrincipalsAsync(
+            string searchText,
+            PrincipalType principalType,
+            string searchType,
+            string tenantId = null)
         {
             switch (searchType)
             {
@@ -34,7 +41,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             }
             var ldapQuery = _activeDirectoryQuery.QueryText(searchText, principalType);
             var principals = await Task.Run(() => FindPrincipalsWithDirectorySearcher(ldapQuery)).ConfigureAwait(false);
-            return (IEnumerable<T>)principals;
+            return principals;
         }
 
         public async Task<IFabricPrincipal> FindUserBySubjectIdAsync(string subjectId, string tenantId = null)
@@ -56,8 +63,27 @@ namespace Fabric.IdentityProviderSearchService.Services
             }
 
             var principal = CreateUserPrincipal(subject);
-
             return principal;
+        }
+
+        public Task<IEnumerable<IFabricGroup>> SearchGroupsAsync(
+            string searchText,
+            string searchType,
+            string tenantId = null)
+        {
+            var fabricGroups = new List<IFabricGroup>();
+
+            var ldapQuery = _activeDirectoryQuery.QueryText(searchText, PrincipalType.Group);
+            var searchResults = _activeDirectoryProxy.SearchDirectory(ldapQuery);
+
+            foreach (var searchResult in searchResults)
+            {
+                if (!IsDirectoryEntryAUser(searchResult))
+                {
+                    fabricGroups.Add(CreateFabricGroup(searchResult));
+                }
+            }
+            return Task.FromResult(fabricGroups.AsEnumerable());
         }
 
         private IEnumerable<IFabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
@@ -75,7 +101,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             return principals;
         }
 
-        private bool IsDirectoryEntryAUser(IDirectoryEntry entryResult)
+        private static bool IsDirectoryEntryAUser(IDirectoryEntry entryResult)
         {
             // TODO: Add to constants file
             return entryResult.SchemaClassName.Equals("user");
@@ -99,7 +125,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             principal.DisplayName = $"{principal.FirstName} {principal.LastName}";
             return principal;
         }
-        private IFabricPrincipal CreateUserPrincipal(IFabricPrincipal userEntry)
+        private static IFabricPrincipal CreateUserPrincipal(IFabricPrincipal userEntry)
         {
             var principal = new FabricPrincipal
             {
@@ -125,6 +151,17 @@ namespace Fabric.IdentityProviderSearchService.Services
             {
                 SubjectId = subjectId,
                 DisplayName = subjectId,
+                IdentityProvider = IdentityProviders.ActiveDirectory,
+                PrincipalType = PrincipalType.Group
+            };
+        }
+
+        private IFabricGroup CreateFabricGroup(IDirectoryEntry groupEntry)
+        {
+            var subjectId = GetSubjectId(groupEntry.Name);
+            return new FabricGroup
+            {
+                GroupName = subjectId,
                 IdentityProvider = IdentityProviders.ActiveDirectory,
                 PrincipalType = PrincipalType.Group
             };

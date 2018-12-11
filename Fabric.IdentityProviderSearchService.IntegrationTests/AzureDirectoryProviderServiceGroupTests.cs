@@ -15,7 +15,6 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         private Mock<IMicrosoftGraphApi> _mockGraphClient;
         private IEnumerable<FabricGraphApiGroup> _allGroups;
         private IEnumerable<FabricGraphApiGroup> _emptyGroups;
-        private IEnumerable<FabricGraphApiGroup> _oneGroupResult;
         private IEnumerable<FabricGraphApiGroup> _allGroupResult;
         private FabricGraphApiGroup _firstGroup;
         private IEnumerable<FabricGraphApiGroup> _listGroups;
@@ -31,7 +30,6 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             _firstGroup = _allGroups.First();
             _listGroups = _allGroups.ToList();
             _emptyGroups = new List<FabricGraphApiGroup>();
-            _oneGroupResult = new List<FabricGraphApiGroup>() { _firstGroup };
 
             _mockGraphClient.Setup(p => p.GetGroupCollectionsAsync(It.IsAny<string>(), null))
                             .Returns(Task.FromResult(_emptyGroups));
@@ -44,7 +42,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             var GroupId = _listGroups.First(g => g.Group.DisplayName == "Fabric").Group.Id;
             this.SetupGraphClient(searchText, "Exact");
 
-            var Group = await  _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Exact);
+            var Group = await  _providerService.SearchPrincipalsAsync(searchText, PrincipalType.Group, SearchTypes.Exact);
 
             Assert.NotNull(Group);
             Assert.True(1 == Group.Count());
@@ -57,7 +55,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var searchText = _listGroups.First(g => g.Group.DisplayName == "ITGroup").Group.DisplayName;
             this.SetupGraphClient(searchText, "Exact");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Exact);
+            var principals = await _providerService.SearchPrincipalsAsync(searchText, PrincipalType.Group, SearchTypes.Exact);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 2);
@@ -67,7 +65,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         public async Task FindGroupByGroupName_InvalidGroupName_NullResultAsync()
         {
             this.SetupGraphClient("not found", "Exact");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>($"not found", PrincipalType.Group, SearchTypes.Exact);
+            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.Group, SearchTypes.Exact);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);
@@ -77,7 +75,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         public async Task FindGroupsThatContainGroupName_InvalidGroupName_NullResultAsync()
         {
             this.SetupGraphClient("not found", "Wild");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>($"not found", PrincipalType.Group, SearchTypes.Wildcard);
+            var principals = await _providerService.SearchPrincipalsAsync($"not found", PrincipalType.Group, SearchTypes.Wildcard);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 0);
@@ -88,7 +86,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
         {
             var searchText = _listGroups.First(g => g.Group.DisplayName == "ITGroup").Group.DisplayName;
             this.SetupGraphClient(searchText, "Wild");
-            var principals = await _providerService.SearchPrincipalsAsync<IFabricGroup>(searchText, PrincipalType.Group, SearchTypes.Wildcard);
+            var principals = await _providerService.SearchPrincipalsAsync(searchText, PrincipalType.Group, SearchTypes.Wildcard);
 
             Assert.NotNull(principals);
             Assert.True(principals.Count() == 4);
