@@ -28,6 +28,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
         private static readonly string directorySearchForUserJohnny = "johnny";
 
+        private static readonly string directorySearchForJamesRocket = "testingAzure\\james rocket";
+
         private static readonly Func<FabricGraphApiGroup, string, bool> AzureGroupSearchStartsWithPredicate =
             (fg, searchText) =>
                 fg.Group.DisplayName.StartsWith(searchText, StringComparison.OrdinalIgnoreCase);
@@ -117,6 +119,17 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             });
 
             return mockAdGraphUsers;
+        }
+
+        public static Mock<IMicrosoftGraphApi> SetupAzureDirectoryGraphUser(this Mock<IMicrosoftGraphApi> mockAdGraphUser, FabricGraphApiUser principal)
+        {
+            mockAdGraphUser.Setup(p => p.GetUserAsync(directorySearchForJamesRocket, null))
+            .Returns((string subjectId, string tenantId) => Task.FromResult(principal));
+            
+
+            mockAdGraphUser.Setup(p => p.GetUserAsync(directorySearchForJamesRocket, "1"))
+            .Returns((string subjectId, string tenantId) => Task.FromResult(principal));
+            return mockAdGraphUser;
         }
     }
 }

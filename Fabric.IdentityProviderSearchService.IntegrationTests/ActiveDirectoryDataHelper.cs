@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Fabric.IdentityProviderSearchService.Constants;
 using Fabric.IdentityProviderSearchService.Models;
 using Microsoft.Graph;
@@ -49,12 +50,20 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
                 CreateMicrosoftGraphUser("6", "ken miller"),
                 CreateMicrosoftGraphUser("7", "johnny depp", "1"),
                 CreateMicrosoftGraphUser("8", "johnny cash", "1"),
-                CreateMicrosoftGraphUser("9", "johnny depp", "2")
+                CreateMicrosoftGraphUser("9", "johnny depp", "2"),
+                CreateMicrosoftGraphUser("testingAzure\\james rocket", "james rocket", "1")
             };
 
             return principals;
         }
-
+        public FabricGraphApiUser GetMicrosoftGraphUser(string id, string displayName, string tenantId = "null")
+        {
+            var principals = GetMicrosoftGraphUsers();
+            var principalSearchList = (List<FabricGraphApiUser>)principals;
+            Predicate<FabricGraphApiUser> userFinder = (FabricGraphApiUser u) => { return u.User.Id == id && u.User.DisplayName == displayName && u.TenantId == tenantId; };
+            return principalSearchList.Find(userFinder);
+        }
+    
         private static FabricGraphApiUser CreateMicrosoftGraphUser(string id, string displayName, string tenantId = "null")
         {
             var user = new User()

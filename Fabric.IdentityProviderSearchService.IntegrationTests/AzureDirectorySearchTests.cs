@@ -68,7 +68,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(4, groups.ResultCount);
             Assert.Equal(4, groups.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(4, groups.Principals.Select(p => p.PrincipalType.Equals("group")).Count());
-            Assert.Equal(4, groups.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
+            Assert.Equal(4, groups.Principals.Select(p => p.TenantId.Equals("TenantId")).Count());
         }
 
         [Fact]
@@ -87,8 +87,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(3, users.ResultCount);
             Assert.Equal(3, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(3, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
-            Assert.Equal(3, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
-            Assert.Equal(3, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")).Count());
+            Assert.Equal(3, users.Principals.Select(p => p.TenantId.Equals("TenantId")).Count());
+            Assert.Equal(3, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("UserPrincipal")).Count());
         }
 
         [Fact]
@@ -108,8 +108,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(1, users.ResultCount);
             Assert.Single(users.Principals.Select(p => p.IdentityProvider.Equals("Azure")));
             Assert.Single(users.Principals.Select(p => p.PrincipalType.Equals("user")));
-            Assert.Single(users.Principals.Select(p => p.TenantId.Equals("tenantid")));
-            Assert.Single(users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")));
+            Assert.Single(users.Principals.Select(p => p.TenantId.Equals("TenantId")));
+            Assert.Single(users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("UserPrincipal")));
         }
 
         [Fact]
@@ -129,8 +129,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(2, users.ResultCount);
             Assert.Equal(2, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(2, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
-            Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
-            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("TenantId")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("UserPrincipal")).Count());
         }
 
         [Fact]
@@ -150,8 +150,8 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Equal(2, users.ResultCount);
             Assert.Equal(2, users.Principals.Select(p => p.IdentityProvider.Equals("Azure")).Count());
             Assert.Equal(2, users.Principals.Select(p => p.PrincipalType.Equals("user")).Count());
-            Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("tenantid")).Count());
-            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("userPrincipal")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.TenantId.Equals("TenantId")).Count());
+            Assert.Equal(2, users.Principals.Select(p => p.IdentityProviderUserPrincipalName.Equals("UserPrincipal")).Count());
         }
 
         [Fact]
@@ -188,6 +188,40 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
             Assert.Single(groups.Principals.Select(p => p.GroupName.Equals("IT")));
             Assert.Single(groups.Principals.Select(p => p.TenantId.Equals("2")));
             Assert.Single(groups.Principals.Select(p => p.PrincipalType.Equals("group")));
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_FindUserNoTenant_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/user", with =>
+            {
+                with.HttpRequest();
+                with.Query("subjectId", $"{ _appConfig.DomainName}\\james rocket");
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var user = searchResult.Body.DeserializeJson<FabricPrincipalApiModel>();
+            Assert.Equal("user", user.PrincipalType);
+            Assert.Equal(user.UserPrincipal, user.IdentityProviderUserPrincipalName);
+        }
+
+        [Fact]
+        public async Task SearchPrincipals_FindUser_Succeeds_Async()
+        {
+            var searchResult = await _browser.Get("/principals/user", with =>
+            {
+                with.HttpRequest();
+                with.Query("subjectId", $"{ _appConfig.DomainName}\\james rocket");
+                with.Query("tenantid", "1");
+            });
+
+            Assert.Equal(HttpStatusCode.OK, searchResult.StatusCode);
+
+            var user = searchResult.Body.DeserializeJson<FabricPrincipalApiModel>();
+            Assert.Equal("user", user.PrincipalType);
+            Assert.Equal("1", user.TenantId);
+            Assert.Equal(user.UserPrincipal, user.IdentityProviderUserPrincipalName);
         }
     }
 }

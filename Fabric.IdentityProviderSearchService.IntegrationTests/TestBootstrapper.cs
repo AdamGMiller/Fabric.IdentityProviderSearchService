@@ -36,6 +36,7 @@ namespace Fabric.IdentityProviderSearchService.IntegrationTests
 
             var mockGraph = new Mock<IMicrosoftGraphApi>()
                 .SetupAzureDirectoryGraphUsers(new ActiveDirectoryDataHelper().GetMicrosoftGraphUsers())
+                .SetupAzureDirectoryGraphUser(new ActiveDirectoryDataHelper().GetMicrosoftGraphUser("testingAzure\\james rocket", "james rocket", "1"))
                 .SetupAzureDirectoryGraphGroups(new ActiveDirectoryDataHelper().GetMicrosoftGraphGroups());
             container.Register(mockGraph.Object);
         }

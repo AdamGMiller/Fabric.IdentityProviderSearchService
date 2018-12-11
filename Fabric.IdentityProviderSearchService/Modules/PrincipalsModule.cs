@@ -60,7 +60,6 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
             try
             {
-                var principals = new List<FabricPrincipalApiModel>();
                 string tenantInfo = null;
 
                 if (!string.IsNullOrEmpty(searchRequest.TenantId))
@@ -73,6 +72,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
 
                 return new FabricPrincipalApiModel
                     {
+                        UserPrincipal = user?.UserPrincipal,
                         FirstName = user?.FirstName,
                         LastName = user?.LastName,
                         MiddleName = user?.MiddleName,
