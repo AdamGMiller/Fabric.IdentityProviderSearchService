@@ -71,14 +71,16 @@ namespace Fabric.IdentityProviderSearchService.Modules
                 var user = await _searchService.FindUserBySubjectIdAsync(searchRequest.SubjectId, searchRequest.TenantId);
 
                 return new FabricPrincipalApiModel
-                {
-                    FirstName = user?.FirstName,
-                    LastName = user?.LastName,
-                    MiddleName = user?.MiddleName,
-                    SubjectId = user?.SubjectId,
-                    TenantId = user?.TenantId,
-                    PrincipalType = user?.PrincipalType.ToString().ToLower()
-                };
+                    {
+                        UserPrincipal = user?.UserPrincipal,
+                        FirstName = user?.FirstName,
+                        LastName = user?.LastName,
+                        MiddleName = user?.MiddleName,
+                        SubjectId = user?.SubjectId,
+                        TenantId = user?.TenantId,
+                        PrincipalType = user?.PrincipalType.ToString().ToLower(),
+                        IdentityProviderUserPrincipalName = user?.IdentityProviderUserPrincipalName
+                    };
             }
             catch (InvalidExternalIdentityProviderException e)
             {
@@ -175,7 +177,8 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     ExternalIdentifier = ug.ExternalIdentifier,
                     TenantId = ug.TenantId,
                     IdentityProvider = ug.IdentityProvider,
-                    PrincipalType = ug.PrincipalType.ToString().ToLower()
+                    PrincipalType = ug.PrincipalType.ToString().ToLower(),
+                    IdentityProviderUserPrincipalName = ug.IdentityProviderUserPrincipalName
                 }));
 
                 return new IdpSearchResultApiModel<FabricPrincipalApiModel>
@@ -231,7 +234,8 @@ namespace Fabric.IdentityProviderSearchService.Modules
                     ExternalIdentifier = ug.ExternalIdentifier,
                     TenantId = ug.TenantId,
                     IdentityProvider = searchRequest.IdentityProvider,
-                    PrincipalType = ug.PrincipalType.ToString().ToLower()
+                    PrincipalType = ug.PrincipalType.ToString().ToLower(),
+                    IdentityProviderUserPrincipalName = ug.IdentityProviderUserPrincipalName
                 }));
 
                 return new IdpSearchResultApiModel<FabricPrincipalApiModel>

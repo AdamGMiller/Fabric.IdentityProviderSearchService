@@ -144,8 +144,8 @@ namespace Fabric.IdentityProviderSearchService.Services.Azure
                 MiddleName = string.Empty,   // this value does not exist in the graph api
                 IdentityProvider = IdentityProviders.AzureActiveDirectory,
                 PrincipalType = PrincipalType.User,
-                SubjectId = userEntry.User.UserPrincipalName,
-                ExternalIdentifier = userEntry.User.Id
+                SubjectId = userEntry.User.Id,
+                IdentityProviderUserPrincipalName = userEntry.User.UserPrincipalName
             };
 
             principal.DisplayName = $"{principal.FirstName} {principal.LastName}";

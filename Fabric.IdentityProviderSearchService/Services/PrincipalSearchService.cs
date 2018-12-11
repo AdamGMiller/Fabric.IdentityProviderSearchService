@@ -47,7 +47,7 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             foreach (var service in _externalIdentityProviderServices)
             {
-                var subject = await service.FindUserBySubjectIdAsync(subjectId);
+                var subject = await service.FindUserBySubjectIdAsync(subjectId, tenantId);
                 if(subject != null)
                 {
                     return subject;

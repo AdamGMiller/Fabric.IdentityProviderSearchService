@@ -48,7 +48,16 @@ namespace Fabric.IdentityProviderSearchService.Services
             var domain = subjectIdParts[0];
             var accountName = subjectIdParts[subjectIdParts.Length - 1];
 
-            return await Task.Run(() => _activeDirectoryProxy.SearchForUser(Encoder.LdapFilterEncode(domain), Encoder.LdapFilterEncode(accountName))).ConfigureAwait(false);
+            var subject = await Task.Run(() => _activeDirectoryProxy.SearchForUser(Encoder.LdapFilterEncode(domain), Encoder.LdapFilterEncode(accountName))).ConfigureAwait(false);
+
+            if (subject == null)
+            {
+                return null;
+            }
+
+            var principal = CreateUserPrincipal(subject);
+
+            return principal;
         }
 
         private IEnumerable<IFabricPrincipal> FindPrincipalsWithDirectorySearcher(string ldapQuery)
@@ -83,7 +92,26 @@ namespace Fabric.IdentityProviderSearchService.Services
                 LastName = userEntry.LastName,
                 MiddleName = userEntry.MiddleName,
                 IdentityProvider = IdentityProviders.ActiveDirectory,
-                PrincipalType = PrincipalType.User
+                PrincipalType = PrincipalType.User,
+                IdentityProviderUserPrincipalName = subjectId
+            };
+
+            principal.DisplayName = $"{principal.FirstName} {principal.LastName}";
+            return principal;
+        }
+        private IFabricPrincipal CreateUserPrincipal(IFabricPrincipal userEntry)
+        {
+            var principal = new FabricPrincipal
+            {
+                UserPrincipal = userEntry.UserPrincipal,
+                TenantId = userEntry.TenantId,
+                FirstName = userEntry.FirstName,
+                LastName = userEntry.LastName,
+                MiddleName = userEntry.MiddleName, 
+                IdentityProvider = IdentityProviders.ActiveDirectory,
+                PrincipalType = PrincipalType.User,
+                SubjectId = userEntry.SubjectId,
+                IdentityProviderUserPrincipalName = userEntry.SubjectId
             };
 
             principal.DisplayName = $"{principal.FirstName} {principal.LastName}";
