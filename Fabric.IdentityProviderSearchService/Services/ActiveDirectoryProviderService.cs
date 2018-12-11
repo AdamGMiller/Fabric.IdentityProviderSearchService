@@ -73,6 +73,18 @@ namespace Fabric.IdentityProviderSearchService.Services
         {
             var fabricGroups = new List<IFabricGroup>();
 
+            switch (searchType)
+            {
+                case SearchTypes.Wildcard:
+                    _activeDirectoryQuery = new ActiveDirectoryWildcardQuery();
+                    break;
+                case SearchTypes.Exact:
+                    _activeDirectoryQuery = new ActiveDirectoryExactMatchQuery();
+                    break;
+                default:
+                    throw new Exception($"{searchType} is not a valid search type");
+            }
+
             var ldapQuery = _activeDirectoryQuery.QueryText(searchText, PrincipalType.Group);
             var searchResults = _activeDirectoryProxy.SearchDirectory(ldapQuery);
 
