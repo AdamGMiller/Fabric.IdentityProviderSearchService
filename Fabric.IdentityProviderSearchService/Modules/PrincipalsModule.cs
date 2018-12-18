@@ -86,13 +86,9 @@ namespace Fabric.IdentityProviderSearchService.Modules
             {
                 return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
-            catch (BadRequestException e)
+            catch (DirectorySearchException e)
             {
                 return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
-            }
-            catch (Exception e)
-            {
-                return CreateFailureResponse<object>(e.Message, HttpStatusCode.BadRequest);
             }
         }
 
@@ -140,7 +136,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             {
                 return CreateFailureResponse<FabricGroupApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
-            catch (BadRequestException e)
+            catch (DirectorySearchException e)
             {
                 return CreateFailureResponse<FabricGroupApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
@@ -189,7 +185,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             {
                 return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
-            catch (BadRequestException e)
+            catch (DirectorySearchException e)
             {
                 return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
@@ -246,7 +242,7 @@ namespace Fabric.IdentityProviderSearchService.Modules
             {
                 return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
             }
-            catch (BadRequestException e)
+            catch (DirectorySearchException e)
             {
                 return CreateFailureResponse<FabricPrincipalApiModel>(e.Message, HttpStatusCode.BadRequest);
             }

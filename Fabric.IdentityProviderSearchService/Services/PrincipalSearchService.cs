@@ -32,7 +32,7 @@ namespace Fabric.IdentityProviderSearchService.Services
             }
             else
             {
-                throw new BadRequestException("invalid principal type provided. valid values are 'user' and 'group'");
+                throw new DirectorySearchException("invalid principal type provided. valid values are 'user' and 'group'");
             }
 
             var result = new List<IFabricPrincipal>();

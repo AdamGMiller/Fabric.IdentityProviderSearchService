@@ -1,5 +1,6 @@
 ﻿using System;
 using Fabric.IdentityProviderSearchService.Constants;
+using Fabric.IdentityProviderSearchService.Exceptions;
 using Fabric.IdentityProviderSearchService.Models;
 
 namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
@@ -16,7 +17,7 @@ namespace Fabric.IdentityProviderSearchService.Services.PrincipalQuery
                 case PrincipalType.Group:
                     return $"DisplayName eq '{searchText}'";
                 default:
-                    throw new Exception($"Query type {principalType} not supported in Azure AD.");
+                    throw new DirectorySearchException($"Query type {principalType} not supported in Azure AD.");
             }
         }
     }
