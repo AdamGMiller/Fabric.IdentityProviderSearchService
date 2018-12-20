@@ -24,7 +24,7 @@ namespace Fabric.IdentityProviderSearchService.Infrastructure.PipelineHooks
             _logger.Error(exception, "Unhandled error on request: @{Url}. Error Message: @{Message}", context.Request.Url,
                 exception.Message);
 
-            var errorMessage = "There was an internal server error while processing the request.";
+            var errorMessage = $"There was an internal server error while processing the request: {exception.Message}.";
             errorMessage = isDevelopment ? $"{exception.Message} Stack Trace: {exception.StackTrace}" : errorMessage;
 
             context.NegotiationContext = new NegotiationContext();

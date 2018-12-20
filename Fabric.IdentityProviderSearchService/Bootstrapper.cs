@@ -41,7 +41,7 @@ namespace Fabric.IdentityProviderSearchService
                         ctx,
                         ex,
                         container.Resolve<IResponseNegotiator>(),
-                        true)); //TODO: find out how to determine if IsDevelopment is true
+                        _appConfig.IsDevelopment));
 
             pipelines.BeforeRequest += ctx => RequestHooks.RemoveContentTypeHeaderForGet(ctx);
             pipelines.BeforeRequest += ctx => RequestHooks.SetDefaultVersionInUrl(ctx);
